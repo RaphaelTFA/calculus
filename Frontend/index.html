@@ -1,1 +1,36 @@
 <!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>GBA Slide Explorer</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="min-h-screen bg-slate-900 text-slate-100">
+		<header class="mx-auto max-w-4xl px-4 py-8">
+			<h1 class="text-3xl font-semibold">GBA Slide Explorer</h1>
+			<p class="mt-2 text-sm text-slate-300">
+				Explore a fixed-camera, tile-based world inspired by classic handheld games. Use the arrow keys to move.
+			</p>
+		</header>
+		<main class="mx-auto flex max-w-4xl flex-col gap-6 px-4 pb-12">
+			<section class="flex flex-col items-center gap-4 rounded-lg bg-slate-800/70 p-6 shadow-lg">
+				<canvas
+					id="game-canvas"
+					width="320"
+					height="320"
+					class="rounded border border-slate-700 shadow-inner"
+				></canvas>
+				<div class="flex w-full flex-wrap items-center justify-between gap-2 text-sm">
+					<span id="slide-name" class="font-medium text-slate-200">Loading...</span>
+					<span id="player-coords" class="font-mono text-xs text-slate-400">(0, 0)</span>
+				</div>
+			</section>
+			<section class="rounded-lg bg-slate-800/70 p-6 shadow-lg">
+				<h2 class="text-lg font-semibold">Debug Console</h2>
+				<div id="debug-log" class="mt-3 h-40 overflow-y-auto rounded bg-slate-900/60 p-3 text-xs font-mono text-slate-300"></div>
+			</section>
+		</main>
+		<script src="./app.js" type="module"></script>
+	</body>
+</html>
