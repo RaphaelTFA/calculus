@@ -108,11 +108,6 @@ Mở trình duyệt và truy cập: **http://localhost:3000**
 - **SQLAlchemy** (async) + **SQLite**
 - **Pydantic** cho validation
 - **JWT** authentication
-
-### Backend
-- **C++17** với cpp-httplib
-- **SQLite3** database
-- **JWT** authentication
 - **bcrypt** password hashing
 
 ---
@@ -128,34 +123,32 @@ calculus/
 │   ├── API.md              # API documentation
 │   └── SLIDE_FORMAT.md     # Slide JSON format spec
 ├── backend/
-│   ├── CMakeLists.txt
-│   ├── include/
-│   │   ├── config.hpp
-│   │   ├── database/
-│   │   ├── models/
-│   │   ├── controllers/
-│   │   ├── services/
-│   │   └── utils/
-│   └── src/
-│       ├── main.cpp
-│       ├── server/
-│       ├── database/
-│       ├── controllers/
-│       └── utils/
+│   ├── requirements.txt    # Python dependencies
+│   └── app/
+│       ├── __init__.py
+│       ├── main.py         # FastAPI application
+│       ├── config.py       # Configuration
+│       ├── database.py     # Database setup
+│       ├── models.py       # SQLAlchemy models
+│       ├── schemas.py      # Pydantic schemas
+│       ├── auth.py         # Authentication
+│       └── routers/        # API route handlers
+│           ├── auth.py
+│           ├── progress.py
+│           ├── steps.py
+│           └── stories.py
 └── frontend/
     ├── index.html
-    ├── css/
-    │   ├── main.css
-    │   ├── animations.css
-    │   ├── slide-engine.css
-    │   └── components.css
-    └── js/
-        ├── app.js
-        ├── router.js
-        ├── store.js
-        ├── utils/
-        ├── pages/
-        └── slide-engine/
+    ├── package.json
+    ├── vite.config.js
+    ├── tailwind.config.js
+    └── src/
+        ├── main.jsx
+        ├── App.jsx
+        ├── index.css
+        ├── components/     # Reusable components
+        ├── pages/          # Page components
+        └── lib/            # Utilities & store
 ```
 
 ---
@@ -163,10 +156,10 @@ calculus/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- C++17 compiler (GCC 9+ / Clang 10+)
-- CMake 3.16+
-- SQLite3
-- (Optional) Node.js for frontend development server
+- **Python** 3.10+
+- **Node.js** 18+
+- **pip** (Python package manager)
+- **npm** (Node package manager)
 
 ---
 
@@ -233,7 +226,7 @@ MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 - Inspired by [Brilliant.org](https://brilliant.org), [Duolingo](https://duolingo.com), and [3Blue1Brown](https://3blue1brown.com)
 - [KaTeX](https://katex.org) for beautiful math rendering
 - [TailwindCSS](https://tailwindcss.com) for styling
-- [cpp-httplib](https://github.com/yhirose/cpp-httplib) for C++ HTTP server
+- [FastAPI](https://fastapi.tiangolo.com) for Python backend framework
 
 ---
 
