@@ -283,4 +283,4 @@ MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 ---
 
-<p align="center">Made with ❤️ for math learners everywhere</p>
+<p align="center">Made with ❤️ for math learners everywhere!</p>
