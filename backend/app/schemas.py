@@ -62,6 +62,7 @@ class StoryListResponse(BaseModel):
     chapter_count: int = 0
     progress: int = 0
     is_enrolled: bool = False
+    is_completed: bool = False
     
     class Config:
         from_attributes = True
@@ -99,6 +100,40 @@ class DashboardResponse(BaseModel):
 class StepCompleteRequest(BaseModel):
     score: int = 100
     time_spent_seconds: int = 0
+
+# Achievements
+class AchievementResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str]
+    icon: Optional[str]
+    category: Optional[str]
+    rarity: str
+    xp_reward: int
+    is_earned: bool = False
+    earned_at: Optional[datetime] = None
+    
+    class Config:
+        from_attributes = True
+
+# User Stats
+class UserStatsResponse(BaseModel):
+    total_xp: int
+    level: int
+    xp_to_next_level: int
+    current_streak: int
+    longest_streak: int
+    completed_steps: int
+    completed_stories: int
+    enrolled_stories: int
+    total_time_spent: int  # in seconds
+    achievements_earned: int
+    total_achievements: int
+
+class UserProgressResponse(BaseModel):
+    stats: UserStatsResponse
+    achievements: list[AchievementResponse]
+    recent_activity: list[dict]
 
 # Generic
 class SuccessResponse(BaseModel):

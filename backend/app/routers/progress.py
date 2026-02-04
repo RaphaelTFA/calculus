@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload, joinedload
 from app.database import get_db
-from app.models import User, Enrollment, Story, StepProgress, Chapter
-from app.schemas import DashboardResponse, StoryDetailResponse, ChapterResponse, StepResponse
+from app.models import User, Enrollment, Story, StepProgress, Chapter, Achievement, UserAchievement
+from app.schemas import (
+    DashboardResponse, StoryDetailResponse, ChapterResponse, StepResponse,
+    UserStatsResponse, UserProgressResponse, AchievementResponse
+)
 from app.auth import get_current_user
 from app.routers.stories import calculate_story_progress
 
@@ -29,7 +32,10 @@ async def get_dashboard(
     if enrollment:
         story_result = await db.execute(
             select(Story)
-            .options(selectinload(Story.chapters).selectinload(Chapter.steps))
+            .options(
+                selectinload(Story.chapters).selectinload(Chapter.steps),
+                joinedload(Story.category)
+            )
             .where(Story.id == enrollment.story_id)
         )
         story = story_result.scalar_one_or_none()
@@ -97,3 +103,189 @@ async def get_dashboard(
         level=level,
         next_level_xp=next_level_xp
     )
+
+
+@router.get("/stats", response_model=UserProgressResponse)
+async def get_user_progress(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get detailed user stats, achievements and recent activity"""
+    
+    # Completed steps count
+    completed_steps_result = await db.execute(
+        select(func.count(StepProgress.id)).where(
+            StepProgress.user_id == current_user.id,
+            StepProgress.is_completed == True
+        )
+    )
+    completed_steps = completed_steps_result.scalar() or 0
+    
+    # Total time spent
+    time_result = await db.execute(
+        select(func.sum(StepProgress.time_spent_seconds)).where(
+            StepProgress.user_id == current_user.id
+        )
+    )
+    total_time_spent = time_result.scalar() or 0
+    
+    # Enrolled stories count
+    enrolled_result = await db.execute(
+        select(func.count(Enrollment.id)).where(
+            Enrollment.user_id == current_user.id
+        )
+    )
+    enrolled_stories = enrolled_result.scalar() or 0
+    
+    # Completed stories (100% progress)
+    completed_stories = 0
+    enrollments_result = await db.execute(
+        select(Enrollment).where(Enrollment.user_id == current_user.id)
+    )
+    for enrollment in enrollments_result.scalars().all():
+        progress = await calculate_story_progress(db, current_user.id, enrollment.story_id)
+        if progress >= 100:
+            completed_stories += 1
+    
+    # All achievements
+    all_achievements_result = await db.execute(select(Achievement))
+    all_achievements = all_achievements_result.scalars().all()
+    
+    # User's earned achievements
+    earned_result = await db.execute(
+        select(UserAchievement).where(UserAchievement.user_id == current_user.id)
+    )
+    earned_achievements = {ua.achievement_id: ua.earned_at for ua in earned_result.scalars().all()}
+    
+    # Build achievements list
+    achievements = []
+    for ach in all_achievements:
+        achievements.append(AchievementResponse(
+            id=ach.id,
+            title=ach.title,
+            description=ach.description,
+            icon=ach.icon,
+            category=ach.category,
+            rarity=ach.rarity,
+            xp_reward=ach.xp_reward,
+            is_earned=ach.id in earned_achievements,
+            earned_at=earned_achievements.get(ach.id)
+        ))
+    
+    # Recent activity (last 10 completed steps)
+    recent_result = await db.execute(
+        select(StepProgress)
+        .options(selectinload(StepProgress.step))
+        .where(
+            StepProgress.user_id == current_user.id,
+            StepProgress.is_completed == True
+        )
+        .order_by(StepProgress.completed_at.desc())
+        .limit(10)
+    )
+    recent_progress = recent_result.scalars().all()
+    
+    recent_activity = []
+    for p in recent_progress:
+        recent_activity.append({
+            "type": "step_completed",
+            "step_id": p.step_id,
+            "step_title": p.step.title if p.step else "Unknown",
+            "xp_earned": p.step.xp_reward if p.step else 0,
+            "completed_at": p.completed_at.isoformat() if p.completed_at else None
+        })
+    
+    # Calculate level
+    level = current_user.xp // 100 + 1
+    xp_to_next = (level * 100) - current_user.xp
+    
+    stats = UserStatsResponse(
+        total_xp=current_user.xp,
+        level=level,
+        xp_to_next_level=xp_to_next,
+        current_streak=current_user.current_streak,
+        longest_streak=current_user.longest_streak,
+        completed_steps=completed_steps,
+        completed_stories=completed_stories,
+        enrolled_stories=enrolled_stories,
+        total_time_spent=total_time_spent,
+        achievements_earned=len(earned_achievements),
+        total_achievements=len(all_achievements)
+    )
+    
+    return UserProgressResponse(
+        stats=stats,
+        achievements=achievements,
+        recent_activity=recent_activity
+    )
+
+
+@router.post("/check-achievements")
+async def check_and_award_achievements(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Check and award any achievements the user has earned"""
+    
+    # Get all achievements not yet earned by user
+    subquery = select(UserAchievement.achievement_id).where(
+        UserAchievement.user_id == current_user.id
+    )
+    result = await db.execute(
+        select(Achievement).where(Achievement.id.notin_(subquery))
+    )
+    unearned = result.scalars().all()
+    
+    # Get user stats for checking
+    completed_steps_result = await db.execute(
+        select(func.count(StepProgress.id)).where(
+            StepProgress.user_id == current_user.id,
+            StepProgress.is_completed == True
+        )
+    )
+    completed_steps = completed_steps_result.scalar() or 0
+    
+    completed_stories = 0
+    enrollments_result = await db.execute(
+        select(Enrollment).where(Enrollment.user_id == current_user.id)
+    )
+    for enrollment in enrollments_result.scalars().all():
+        progress = await calculate_story_progress(db, current_user.id, enrollment.story_id)
+        if progress >= 100:
+            completed_stories += 1
+    
+    # Check each unearned achievement
+    newly_earned = []
+    for ach in unearned:
+        earned = False
+        
+        if ach.requirement_type == "xp" and current_user.xp >= ach.requirement_value:
+            earned = True
+        elif ach.requirement_type == "steps" and completed_steps >= ach.requirement_value:
+            earned = True
+        elif ach.requirement_type == "streak" and current_user.current_streak >= ach.requirement_value:
+            earned = True
+        elif ach.requirement_type == "stories" and completed_stories >= ach.requirement_value:
+            earned = True
+        
+        if earned:
+            user_ach = UserAchievement(
+                user_id=current_user.id,
+                achievement_id=ach.id
+            )
+            db.add(user_ach)
+            current_user.xp += ach.xp_reward
+            newly_earned.append({
+                "id": ach.id,
+                "title": ach.title,
+                "icon": ach.icon,
+                "xp_reward": ach.xp_reward
+            })
+    
+    if newly_earned:
+        await db.commit()
+    
+    return {
+        "newly_earned": newly_earned,
+        "total_xp": current_user.xp
+    }

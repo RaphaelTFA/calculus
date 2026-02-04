@@ -2,13 +2,53 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from app.database import get_db
 from app.models import Step, Slide, StepProgress, Chapter, Story, User
 from app.schemas import StepDetailResponse, SlideResponse, StepCompleteRequest
 from app.auth import get_current_user
 
 router = APIRouter(prefix="/steps", tags=["steps"])
+
+
+def update_streak(user: User) -> dict:
+    """Update user's streak based on activity dates.
+    Returns dict with streak info."""
+    today = date.today()
+    last_activity = user.last_activity_date.date() if user.last_activity_date else None
+    
+    streak_increased = False
+    streak_reset = False
+    
+    if last_activity is None:
+        # First activity ever
+        user.current_streak = 1
+        streak_increased = True
+    elif last_activity == today:
+        # Already active today, no change
+        pass
+    elif last_activity == today - timedelta(days=1):
+        # Active yesterday, continue streak
+        user.current_streak += 1
+        streak_increased = True
+    else:
+        # Missed at least one day, reset streak
+        user.current_streak = 1
+        streak_reset = True
+    
+    # Update longest streak if needed
+    if user.current_streak > user.longest_streak:
+        user.longest_streak = user.current_streak
+    
+    # Update last activity date
+    user.last_activity_date = datetime.now()
+    
+    return {
+        "current_streak": user.current_streak,
+        "longest_streak": user.longest_streak,
+        "streak_increased": streak_increased,
+        "streak_reset": streak_reset
+    }
 
 @router.get("/{step_id}", response_model=StepDetailResponse)
 async def get_step(step_id: int, db: AsyncSession = Depends(get_db)):
@@ -87,10 +127,14 @@ async def complete_step(
         xp_earned = step.xp_reward
         current_user.xp += xp_earned
     
+    # Update streak
+    streak_info = update_streak(current_user)
+    
     await db.commit()
     
     return {
         "success": True,
         "xp_earned": xp_earned,
-        "total_xp": current_user.xp
+        "total_xp": current_user.xp,
+        "streak": streak_info
     }

@@ -10,6 +10,7 @@ async def lifespan(app: FastAPI):
     # Startup
     await init_db()
     await seed_demo_data()
+    await seed_achievements()
     yield
     # Shutdown
 
@@ -408,3 +409,50 @@ async def seed_demo_data():
         
         await db.commit()
         print("✅ Demo data seeded với nội dung phong phú!")
+
+
+async def seed_achievements():
+    """Seed achievements data"""
+    from app.database import async_session
+    from app.models import Achievement
+    from sqlalchemy import select
+    
+    async with async_session() as db:
+        # Check if achievements exist
+        result = await db.execute(select(Achievement).limit(1))
+        if result.scalar_one_or_none():
+            return
+        
+        achievements_data = [
+            # XP milestones
+            {"title": "Người mới bắt đầu", "description": "Đạt 100 XP đầu tiên", "icon": "🌱", "category": "xp", "rarity": "common", "xp_reward": 10, "requirement_type": "xp", "requirement_value": 100},
+            {"title": "Sinh viên chăm chỉ", "description": "Đạt 500 XP", "icon": "📚", "category": "xp", "rarity": "common", "xp_reward": 25, "requirement_type": "xp", "requirement_value": 500},
+            {"title": "Nhà toán học trẻ", "description": "Đạt 1000 XP", "icon": "🎓", "category": "xp", "rarity": "uncommon", "xp_reward": 50, "requirement_type": "xp", "requirement_value": 1000},
+            {"title": "Bậc thầy giải tích", "description": "Đạt 5000 XP", "icon": "🏆", "category": "xp", "rarity": "rare", "xp_reward": 100, "requirement_type": "xp", "requirement_value": 5000},
+            {"title": "Huyền thoại toán học", "description": "Đạt 10000 XP", "icon": "👑", "category": "xp", "rarity": "legendary", "xp_reward": 200, "requirement_type": "xp", "requirement_value": 10000},
+            
+            # Steps milestones
+            {"title": "Bước đầu tiên", "description": "Hoàn thành bài học đầu tiên", "icon": "👣", "category": "progress", "rarity": "common", "xp_reward": 15, "requirement_type": "steps", "requirement_value": 1},
+            {"title": "Đang tiến bộ", "description": "Hoàn thành 5 bài học", "icon": "🚶", "category": "progress", "rarity": "common", "xp_reward": 30, "requirement_type": "steps", "requirement_value": 5},
+            {"title": "Học tập đều đặn", "description": "Hoàn thành 10 bài học", "icon": "🏃", "category": "progress", "rarity": "uncommon", "xp_reward": 50, "requirement_type": "steps", "requirement_value": 10},
+            {"title": "Không gì ngăn cản", "description": "Hoàn thành 25 bài học", "icon": "🚀", "category": "progress", "rarity": "rare", "xp_reward": 75, "requirement_type": "steps", "requirement_value": 25},
+            {"title": "Bền bỉ", "description": "Hoàn thành 50 bài học", "icon": "💪", "category": "progress", "rarity": "epic", "xp_reward": 100, "requirement_type": "steps", "requirement_value": 50},
+            
+            # Streak milestones
+            {"title": "Khởi động", "description": "Streak 3 ngày liên tiếp", "icon": "🔥", "category": "streak", "rarity": "common", "xp_reward": 20, "requirement_type": "streak", "requirement_value": 3},
+            {"title": "Tuần hoàn hảo", "description": "Streak 7 ngày liên tiếp", "icon": "⚡", "category": "streak", "rarity": "uncommon", "xp_reward": 50, "requirement_type": "streak", "requirement_value": 7},
+            {"title": "Tháng kiên trì", "description": "Streak 30 ngày liên tiếp", "icon": "🌟", "category": "streak", "rarity": "rare", "xp_reward": 150, "requirement_type": "streak", "requirement_value": 30},
+            {"title": "Kỷ luật thép", "description": "Streak 100 ngày liên tiếp", "icon": "💎", "category": "streak", "rarity": "legendary", "xp_reward": 500, "requirement_type": "streak", "requirement_value": 100},
+            
+            # Stories milestones
+            {"title": "Hoàn thành khóa học", "description": "Hoàn thành 1 khóa học", "icon": "✅", "category": "stories", "rarity": "uncommon", "xp_reward": 100, "requirement_type": "stories", "requirement_value": 1},
+            {"title": "Nhà sưu tập", "description": "Hoàn thành 3 khóa học", "icon": "🎯", "category": "stories", "rarity": "rare", "xp_reward": 200, "requirement_type": "stories", "requirement_value": 3},
+            {"title": "Đa năng", "description": "Hoàn thành 5 khóa học", "icon": "🌈", "category": "stories", "rarity": "epic", "xp_reward": 300, "requirement_type": "stories", "requirement_value": 5},
+        ]
+        
+        for ach_data in achievements_data:
+            achievement = Achievement(**ach_data)
+            db.add(achievement)
+        
+        await db.commit()
+        print("✅ Achievements seeded!")

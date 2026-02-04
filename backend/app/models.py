@@ -22,6 +22,7 @@ class User(Base):
     
     enrollments = relationship("Enrollment", back_populates="user")
     progress = relationship("StepProgress", back_populates="user")
+    achievements = relationship("UserAchievement", back_populates="user")
 
 
 class Category(Base):
@@ -132,6 +133,10 @@ class Achievement(Base):
     category = Column(String(50))
     rarity = Column(String(20), default="common")
     xp_reward = Column(Integer, default=0)
+    requirement_type = Column(String(50))  # 'xp', 'steps', 'streak', 'stories'
+    requirement_value = Column(Integer, default=0)
+    
+    user_achievements = relationship("UserAchievement", back_populates="achievement")
 
 
 class UserAchievement(Base):
@@ -141,3 +146,6 @@ class UserAchievement(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     achievement_id = Column(Integer, ForeignKey("achievements.id"), nullable=False)
     earned_at = Column(DateTime, server_default=func.now())
+    
+    user = relationship("User", back_populates="achievements")
+    achievement = relationship("Achievement", back_populates="user_achievements")

@@ -6,7 +6,7 @@ from typing import Optional
 from app.database import get_db
 from app.models import Story, Chapter, Step, Enrollment, StepProgress, User, Category
 from app.schemas import StoryListResponse, StoryDetailResponse, ChapterResponse, StepResponse
-from app.auth import get_current_user_optional
+from app.auth import get_current_user_optional, get_current_user
 
 router = APIRouter(prefix="/stories", tags=["stories"])
 
@@ -63,6 +63,9 @@ async def get_stories(
         # Access category safely - already loaded
         category_name = story.category.name if story.category else None
         
+        # Story is completed when progress is 100%
+        is_completed = progress == 100
+        
         response.append(StoryListResponse(
             id=story.id,
             slug=story.slug,
@@ -73,7 +76,8 @@ async def get_stories(
             category_name=category_name,
             chapter_count=chapter_count,
             progress=progress,
-            is_enrolled=is_enrolled
+            is_enrolled=is_enrolled,
+            is_completed=is_completed
         ))
     
     return response
@@ -160,6 +164,9 @@ async def get_story(
     # Access category safely
     category_name = story.category.name if story.category else None
     
+    # Story is completed when progress is 100%
+    is_completed = progress == 100
+    
     return StoryDetailResponse(
         id=story.id,
         slug=story.slug,
@@ -171,6 +178,7 @@ async def get_story(
         chapter_count=len(chapters),
         progress=progress,
         is_enrolled=is_enrolled,
+        is_completed=is_completed,
         chapters=chapters
     )
 
@@ -178,11 +186,8 @@ async def get_story(
 async def enroll_story(
     slug: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
-    if not current_user:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    
     result = await db.execute(select(Story).where(Story.slug == slug))
     story = result.scalar_one_or_none()
     

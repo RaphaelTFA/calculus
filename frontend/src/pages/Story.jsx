@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Lock, Star, Play, Trophy } from 'lucide-react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Lock, Star, Play, Trophy, BookOpen } from 'lucide-react'
 import api from '../lib/api'
+import { useAuthStore } from '../lib/store'
 
 export default function Story() {
   const { slug } = useParams()
+  const navigate = useNavigate()
   const [story, setStory] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [enrolling, setEnrolling] = useState(false)
+  const { user } = useAuthStore()
 
   useEffect(() => {
     loadStory()
@@ -20,6 +24,25 @@ export default function Story() {
       console.error(e)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleEnroll = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+    
+    setEnrolling(true)
+    try {
+      await api.post(`/stories/${slug}/enroll`)
+      // Reload story to get updated enrollment status
+      await loadStory()
+    } catch (e) {
+      console.error(e)
+      alert(e.message || 'Không thể tham gia khóa học')
+    } finally {
+      setEnrolling(false)
     }
   }
 
@@ -40,6 +63,9 @@ export default function Story() {
     return <div className="text-center py-20 text-slate-500">Không tìm thấy khóa học</div>
   }
 
+  // Check if user needs to enroll first
+  const needsEnrollment = !story.is_enrolled
+
   return (
     <div className="min-h-screen pb-20 -mx-4 -mt-6">
       {/* Header */}
@@ -49,19 +75,54 @@ export default function Story() {
             <ArrowLeft className="w-6 h-6 text-slate-500" />
           </Link>
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-slate-800 truncate">{story.title}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-800 truncate">{story.title}</h2>
+              {story.is_completed && (
+                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Trophy className="w-3 h-3" /> Hoàn thành
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 mt-1">
               <div className="flex-1 bg-slate-100 rounded-full h-2">
                 <div 
-                  className="bg-primary-500 h-2 rounded-full transition-all duration-500" 
+                  className={`h-2 rounded-full transition-all duration-500 ${
+                    story.is_completed 
+                      ? 'bg-gradient-to-r from-yellow-400 to-amber-500' 
+                      : 'bg-primary-500'
+                  }`}
                   style={{ width: `${story.progress || 0}%` }}
                 />
               </div>
-              <span className="text-xs font-bold text-primary-600">{story.progress || 0}%</span>
+              <span className={`text-xs font-bold ${story.is_completed ? 'text-amber-500' : 'text-primary-600'}`}>
+                {story.progress || 0}%
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Enrollment CTA */}
+      {needsEnrollment && (
+        <div className="max-w-md mx-auto px-4 py-8">
+          <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-3xl p-6 text-white text-center shadow-xl">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-10 h-10" />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Tham gia khóa học</h3>
+            <p className="text-white/80 mb-6 text-sm">
+              Đăng ký để theo dõi tiến trình học tập và mở khóa các bài học.
+            </p>
+            <button
+              onClick={handleEnroll}
+              disabled={enrolling}
+              className="w-full bg-white text-primary-600 font-bold py-3 px-6 rounded-2xl hover:bg-primary-50 transition-colors disabled:opacity-50"
+            >
+              {enrolling ? 'Đang xử lý...' : user ? 'Bắt đầu học ngay' : 'Đăng nhập để tham gia'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Map Container */}
       <div className="max-w-md mx-auto px-4 py-12 relative select-none">
@@ -81,14 +142,23 @@ export default function Story() {
 
           {/* Chapters */}
           {story.chapters?.map((chapter, cIndex) => (
-            <ChapterSegment key={chapter.id} chapter={chapter} index={cIndex} />
+            <ChapterSegment key={chapter.id} chapter={chapter} index={cIndex} isEnrolled={story.is_enrolled} />
           ))}
 
           {/* End Node */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-slate-200 flex items-center justify-center text-4xl text-slate-400 border-4 border-white z-20 shadow-inner">
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center text-4xl border-4 border-white z-20 ${
+              story.is_completed 
+                ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-[0_0_30px_rgba(251,191,36,0.6)]' 
+                : 'bg-slate-200 text-slate-400 shadow-inner'
+            }`}>
               <Trophy className="w-10 h-10" />
             </div>
+            {story.is_completed && (
+              <div className="mt-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-bold px-4 py-2 rounded-full text-sm shadow-lg animate-pulse">
+                🎉 Đã hoàn thành!
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -96,7 +166,7 @@ export default function Story() {
   )
 }
 
-function ChapterSegment({ chapter, index }) {
+function ChapterSegment({ chapter, index, isEnrolled }) {
   return (
     <div className="chapter-segment relative">
       {/* Chapter Marker */}
@@ -114,16 +184,19 @@ function ChapterSegment({ chapter, index }) {
       {/* Steps */}
       <div className="steps-container space-y-8">
         {chapter.steps?.map((step, sIndex) => (
-          <StepNode key={step.id} step={step} index={sIndex} chapterIndex={index} />
+          <StepNode key={step.id} step={step} index={sIndex} chapterIndex={index} isEnrolled={isEnrolled} />
         ))}
       </div>
     </div>
   )
 }
 
-function StepNode({ step, index, chapterIndex }) {
+function StepNode({ step, index, chapterIndex, isEnrolled }) {
   const isCompleted = step.is_completed
-  const isLocked = !isCompleted && !step.is_current && !(chapterIndex === 0 && index === 0)
+  // Only allow first step of first chapter if enrolled, or if explicitly marked as current
+  const isFirstStep = chapterIndex === 0 && index === 0
+  const canAccess = isCompleted || step.is_current || (isFirstStep && isEnrolled)
+  const isLocked = !canAccess
   
   const offsets = ['translate-x-0', '-translate-x-12', 'translate-x-12', 'translate-x-0']
   const positionClass = offsets[index % 4]

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { X, ChevronLeft, ChevronRight, Heart } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Heart, Trophy, Flame } from 'lucide-react'
 import api from '../lib/api'
+import { useAuthStore } from '../lib/store'
 
 export default function Step() {
   const { id } = useParams()
@@ -10,9 +11,16 @@ export default function Step() {
   const [slides, setSlides] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [completing, setCompleting] = useState(false)
+  const [showComplete, setShowComplete] = useState(false)
+  const [xpEarned, setXpEarned] = useState(0)
+  const [streakInfo, setStreakInfo] = useState(null)
+  const startTimeRef = useRef(Date.now())
+  const { user, fetchUser } = useAuthStore()
 
   useEffect(() => {
     loadStep()
+    startTimeRef.current = Date.now()
   }, [id])
 
   const loadStep = async () => {
@@ -34,10 +42,47 @@ export default function Step() {
   const currentSlide = slides[currentIndex]
   const isLast = currentIndex === slides.length - 1
 
+  const handleComplete = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+    
+    setCompleting(true)
+    try {
+      const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000)
+      const result = await api.post(`/steps/${id}/complete`, {
+        score: 100,
+        time_spent_seconds: timeSpent
+      })
+      
+      setXpEarned(result.xp_earned || 0)
+      setStreakInfo(result.streak || null)
+      setShowComplete(true)
+      
+      // Refresh user data to update XP
+      if (fetchUser) {
+        await fetchUser()
+      }
+      
+      // Also check for new achievements
+      try {
+        await api.post('/progress/check-achievements')
+      } catch (e) {
+        // Ignore achievement check errors
+      }
+    } catch (e) {
+      console.error(e)
+      // Still navigate back even if completion fails
+      navigate(-1)
+    } finally {
+      setCompleting(false)
+    }
+  }
+
   const goNext = () => {
     if (isLast) {
-      // Complete lesson
-      navigate(-1)
+      handleComplete()
     } else {
       setCurrentIndex(i => i + 1)
     }
@@ -53,6 +98,59 @@ export default function Step() {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-slate-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400 font-bold">Đang tải bài học...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show completion screen
+  if (showComplete) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-primary-500 to-primary-700 flex items-center justify-center p-6">
+        <div className="text-center text-white">
+          <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-bounce">
+            <Trophy className="w-12 h-12 text-yellow-800" />
+          </div>
+          <h1 className="text-3xl font-extrabold mb-2">Hoàn thành!</h1>
+          <p className="text-white/80 mb-6">{step?.title}</p>
+          
+          <div className="flex justify-center gap-4 mb-8">
+            {xpEarned > 0 && (
+              <div className="bg-white/20 backdrop-blur rounded-2xl p-4">
+                <span className="text-3xl font-extrabold">+{xpEarned}</span>
+                <span className="text-sm ml-1">XP</span>
+              </div>
+            )}
+            
+            {streakInfo && (
+              <div className={`backdrop-blur rounded-2xl p-4 ${
+                streakInfo.streak_increased 
+                  ? 'bg-orange-500/40 ring-2 ring-orange-300' 
+                  : 'bg-white/20'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <Flame className={`w-6 h-6 ${streakInfo.streak_increased ? 'text-orange-300 animate-pulse' : ''}`} />
+                  <span className="text-3xl font-extrabold">{streakInfo.current_streak}</span>
+                </div>
+                <span className="text-xs opacity-80">
+                  {streakInfo.streak_increased ? 'Streak tăng!' : 'Ngày streak'}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          {streakInfo?.streak_increased && streakInfo.current_streak > 1 && (
+            <p className="text-white/70 text-sm mb-4">
+              🔥 Tuyệt vời! Bạn đã học {streakInfo.current_streak} ngày liên tiếp!
+            </p>
+          )}
+          
+          <button
+            onClick={() => navigate(-1)}
+            className="w-full max-w-xs bg-white text-primary-600 font-bold py-4 px-8 rounded-2xl hover:bg-primary-50 transition-colors shadow-xl"
+          >
+            Tiếp tục
+          </button>
         </div>
       </div>
     )
@@ -105,9 +203,10 @@ export default function Step() {
           
           <button 
             onClick={goNext}
-            className="flex-1 bg-green-500 hover:bg-green-400 text-white font-extrabold text-lg py-3 px-6 rounded-2xl border-b-4 border-green-700 shadow-lg active:border-b-0 active:translate-y-1 active:shadow-none transition-all uppercase tracking-wide"
+            disabled={completing}
+            className="flex-1 bg-green-500 hover:bg-green-400 text-white font-extrabold text-lg py-3 px-6 rounded-2xl border-b-4 border-green-700 shadow-lg active:border-b-0 active:translate-y-1 active:shadow-none transition-all uppercase tracking-wide disabled:opacity-50"
           >
-            {isLast ? 'HOÀN THÀNH' : 'TIẾP TỤC'}
+            {completing ? 'Đang lưu...' : isLast ? 'HOÀN THÀNH' : 'TIẾP TỤC'}
           </button>
         </div>
       </div>
