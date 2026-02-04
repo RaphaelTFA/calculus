@@ -1,8 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Lock, Star, Play, Trophy, BookOpen } from 'lucide-react'
+import { 
+  ArrowLeft, 
+  Lock, 
+  Check, 
+  Play, 
+  BookOpen, 
+  Clock, 
+  Layers,
+  Sparkles,
+  ArrowRight,
+  Circle
+} from 'lucide-react'
 import api from '../lib/api'
 import { useAuthStore } from '../lib/store'
+
+// shadcn/ui components
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
+import { Button } from '../components/ui/button'
+import { Badge } from '../components/ui/badge'
+import { Progress } from '../components/ui/progress'
+import { Separator } from '../components/ui/separator'
 
 export default function Story() {
   const { slug } = useParams()
@@ -36,201 +54,340 @@ export default function Story() {
     setEnrolling(true)
     try {
       await api.post(`/stories/${slug}/enroll`)
-      // Reload story to get updated enrollment status
       await loadStory()
     } catch (e) {
       console.error(e)
-      alert(e.message || 'Không thể tham gia khóa học')
     } finally {
       setEnrolling(false)
     }
   }
 
+  // Calculate stats
+  const totalLessons = story?.chapters?.reduce((acc, ch) => acc + (ch.steps?.length || 0), 0) || 0
+  const completedLessons = story?.chapters?.reduce((acc, ch) => 
+    acc + (ch.steps?.filter(s => s.is_completed).length || 0), 0) || 0
+  
+  // Find current lesson
+  const findCurrentLesson = () => {
+    if (!story?.chapters) return null
+    for (const chapter of story.chapters) {
+      for (const step of chapter.steps || []) {
+        if (step.is_current || (!step.is_completed && story.is_enrolled)) {
+          return { step, chapter }
+        }
+      }
+    }
+    return null
+  }
+  
+  const currentLesson = findCurrentLesson()
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 pb-20">
-        <div className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30" />
-        <div className="max-w-md mx-auto px-4 py-12 space-y-8">
-          <div className="skeleton h-20 w-20 rounded-full mx-auto" />
-          <div className="skeleton h-32 rounded-3xl" />
-          <div className="skeleton h-32 rounded-3xl" />
+      <div className="min-h-screen bg-background">
+        <header className="h-14 bg-card border-b sticky top-0 z-30" />
+        <div className="container max-w-6xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8">
+            <Card className="h-80 animate-pulse bg-muted" />
+            <Card className="h-96 animate-pulse bg-muted" />
+          </div>
         </div>
       </div>
     )
   }
 
   if (!story) {
-    return <div className="text-center py-20 text-slate-500">Không tìm thấy khóa học</div>
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Course not found</p>
+      </div>
+    )
   }
 
-  // Check if user needs to enroll first
   const needsEnrollment = !story.is_enrolled
 
   return (
-    <div className="min-h-screen pb-20 -mx-4 -mt-6">
-      {/* Header */}
-      <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-4">
-          <Link to="/explore" className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
-            <ArrowLeft className="w-6 h-6 text-slate-500" />
-          </Link>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-800 truncate">{story.title}</h2>
-              {story.is_completed && (
-                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Trophy className="w-3 h-3" /> Hoàn thành
-                </span>
+    <div className="min-h-screen bg-background pb-8">
+      {/* Minimal Header */}
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-sm border-b">
+        <div className="container max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/explore">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+          </Button>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-bold text-foreground truncate">{story.title}</h1>
+          </div>
+          {story.is_enrolled && (
+            <Badge variant="secondary" className="shrink-0">
+              {story.progress || 0}% complete
+            </Badge>
+          )}
+        </div>
+      </header>
+
+      {/* Two-column layout */}
+      <div className="container max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 items-start">
+          
+          {/* Left Column - Static Course Overview Card */}
+          <div className="lg:sticky lg:top-24">
+            <CourseOverviewCard 
+              story={story} 
+              totalLessons={totalLessons}
+              completedLessons={completedLessons}
+              needsEnrollment={needsEnrollment}
+              onEnroll={handleEnroll}
+              enrolling={enrolling}
+              user={user}
+            />
+          </div>
+
+          {/* Right Column - Lesson Path + Active Lesson Card */}
+          <div className="space-y-6">
+            {story.chapters?.map((chapter, cIndex) => (
+              <ChapterSection 
+                key={chapter.id} 
+                chapter={chapter} 
+                index={cIndex}
+                isEnrolled={story.is_enrolled}
+                currentLesson={currentLesson}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// LEFT COLUMN - Course Overview Card (No CTA, informational only)
+// =============================================================================
+
+function CourseOverviewCard({ story, totalLessons, completedLessons, needsEnrollment, onEnroll, enrolling, user }) {
+  return (
+    <Card className="overflow-hidden">
+      {/* Course illustration placeholder */}
+      <div className="aspect-[4/3] bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.3),transparent)]" />
+        <div className="text-center relative z-10">
+          <div className="w-20 h-20 rounded-2xl bg-white/80 backdrop-blur flex items-center justify-center mx-auto mb-3 shadow-lg">
+            <span className="text-4xl">{story.icon || '📐'}</span>
+          </div>
+          <Badge variant="secondary" className="bg-white/80 backdrop-blur">
+            {story.difficulty || 'Beginner'}
+          </Badge>
+        </div>
+      </div>
+
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl">{story.title}</CardTitle>
+        <CardDescription className="text-base">
+          {story.description || 'Master the fundamentals through interactive problem-solving.'}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Progress (if enrolled) */}
+        {!needsEnrollment && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="font-semibold">{completedLessons}/{totalLessons} lessons</span>
+            </div>
+            <Progress value={story.progress || 0} className="h-2" />
+          </div>
+        )}
+
+        <Separator />
+
+        {/* Meta stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+              <Layers className="w-5 h-5 text-primary-600" />
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">{totalLessons}</p>
+              <p className="text-xs text-muted-foreground">Lessons</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">{story.duration || '2h'}</p>
+              <p className="text-xs text-muted-foreground">Duration</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Enrollment CTA (only if not enrolled) */}
+        {needsEnrollment && (
+          <>
+            <Separator />
+            <Button 
+              onClick={onEnroll} 
+              disabled={enrolling}
+              className="w-full h-12 font-bold"
+            >
+              {enrolling ? 'Enrolling...' : user ? 'Start Learning' : 'Sign in to Start'}
+            </Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// =============================================================================
+// RIGHT COLUMN - Chapter Section with Lesson Path
+// =============================================================================
+
+function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
+  const steps = chapter.steps || []
+  
+  return (
+    <div className="space-y-4">
+      {/* Level indicator pill */}
+      <div className="flex items-center gap-3">
+        <Badge variant="outline" className="px-4 py-1.5 text-sm font-bold uppercase tracking-wider">
+          Level {index + 1}
+        </Badge>
+        <span className="text-muted-foreground font-medium">{chapter.title}</span>
+      </div>
+
+      {/* Lesson path container */}
+      <Card className="p-4">
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-5 top-6 bottom-6 w-0.5 bg-border" />
+          
+          {/* Lessons */}
+          <div className="space-y-2">
+            {steps.map((step, stepIndex) => {
+              const isCurrentStep = currentLesson?.step?.id === step.id
+              const isCompleted = step.is_completed
+              const isLocked = !isCompleted && !isCurrentStep
+              
+              return (
+                <LessonNode
+                  key={step.id}
+                  step={step}
+                  isCompleted={isCompleted}
+                  isCurrent={isCurrentStep}
+                  isLocked={isLocked}
+                  isEnrolled={isEnrolled}
+                  isLast={stepIndex === steps.length - 1}
+                />
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Active lesson card - appears at bottom if current lesson is in this chapter */}
+        {currentLesson?.chapter?.id === chapter.id && (
+          <ActiveLessonCard lesson={currentLesson.step} />
+        )}
+      </Card>
+    </div>
+  )
+}
+
+// =============================================================================
+// LESSON NODE - Individual lesson in the path
+// =============================================================================
+
+function LessonNode({ step, isCompleted, isCurrent, isLocked, isEnrolled }) {
+  return (
+    <div className={`relative flex items-center gap-4 p-3 rounded-xl transition-all ${
+      isCurrent 
+        ? 'bg-primary-50 ring-2 ring-primary ring-offset-2' 
+        : isCompleted
+          ? 'bg-muted/50'
+          : 'opacity-60'
+    }`}>
+      {/* Status icon */}
+      <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+        isCompleted 
+          ? 'bg-green-500 text-white' 
+          : isCurrent 
+            ? 'bg-primary text-white shadow-lg shadow-primary/30' 
+            : 'bg-muted text-muted-foreground'
+      }`}>
+        {isCompleted ? (
+          <Check className="w-5 h-5" />
+        ) : isCurrent ? (
+          <Play className="w-5 h-5" fill="currentColor" />
+        ) : (
+          <Lock className="w-4 h-4" />
+        )}
+      </div>
+
+      {/* Lesson info */}
+      <div className="flex-1 min-w-0">
+        <p className={`font-semibold truncate ${
+          isCompleted ? 'text-muted-foreground' : 'text-foreground'
+        }`}>
+          {step.title}
+        </p>
+        {step.duration && (
+          <p className="text-xs text-muted-foreground">{step.duration}</p>
+        )}
+      </div>
+
+      {/* Current indicator */}
+      {isCurrent && (
+        <Badge variant="default" className="shrink-0 bg-primary">
+          <Sparkles className="w-3 h-3 mr-1" />
+          Current
+        </Badge>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// ACTIVE LESSON CARD - Primary CTA area (Fitts's Law)
+// =============================================================================
+
+function ActiveLessonCard({ lesson }) {
+  return (
+    <div className="mt-6 pt-6 border-t">
+      <Card className="border-primary/20 bg-gradient-to-br from-primary-50/50 to-white overflow-hidden">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shrink-0">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-muted-foreground font-medium">Up next</p>
+              <h3 className="text-lg font-bold text-foreground truncate">{lesson.title}</h3>
+              {lesson.description && (
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  {lesson.description}
+                </p>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="flex-1 bg-slate-100 rounded-full h-2">
-                <div 
-                  className={`h-2 rounded-full transition-all duration-500 ${
-                    story.is_completed 
-                      ? 'bg-gradient-to-r from-yellow-400 to-amber-500' 
-                      : 'bg-primary-500'
-                  }`}
-                  style={{ width: `${story.progress || 0}%` }}
-                />
-              </div>
-              <span className={`text-xs font-bold ${story.is_completed ? 'text-amber-500' : 'text-primary-600'}`}>
-                {story.progress || 0}%
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Enrollment CTA */}
-      {needsEnrollment && (
-        <div className="max-w-md mx-auto px-4 py-8">
-          <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-3xl p-6 text-white text-center shadow-xl">
-            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-10 h-10" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Tham gia khóa học</h3>
-            <p className="text-white/80 mb-6 text-sm">
-              Đăng ký để theo dõi tiến trình học tập và mở khóa các bài học.
-            </p>
-            <button
-              onClick={handleEnroll}
-              disabled={enrolling}
-              className="w-full bg-white text-primary-600 font-bold py-3 px-6 rounded-2xl hover:bg-primary-50 transition-colors disabled:opacity-50"
-            >
-              {enrolling ? 'Đang xử lý...' : user ? 'Bắt đầu học ngay' : 'Đăng nhập để tham gia'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Map Container */}
-      <div className="max-w-md mx-auto px-4 py-12 relative select-none">
-        {/* Path Line */}
-        <div className="absolute left-1/2 top-10 bottom-10 w-3 bg-slate-200 -ml-1.5 rounded-full z-0" />
-
-        <div className="space-y-16 relative z-10">
-          {/* Start Node */}
-          <div className="flex flex-col items-center">
-            <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-b from-primary-400 to-primary-600 shadow-game flex items-center justify-center text-3xl text-white mb-2 z-20 border-4 border-white">
-              🏁
-            </div>
-            <span className="font-bold text-primary-600 uppercase tracking-widest text-sm bg-white px-3 py-1 rounded-full shadow-sm border border-primary-100">
-              Bắt đầu
-            </span>
           </div>
 
-          {/* Chapters */}
-          {story.chapters?.map((chapter, cIndex) => (
-            <ChapterSegment key={chapter.id} chapter={chapter} index={cIndex} isEnrolled={story.is_enrolled} />
-          ))}
-
-          {/* End Node */}
-          <div className="flex flex-col items-center">
-            <div className={`w-24 h-24 rounded-full flex items-center justify-center text-4xl border-4 border-white z-20 ${
-              story.is_completed 
-                ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-[0_0_30px_rgba(251,191,36,0.6)]' 
-                : 'bg-slate-200 text-slate-400 shadow-inner'
-            }`}>
-              <Trophy className="w-10 h-10" />
-            </div>
-            {story.is_completed && (
-              <div className="mt-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-bold px-4 py-2 rounded-full text-sm shadow-lg animate-pulse">
-                🎉 Đã hoàn thành!
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ChapterSegment({ chapter, index, isEnrolled }) {
-  return (
-    <div className="chapter-segment relative">
-      {/* Chapter Marker */}
-      <div className="sticky top-20 z-10 mb-12 pointer-events-none drop-shadow-md">
-        <div className="bg-white/95 backdrop-blur shadow-sm border-2 border-slate-100 rounded-3xl p-4 mx-auto max-w-[220px] text-center">
-          <h3 className="font-extrabold text-primary-600 text-xs uppercase tracking-widest mb-1">
-            CHƯƠNG {index + 1}
-          </h3>
-          <p className="text-slate-800 text-sm font-bold leading-tight line-clamp-2">
-            {chapter.title}
-          </p>
-        </div>
-      </div>
-
-      {/* Steps */}
-      <div className="steps-container space-y-8">
-        {chapter.steps?.map((step, sIndex) => (
-          <StepNode key={step.id} step={step} index={sIndex} chapterIndex={index} isEnrolled={isEnrolled} />
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function StepNode({ step, index, chapterIndex, isEnrolled }) {
-  const isCompleted = step.is_completed
-  // Only allow first step of first chapter if enrolled, or if explicitly marked as current
-  const isFirstStep = chapterIndex === 0 && index === 0
-  const canAccess = isCompleted || step.is_current || (isFirstStep && isEnrolled)
-  const isLocked = !canAccess
-  
-  const offsets = ['translate-x-0', '-translate-x-12', 'translate-x-12', 'translate-x-0']
-  const positionClass = offsets[index % 4]
-
-  let content, className
-  
-  if (isCompleted) {
-    content = <Star className="w-8 h-8" fill="currentColor" />
-    className = 'bg-yellow-400 text-slate-800 border-b-4 border-yellow-600 shadow-lg'
-  } else if (!isLocked) {
-    content = <Play className="w-8 h-8" fill="currentColor" />
-    className = 'bg-primary-500 text-white border-b-4 border-primary-700 shadow-[0_0_25px_rgba(139,92,246,0.6)] animate-bounce-slight'
-  } else {
-    content = <Lock className="w-6 h-6" />
-    className = 'bg-slate-200 text-slate-400 border-b-4 border-slate-300 cursor-not-allowed opacity-80'
-  }
-
-  const Wrapper = isLocked ? 'div' : Link
-  const wrapperProps = isLocked ? {} : { to: `/step/${step.id}` }
-
-  return (
-    <div className={`flex justify-center transform ${positionClass} transition-transform duration-500`}>
-      <Wrapper 
-        {...wrapperProps}
-        className={`relative group w-20 h-20 rounded-[2rem] ${className} flex items-center justify-center transition-all z-20 ${!isLocked ? 'hover:scale-110 btn-game' : ''}`}
-      >
-        {content}
-        
-        {/* Tooltip */}
-        <div className="absolute w-max max-w-[150px] -bottom-10 opacity-0 group-hover:opacity-100 transition-all bg-slate-800/90 backdrop-blur text-white text-[10px] font-bold py-1.5 px-3 rounded-xl z-30 pointer-events-none text-center transform group-hover:translate-y-1 shadow-xl left-1/2 -translate-x-1/2">
-          {step.title}
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800/90" />
-        </div>
-      </Wrapper>
+          {/* Primary CTA - Continue button */}
+          {/* Fitts's Law: Large, full-width, bottom-positioned */}
+          <Button 
+            asChild 
+            size="lg" 
+            className="w-full h-14 text-base font-bold"
+          >
+            <Link to={`/step/${lesson.id}`} className="flex items-center justify-center gap-2">
+              Continue
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }
