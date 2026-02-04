@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-game {
+    @apply relative transform transition-all active:translate-y-1 active:shadow-none;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-500 text-white font-bold py-3 px-6 rounded-2xl shadow-game btn-game;
+  }
+  
+  .btn-secondary {
+    @apply bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 px-6 rounded-2xl hover:border-primary-500 hover:text-primary-600 transition-colors;
+  }
+  
+  .btn-success {
+    @apply bg-green-500 hover:bg-green-400 text-white font-extrabold py-3 px-6 rounded-2xl border-b-4 border-green-700 shadow-lg btn-game;
+  }
+
+  .card {
+    @apply bg-white rounded-3xl border-2 border-slate-100 shadow-sm;
+  }
+  
+  .card-hover {
+    @apply card hover:border-primary-500 hover:scale-[1.02] transform transition-all cursor-pointer;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Loading animation */
+.skeleton {
+  @apply bg-slate-200 animate-pulse rounded-xl;
+}
