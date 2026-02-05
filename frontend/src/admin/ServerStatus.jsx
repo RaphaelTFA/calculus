@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-export default function ServerStatus() {
+export default function AdminServerStatus() {
   const [refreshing, setRefreshing] = useState(false)
 
   const { data: backendStatus, refetch: refetchBackend } = useQuery({
@@ -28,24 +28,9 @@ export default function ServerStatus() {
     refetchInterval: 30000
   })
 
-  const { data: frontendStatus, refetch: refetchFrontend } = useQuery({
-    queryKey: ['frontend-status'],
-    queryFn: async () => {
-      try {
-        const start = Date.now()
-        const res = await fetch('http://localhost:3000', { mode: 'no-cors' })
-        const latency = Date.now() - start
-        return { online: true, latency }
-      } catch {
-        return { online: false, latency: 0 }
-      }
-    },
-    refetchInterval: 30000
-  })
-
   const handleRefresh = async () => {
     setRefreshing(true)
-    await Promise.all([refetchBackend(), refetchFrontend()])
+    await refetchBackend()
     setRefreshing(false)
   }
 
@@ -59,20 +44,12 @@ export default function ServerStatus() {
       description: 'FastAPI Backend Server'
     },
     {
-      name: 'Frontend',
+      name: 'Frontend + Admin',
       url: 'http://localhost:3000',
-      status: frontendStatus?.online,
-      latency: frontendStatus?.latency,
-      icon: Activity,
-      description: 'React Frontend App'
-    },
-    {
-      name: 'Admin Panel',
-      url: 'http://localhost:3002',
       status: true,
       latency: 0,
-      icon: Server,
-      description: 'This admin panel'
+      icon: Activity,
+      description: 'React App (this server)'
     },
     {
       name: 'Database',
@@ -99,7 +76,7 @@ export default function ServerStatus() {
       </div>
 
       {/* Services Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {services.map(service => (
           <div key={service.name} className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-start justify-between">
@@ -139,29 +116,23 @@ export default function ServerStatus() {
       {/* Quick Commands */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="font-semibold mb-4">Quick Commands</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-500 mb-2">Start Backend</p>
-            <code className="text-xs bg-gray-200 px-2 py-1 rounded">
-              uvicorn app.main:app --reload
+            <code className="text-xs bg-gray-200 px-2 py-1 rounded block">
+              cd backend && uvicorn app.main:app --reload
             </code>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-500 mb-2">Start Frontend</p>
-            <code className="text-xs bg-gray-200 px-2 py-1 rounded">
-              npm run dev
+            <code className="text-xs bg-gray-200 px-2 py-1 rounded block">
+              cd frontend && npm run dev
             </code>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-500 mb-2">Start Admin</p>
-            <code className="text-xs bg-gray-200 px-2 py-1 rounded">
-              npm run dev
-            </code>
-          </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-500 mb-2">Reset DB</p>
-            <code className="text-xs bg-gray-200 px-2 py-1 rounded">
-              python db_manager.py reset-seed
+            <p className="text-sm text-gray-500 mb-2">Reset Database</p>
+            <code className="text-xs bg-gray-200 px-2 py-1 rounded block">
+              rm backend/calculus.db && restart backend
             </code>
           </div>
         </div>
@@ -183,7 +154,7 @@ export default function ServerStatus() {
               <td className="py-3">Backend API</td>
               <td className="py-3 font-mono">8000</td>
               <td className="py-3">
-                <a href="http://localhost:8000/docs" target="_blank" className="text-blue-600 hover:underline">
+                <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
                   http://localhost:8000
                 </a>
               </td>
@@ -192,17 +163,17 @@ export default function ServerStatus() {
               <td className="py-3">Frontend App</td>
               <td className="py-3 font-mono">3000</td>
               <td className="py-3">
-                <a href="http://localhost:3000" target="_blank" className="text-blue-600 hover:underline">
+                <a href="http://localhost:3000" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
                   http://localhost:3000
                 </a>
               </td>
             </tr>
             <tr>
               <td className="py-3">Admin Panel</td>
-              <td className="py-3 font-mono">3002</td>
+              <td className="py-3 font-mono">3000</td>
               <td className="py-3">
-                <a href="http://localhost:3002" target="_blank" className="text-blue-600 hover:underline">
-                  http://localhost:3002
+                <a href="http://localhost:3000/admin" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  http://localhost:3000/admin
                 </a>
               </td>
             </tr>

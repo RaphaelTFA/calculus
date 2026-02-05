@@ -4,9 +4,9 @@ import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
 
 const API_URL = '/api/v1'
 
-export default function Courses() {
+export default function AdminCourses() {
   const { data: courses, isLoading } = useQuery({
-    queryKey: ['courses'],
+    queryKey: ['admin-courses'],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/stories`)
       return res.json()
@@ -81,7 +81,7 @@ export default function Courses() {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
                     <Link
-                      to={`/courses/${course.slug}`}
+                      to={`/admin/courses/${course.slug}`}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                     >
                       <Edit size={18} />
