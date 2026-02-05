@@ -27,14 +27,17 @@ cd /home/RaphaelTFA/Project/calculus
 ### 2. Chạy Backend (FastAPI)
 
 ```bash
-# Tạo virtual environment (chỉ lần đầu)
+# Tạo virtual environment (chỉ lần đầu, linux)
 python -m venv .venv
 
-# Kích hoạt virtual environment
+# Kích hoạt virtual environment (linux)
 source .venv/bin/activate
 
 # Cài đặt dependencies
 pip install -r backend/requirements.txt
+
+# Đổi sang thư mục backend
+cd backend
 
 # Chạy server
 uvicorn app.main:app --reload --port 8000
