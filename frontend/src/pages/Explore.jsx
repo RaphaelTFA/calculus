@@ -159,8 +159,14 @@ function ContinueLearningCard({ course }) {
       <div className="p-5">
         <div className="flex gap-4">
           {/* Icon */}
-          <div className={`w-14 h-14 bg-gradient-to-br ${course.color || 'from-blue-500 to-indigo-600'} rounded-xl flex items-center justify-center text-2xl text-white shadow-lg flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-            {course.icon || '📘'}
+          <div className="w-14 h-14 rounded-xl overflow-hidden shadow-lg flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+            {course.thumbnail_url ? (
+              <img src={course.thumbnail_url} className="w-full h-full object-cover" />
+            ) : (
+              <div className={`w-full h-full bg-gradient-to-br ${course.color || 'from-blue-500 to-indigo-600'} flex items-center justify-center text-2xl text-white`}>
+                {course.icon || '📘'}
+              </div>
+            )}
           </div>
 
           {/* Content */}
@@ -202,11 +208,24 @@ function StoryCard({ story }) {
       to={`/story/${story.slug}`} 
       className="card-hover p-4 block h-full flex flex-col group"
     >
-      <div className={`aspect-video bg-gradient-to-br ${story.color || 'from-blue-400 to-blue-600'} rounded-2xl mb-4 flex items-center justify-center text-5xl text-white shadow-inner relative overflow-hidden`}>
-        <div className="absolute inset-0 bg-black/10" />
-        <span className="relative z-10 transform group-hover:scale-110 transition-transform duration-500">
-          {story.icon || '📘'}
-        </span>
+      {/* Thumbnail Container */}
+      <div className="aspect-video rounded-2xl mb-4 relative overflow-hidden shadow-md">
+        {story.thumbnail_url ? (
+          // Nếu có ảnh từ database/API
+          <img 
+            src={story.thumbnail_url} 
+            alt={story.title}
+            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          // Fallback nếu không có ảnh (Dùng lại gradient của bạn nhưng thêm hiệu ứng)
+          <div className={`w-full h-full bg-gradient-to-br ${story.color || 'from-blue-400 to-blue-600'} flex items-center justify-center text-5xl text-white`}>
+            <div className="absolute inset-0 bg-black/5" />
+            <span className="relative z-10 transform group-hover:scale-110 transition-transform duration-500">
+              {story.icon || '📘'}
+            </span>
+          </div>
+        )}
       </div>
       
       <div className="flex-1 flex flex-col">
