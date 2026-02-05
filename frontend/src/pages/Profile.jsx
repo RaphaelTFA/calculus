@@ -11,8 +11,6 @@ export default function Profile() {
   const [showSettings, setShowSettings] = useState(false)
 
   const [displayName, setDisplayName] = useState(user?.display_name || '')
-  const [username, setUsername] = useState(user?.username || '')
-  const [darkMode, setDarkMode] = useState(false)
 
   if (!isAuthenticated()) {
     navigate('/login')
@@ -28,7 +26,6 @@ export default function Profile() {
     try {
       const updatedUser = await updateProfile({
         display_name: displayName,
-        username: username,
       })
 
       console.log("UPDATED USER:", updatedUser)
@@ -64,7 +61,11 @@ export default function Profile() {
       {/* ================= MENU ================= */}
       <div className="card divide-y divide-slate-100">
         <button
-          onClick={() => setShowEditProfile(true)}
+          onClick={() => {
+            setDisplayName(user?.display_name || "")
+            setShowEditProfile(true)
+          }}
+
           className="w-full flex items-center gap-4 p-4 hover:bg-slate-50"
         >
           <User className="w-5 h-5 text-slate-400" />
@@ -93,7 +94,8 @@ export default function Profile() {
         <Modal title="Chỉnh sửa hồ sơ" onClose={() => setShowEditProfile(false)}>
           <div className="space-y-4">
             <Input label="Tên hiển thị" value={displayName} onChange={e => setDisplayName(e.target.value)} />
-            <Input label="Username" value={username} onChange={e => setUsername(e.target.value)} />
+            <Input label="Username" value={user.username} disabled />
+            <Input label="Email" value={user.email} disabled />
 
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowEditProfile(false)} className="btn-secondary">

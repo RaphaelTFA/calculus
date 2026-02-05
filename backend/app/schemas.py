@@ -145,5 +145,4 @@ class APIResponse(BaseModel):
     error: Optional[dict] = None
 
 class UpdateProfile(BaseModel):
-    username: Optional[str] = None
     display_name: Optional[str] = None
