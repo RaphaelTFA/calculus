@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Flame, 
   Zap, 
@@ -8,7 +9,13 @@ import {
   CheckCircle, 
   ArrowRight,
   Sparkles,
-  Target
+  Target,
+  Calendar,
+  Award,
+  TrendingUp,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 import { useAuthStore } from '../lib/store'
 import api from '../lib/api'
@@ -22,8 +29,10 @@ import { Separator } from '../components/ui/separator'
 
 export default function Home() {
   const { user, isAuthenticated } = useAuthStore()
-  const [currentStory, setCurrentStory] = useState(null)
+  const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
     loadDashboard()
@@ -32,12 +41,77 @@ export default function Home() {
   const loadDashboard = async () => {
     try {
       const data = await api.get('/progress/dashboard')
-      setCurrentStory(data?.current_story)
+      setDashboardData(data)
     } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
     }
+  }
+
+  // Get course cards to display - in progress + suggested (up to 5)
+  const getCourseCards = () => {
+    if (!dashboardData) return []
+    
+    const stories = []
+    
+    // Add in-progress courses first
+    if (dashboardData.current_story) {
+      stories.push({ ...dashboardData.current_story, status: 'in-progress' })
+    }
+    if (dashboardData.in_progress_stories && Array.isArray(dashboardData.in_progress_stories)) {
+      const currentSlug = dashboardData.current_story?.slug
+      const inProgress = dashboardData.in_progress_stories
+        .filter(s => s.slug !== currentSlug)
+        .map(s => ({ ...s, status: 'in-progress' }))
+      stories.push(...inProgress)
+    }
+    
+    // Add suggested courses
+    if (dashboardData.stories && Array.isArray(dashboardData.stories)) {
+      const existingSlugs = new Set(stories.map(s => s.slug))
+      const suggested = dashboardData.stories
+        .filter(s => !existingSlugs.has(s.slug))
+        .map(s => ({ ...s, status: 'suggested' }))
+        .slice(0, 5 - stories.length) // Fill up to 5 total
+      stories.push(...suggested)
+    }
+    
+    return stories.slice(0, 5) // Maximum 5 courses
+  }
+
+  const courses = getCourseCards()
+  
+  // Auto-slide every 10 seconds - cycle through all cards one by one
+  useEffect(() => {
+    if (courses.length <= 1 || isPaused) return
+
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => {
+        // Loop back to 0 after reaching the last card
+        return (prev + 1) % courses.length
+      })
+    }, 10000) // 10 seconds
+
+    return () => clearInterval(interval)
+  }, [courses.length, isPaused])
+
+  const nextSlide = () => {
+    setCurrentSlide(prev => (prev + 1) % courses.length)
+    setIsPaused(true)
+    setTimeout(() => setIsPaused(false), 10000) // Resume after 10s
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide(prev => (prev - 1 + courses.length) % courses.length)
+    setIsPaused(true)
+    setTimeout(() => setIsPaused(false), 10000) // Resume after 10s
+  }
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index)
+    setIsPaused(true)
+    setTimeout(() => setIsPaused(false), 10000) // Resume after 10s
   }
 
   if (!isAuthenticated()) {
@@ -47,47 +121,226 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* 2-Column Responsive Layout */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 lg:gap-8">
         
-        {/* Left Sidebar - Secondary Content (Informational only) */}
+        {/* Left Sidebar - Enhanced with more features */}
         <aside className="order-2 lg:order-1 space-y-4">
+          {/* User Stats Overview */}
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                Your Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <StatItem icon={Flame} label="Streak" value={`${user?.current_streak || 0}d`} color="text-orange-600" bgColor="bg-orange-100" />
+                <StatItem icon={Zap} label="XP" value={user?.xp || 0} color="text-yellow-600" bgColor="bg-yellow-100" />
+                <StatItem icon={Trophy} label="Rank" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100" />
+                <StatItem icon={BookOpen} label="Lessons" value={dashboardData?.lessons_completed || 0} color="text-blue-600" bgColor="bg-blue-100" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Daily Goal */}
+          {dashboardData?.daily_goal && (
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Daily Goal
+                  </CardTitle>
+                  <Badge variant="secondary" className="text-xs">
+                    {dashboardData.daily_goal.completed}/{dashboardData.daily_goal.target}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Progress 
+                  value={(dashboardData.daily_goal.completed / dashboardData.daily_goal.target) * 100} 
+                  className="h-2" 
+                />
+                <p className="text-xs text-muted-foreground">
+                  {dashboardData.daily_goal.remaining > 0 
+                    ? `${dashboardData.daily_goal.remaining} more lesson${dashboardData.daily_goal.remaining !== 1 ? 's' : ''} to reach your daily goal!`
+                    : 'Daily goal completed! 🎉'
+                  }
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          
           {/* Learning Streak Card */}
           <StreakCard streak={user?.current_streak || 0} />
           
-          {/* Energy / Lives Indicator */}
-          <EnergyCard energy={5} maxEnergy={5} />
+          {/* Achievements Preview */}
+          {dashboardData?.recent_achievements && dashboardData.recent_achievements.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Recent Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {dashboardData.recent_achievements.map((achievement, idx) => (
+                  <AchievementItem 
+                    key={idx}
+                    icon={achievement.icon || '🏆'} 
+                    title={achievement.title} 
+                    description={achievement.description}
+                    unlocked={achievement.unlocked}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
           
           {/* XP / League Progress */}
-          <LeagueCard xp={user?.xp || 0} league="Silver" rank={12} />
-          
-          {/* Premium Upsell Card */}
-          <PremiumCard />
+          {dashboardData?.league && (
+            <LeagueCard 
+              xp={user?.xp || 0} 
+              league={dashboardData.league} 
+              rank={dashboardData.rank || 0} 
+            />
+          )}
         </aside>
 
-        {/* Main Content Area - Primary Focus */}
+        {/* Main Content Area - Course Carousel */}
         <main className="order-1 lg:order-2 space-y-6">
-          {/* Friendly Greeting - Minimal */}
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">👋</span>
-            <div>
-              <p className="text-muted-foreground font-medium">Nice work today</p>
-              <h1 className="text-xl font-bold text-foreground">
-                Welcome back, {user?.display_name || user?.username}
-              </h1>
+          {/* Friendly Greeting */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">👋</span>
+              <div>
+                <p className="text-muted-foreground font-medium">Nice work today</p>
+                <h1 className="text-xl font-bold text-foreground">
+                  Welcome back, {user?.display_name || user?.username}
+                </h1>
+              </div>
             </div>
           </div>
 
-          {/* Current Course Card - Primary CTA Area */}
+          {/* Course Cards Carousel - Multiple Cards */}
           {loading ? (
-            <Card className="h-80 animate-pulse bg-muted" />
-          ) : currentStory ? (
-            <CurrentCourseCard story={currentStory} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="h-80 animate-pulse bg-muted" />
+              <Card className="h-80 animate-pulse bg-muted hidden md:block" />
+            </div>
+          ) : courses.length > 0 ? (
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              {/* Section Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Your Courses
+                </h2>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {courses.filter(c => c.status === 'in-progress').length} In Progress
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {courses.filter(c => c.status === 'suggested').length} Suggested
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Carousel Container */}
+              <div className="relative overflow-hidden">
+                <motion.div 
+                  className="flex gap-4"
+                  animate={{ 
+                    x: `-${currentSlide * 100}%`
+                  }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 30 
+                  }}
+                >
+                  {courses.map((course, idx) => (
+                    <motion.div
+                      key={course.slug || idx}
+                      className="flex-shrink-0 w-full px-1"
+                    >
+                      <CourseCard story={course} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+
+              {/* Navigation Controls */}
+              {courses.length > 1 && (
+                <>
+                  {/* Previous/Next Buttons */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white hover:bg-white shadow-lg rounded-full h-10 w-10 z-20 transition-all hover:scale-110"
+                    onClick={prevSlide}
+                    aria-label="Previous course"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white hover:bg-white shadow-lg rounded-full h-10 w-10 z-20 transition-all hover:scale-110"
+                    onClick={nextSlide}
+                    aria-label="Next course"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
+
+                  {/* Slide Indicators */}
+                  <div className="flex items-center justify-center gap-2 mt-6">
+                    {courses.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => goToSlide(idx)}
+                        className={`h-2 rounded-full transition-all ${
+                          idx === currentSlide
+                            ? 'w-8 bg-primary'
+                            : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                        }`}
+                        aria-label={`Go to course ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
             <EmptyStateCard />
           )}
 
-          {/* Lesson Status - Completed feedback */}
-          <LessonFeedback completedToday={currentStory?.lessons_completed_today || 1} />
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <QuickActionCard 
+              icon={BookOpen} 
+              title="Continue Learning" 
+              description="Pick up where you left off"
+              to="/explore"
+            />
+            <QuickActionCard 
+              icon={Trophy} 
+              title="View Leaderboard" 
+              description="See how you rank"
+              to="/profile"
+            />
+            <QuickActionCard 
+              icon={Target} 
+              title="Practice" 
+              description="Sharpen your skills"
+              to="/explore"
+            />
+          </div>
         </main>
       </div>
     </div>
@@ -99,68 +352,205 @@ export default function Home() {
 // =============================================================================
 
 /**
- * Current Course Card - Primary Focus
- * UX: One screen → one action (Cognitive Load Theory)
- * Fitts's Law: Large, isolated primary CTA at bottom
+ * Extract color from gradient or solid color string
  */
-function CurrentCourseCard({ story }) {
+function extractThemeColor(colorString) {
+  if (!colorString) return '#6366f1' // Default primary color
+  
+  // If it's a hex color, return it directly
+  if (colorString.startsWith('#')) return colorString
+  
+  // Try to extract from Tailwind gradient classes like "from-blue-500 to-blue-700"
+  const colorMatch = colorString.match(/(?:from|to)-(\w+)-(\d+)/)
+  if (colorMatch) {
+    const [_, color, shade] = colorMatch
+    // Map Tailwind colors to hex (common ones)
+    const colorMap = {
+      'blue': '#3b82f6',
+      'purple': '#a855f7',
+      'green': '#22c55e',
+      'red': '#ef4444',
+      'orange': '#f97316',
+      'yellow': '#eab308',
+      'pink': '#ec4899',
+      'indigo': '#6366f1',
+      'teal': '#14b8a6',
+      'cyan': '#06b6d4',
+    }
+    return colorMap[color] || '#6366f1'
+  }
+  
+  return '#6366f1' // Default
+}
+
+/**
+ * Course Card - White background with theme color accents
+ */
+function CourseCard({ story }) {
   const progressValue = story.progress || 0
+  const isStarted = progressValue > 0
+  
+  // Extract theme color from the story
+  const themeColor = story.themeColor || extractThemeColor(story.color)
+  
+  // Determine if this is an in-progress or suggested course
+  const isInProgress = story.status === 'in-progress'
 
   return (
-    <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-primary-500 to-primary-700">
-      {/* Course Illustration Placeholder */}
-      <div className="absolute right-0 top-0 h-full w-1/3 opacity-10 flex items-center justify-center">
-        <div className="text-[180px] text-white/20">{story.icon || '∫'}</div>
-      </div>
-
-      <CardHeader className="relative z-10 pb-2">
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="secondary" className="bg-white/20 text-white border-0 font-semibold">
-            In Progress
-          </Badge>
-          <Badge variant="secondary" className="bg-white/20 text-white border-0 font-semibold">
-            Level {story.level || 1}
-          </Badge>
-        </div>
-        <CardTitle className="text-3xl font-bold text-white">
-          {story.title}
-        </CardTitle>
-        <CardDescription className="text-white/80 text-base font-medium">
-          {story.description || 'Continue your learning journey'}
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className="relative z-10 space-y-6">
-        {/* Progress indicator with context */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm text-white/90 font-semibold">
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4" />
-              {progressValue}% complete
-            </span>
-            <span>{story.lessons_remaining || 3} lessons left</span>
-          </div>
-          <Progress 
-            value={progressValue} 
-            className="h-3 bg-white/20"
-            indicatorClassName="bg-white"
-          />
-        </div>
-
-        {/* Primary CTA - Full width, large, high contrast */}
-        {/* Fitts's Law: Easiest action to hit */}
-        <Button 
-          asChild 
-          size="lg" 
-          className="w-full bg-white text-primary-600 hover:bg-white/90 font-bold text-base h-14 shadow-lg"
+    <Link to={`/story/${story.slug}`} className="block h-full">
+      <Card 
+        className="relative overflow-hidden shadow-xl bg-white border-0 h-full hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02]"
+        style={{ borderTop: `6px solid ${themeColor}` }}
+      >
+        {/* Decorative colored accent */}
+        <div 
+          className="absolute right-0 top-0 w-64 h-64 opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"
+          style={{ backgroundColor: themeColor }}
+        />
+        
+        {/* Course Icon */}
+        <div 
+          className="absolute right-8 top-8 text-[120px] opacity-5 font-bold select-none pointer-events-none"
+          style={{ color: themeColor }}
         >
-          <Link to={`/story/${story.slug}`} className="flex items-center justify-center gap-2">
-            Continue course
+          {story.icon || '∫'}
+        </div>
+
+        <CardContent className="relative z-10 p-8 space-y-6">
+          {/* Header */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge 
+                className="border-0 font-bold text-xs text-white pointer-events-none"
+                style={{ backgroundColor: themeColor }}
+              >
+                Level {story.level || 1}
+              </Badge>
+              {isInProgress && (
+                <Badge 
+                  variant="secondary"
+                  className="border-0 font-bold text-xs bg-blue-100 text-blue-700 pointer-events-none"
+                >
+                  In Progress
+                </Badge>
+              )}
+              {!isInProgress && (
+                <Badge 
+                  variant="outline"
+                  className="font-bold text-xs pointer-events-none"
+                >
+                  Suggested
+                </Badge>
+              )}
+              {isStarted && (
+                <Badge 
+                  variant="secondary"
+                  className="border font-bold text-xs pointer-events-none"
+                  style={{ 
+                    borderColor: themeColor,
+                    color: themeColor,
+                    backgroundColor: `${themeColor}10`
+                  }}
+                >
+                  {progressValue}% Complete
+                </Badge>
+              )}
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight line-clamp-2">
+              {story.title}
+            </h2>
+            <p className="text-gray-600 text-base font-medium line-clamp-2">
+              {story.description || 'Continue your learning journey'}
+            </p>
+          </div>
+
+          {/* Progress Bar */}
+          {isStarted && (
+            <div className="space-y-2">
+              <Progress 
+                value={progressValue} 
+                className="h-2.5 bg-gray-100"
+                style={{ 
+                  '--progress-color': themeColor 
+                }}
+              />
+              <style jsx>{`
+                :global(.bg-gray-100 > div) {
+                  background-color: var(--progress-color) !important;
+                }
+              `}</style>
+              <p className="text-sm text-gray-600 font-semibold">
+                {story.lessons_remaining || 0} lessons remaining
+              </p>
+            </div>
+          )}
+
+          {/* CTA Button - Now just visual, parent Link handles navigation */}
+          <div 
+            className="w-full md:w-auto font-bold text-base h-12 px-8 rounded-md border-2 flex items-center justify-center gap-2 transition-colors pointer-events-none"
+            style={{ 
+              borderColor: themeColor,
+              color: themeColor
+            }}
+          >
+            {isStarted ? 'Continue' : 'Start Course'}
             <ArrowRight className="w-5 h-5" />
-          </Link>
-        </Button>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  )
+}
+
+/**
+ * Stat Item Component
+ */
+function StatItem({ icon: Icon, label, value, color, bgColor }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-background/50">
+      <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center mb-2`}>
+        <Icon className={`w-5 h-5 ${color}`} />
+      </div>
+      <p className="text-lg font-bold text-foreground">{value}</p>
+      <p className="text-xs text-muted-foreground font-medium">{label}</p>
+    </div>
+  )
+}
+
+/**
+ * Achievement Item Component
+ */
+function AchievementItem({ icon, title, description, unlocked }) {
+  return (
+    <div className={`flex items-center gap-3 p-2 rounded-lg ${unlocked ? 'opacity-100' : 'opacity-50'}`}>
+      <div className="text-2xl">{icon}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-foreground truncate">{title}</p>
+        <p className="text-xs text-muted-foreground truncate">{description}</p>
+      </div>
+      {unlocked && <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />}
+    </div>
+  )
+}
+
+/**
+ * Quick Action Card Component
+ */
+function QuickActionCard({ icon: Icon, title, description, to }) {
+  return (
+    <Link to={to}>
+      <Card className="hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer h-full">
+        <CardContent className="p-4 space-y-3">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Icon className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-bold text-foreground">{title}</h3>
+            <p className="text-sm text-muted-foreground">{description}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }
 
@@ -169,19 +559,19 @@ function CurrentCourseCard({ story }) {
  */
 function EmptyStateCard() {
   return (
-    <Card className="p-8 text-center border-2 border-dashed">
-      <div className="space-y-4">
-        <div className="w-16 h-16 mx-auto rounded-full bg-primary-50 flex items-center justify-center">
-          <Target className="w-8 h-8 text-primary-500" />
+    <Card className="p-12 text-center border-2 border-dashed">
+      <div className="space-y-6">
+        <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+          <Target className="w-10 h-10 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-foreground mb-1">Ready to start?</h3>
-          <p className="text-muted-foreground">Discover your first course</p>
+          <h3 className="text-2xl font-bold text-foreground mb-2">Ready to start?</h3>
+          <p className="text-muted-foreground text-lg">Discover your first course and begin learning</p>
         </div>
         <Button asChild size="lg" className="w-full max-w-xs">
           <Link to="/explore">
             Explore courses
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="w-5 h-5 ml-2" />
           </Link>
         </Button>
       </div>
@@ -190,95 +580,30 @@ function EmptyStateCard() {
 }
 
 /**
- * Lesson Feedback - Short, icon-based
- * Cognitive Load: Icons instead of text, short feedback
- */
-function LessonFeedback({ completedToday }) {
-  if (completedToday === 0) return null
-
-  return (
-    <Card className="border-green-100 bg-green-50/50">
-      <CardContent className="flex items-center gap-3 py-4">
-        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-          <CheckCircle className="w-5 h-5 text-green-600" />
-        </div>
-        <div>
-          <p className="font-semibold text-green-800">
-            {completedToday === 1 ? 'Lesson completed' : `${completedToday} lessons completed`}
-          </p>
-          <p className="text-sm text-green-600">Great progress today!</p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-// =============================================================================
-// SIDEBAR COMPONENTS - Informational only, visually muted
-// =============================================================================
-
-/**
  * Streak Card - Gamification (passive display)
- * Rule: Passive display only, no interruptions
  */
 function StreakCard({ streak }) {
   const isOnFire = streak >= 7
 
   return (
-    <Card className="border-streak-light/50 bg-gradient-to-br from-white to-orange-50/30">
+    <Card className="border-2 border-orange-200/50 bg-gradient-to-br from-white to-orange-50/50">
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+          <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
             isOnFire ? 'bg-gradient-to-br from-orange-400 to-red-500' : 'bg-orange-100'
           }`}>
-            <Flame className={`w-6 h-6 ${isOnFire ? 'text-white' : 'text-orange-500'}`} />
+            <Flame className={`w-7 h-7 ${isOnFire ? 'text-white' : 'text-orange-500'}`} />
           </div>
           <div>
-            <p className="text-2xl font-bold text-foreground">{streak}</p>
-            <p className="text-sm text-muted-foreground font-medium">day streak</p>
+            <p className="text-3xl font-bold text-foreground leading-none mb-1">{streak}</p>
+            <p className="text-sm text-muted-foreground font-semibold">Day Streak</p>
           </div>
         </div>
         {streak > 0 && (
-          <p className="text-xs text-orange-600 mt-3 font-medium">
-            {isOnFire ? '🔥 On fire!' : 'Keep it up!'}
+          <p className="text-sm text-orange-600 mt-3 font-bold">
+            {isOnFire ? '🔥 You\'re on fire!' : '💪 Keep it going!'}
           </p>
         )}
-      </CardContent>
-    </Card>
-  )
-}
-
-/**
- * Energy Card - Lives/energy indicator
- * Rule: Accent color (lime) for motivation signals only
- */
-function EnergyCard({ energy, maxEnergy }) {
-  return (
-    <Card className="border-energy-light/50 bg-gradient-to-br from-white to-lime-50/30">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-lime-100 flex items-center justify-center">
-            <Zap className="w-6 h-6 text-lime-600" />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">{energy}</span>
-              <span className="text-sm text-muted-foreground">/ {maxEnergy}</span>
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">energy</p>
-          </div>
-        </div>
-        {/* Visual energy indicators */}
-        <div className="flex gap-1.5 mt-3">
-          {Array.from({ length: maxEnergy }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-2 flex-1 rounded-full transition-colors ${
-                i < energy ? 'bg-lime-400' : 'bg-slate-200'
-              }`}
-            />
-          ))}
-        </div>
       </CardContent>
     </Card>
   )
@@ -292,62 +617,33 @@ function LeagueCard({ xp, league, rank }) {
   const currentLevel = Math.floor(xp / 100)
 
   return (
-    <Card>
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
-            <Trophy className="w-6 h-6 text-indigo-600" />
-          </div>
-          <div>
-            <p className="font-bold text-foreground">{league} League</p>
-            <p className="text-sm text-muted-foreground">Rank #{rank}</p>
-          </div>
+    <Card className="border-2 border-purple-200/50">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-purple-600" />
+          {league} League
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Rank</span>
+          <span className="text-lg font-bold text-foreground">#{rank}</span>
         </div>
         
         <Separator />
         
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Level {currentLevel}</span>
-            <span className="font-semibold text-foreground">{xp} XP</span>
+            <span className="text-muted-foreground font-medium">Level {currentLevel}</span>
+            <span className="font-bold text-foreground">{xp} XP</span>
           </div>
-          <Progress value={levelProgress} className="h-2" />
-          <p className="text-xs text-muted-foreground">{100 - levelProgress} XP to level {currentLevel + 1}</p>
+          <Progress value={levelProgress} className="h-2.5" />
+          <p className="text-xs text-muted-foreground">{100 - levelProgress} XP to next level</p>
         </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-/**
- * Premium Upsell Card
- * Rule: Gradient accent card, non-intrusive
- */
-function PremiumCard() {
-  return (
-    <Card className="border-0 bg-gradient-to-br from-violet-500 to-indigo-600 text-white overflow-hidden">
-      <CardContent className="p-4 relative">
-        {/* Decorative element */}
-        <div className="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10" />
-        <div className="absolute -right-2 bottom-0 w-16 h-16 rounded-full bg-white/5" />
         
-        <div className="relative z-10 space-y-3">
-          <div className="flex items-center gap-2">
-            <Crown className="w-5 h-5 text-yellow-300" />
-            <span className="font-bold">Go Premium</span>
-          </div>
-          <p className="text-sm text-white/80">
-            Unlimited learning, no ads
-          </p>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="bg-white/20 hover:bg-white/30 text-white border-0 font-semibold"
-          >
-            <Sparkles className="w-4 h-4 mr-1.5" />
-            Learn more
-          </Button>
-        </div>
+        <Button variant="outline" size="sm" className="w-full mt-2">
+          View Leaderboard
+        </Button>
       </CardContent>
     </Card>
   )
