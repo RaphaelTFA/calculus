@@ -1,0 +1,22 @@
+{
+  "categories": [
+    {
+      "id": "giai-tich",
+      "name": "Giải tích",
+      "slug": "giai-tich",
+      "icon": "∫"
+    },
+    {
+      "id": "dai-so",
+      "name": "Đại số",
+      "slug": "dai-so",
+      "icon": "Σ"
+    },
+    {
+      "id": "hinh-hoc",
+      "name": "Hình học",
+      "slug": "hinh-hoc",
+      "icon": "△"
+    }
+  ]
+}

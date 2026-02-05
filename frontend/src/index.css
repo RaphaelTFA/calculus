@@ -2,6 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217.2 91.2% 59.8%;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
 @layer components {
   .btn-game {
     @apply relative transform transition-all active:translate-y-1 active:shadow-none;
@@ -19,12 +54,43 @@
     @apply bg-green-500 hover:bg-green-400 text-white font-extrabold py-3 px-6 rounded-2xl border-b-4 border-green-700 shadow-lg btn-game;
   }
 
-  .card {
+  .card-legacy {
     @apply bg-white rounded-3xl border-2 border-slate-100 shadow-sm;
   }
   
   .card-hover {
-    @apply card hover:border-primary-500 hover:scale-[1.02] transform transition-all cursor-pointer;
+    @apply card-legacy hover:border-primary-500 hover:scale-[1.02] transform transition-all cursor-pointer;
+  }
+
+  /* Tab transition animations */
+  .page-transition-enter {
+    animation: pageEnter 0.3s ease-out forwards;
+  }
+  
+  .page-transition-exit {
+    animation: pageExit 0.3s ease-out forwards;
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
   }
 }
 
