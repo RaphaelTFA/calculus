@@ -1,0 +1,366 @@
+{
+  "slug": "gioi-han",
+  "title": "Giới hạn hàm số",
+  "description": "Khám phá khái niệm giới hạn - nền tảng của giải tích. Học cách tính giới hạn và áp dụng định lý.",
+  "icon": "lim",
+  "color": "from-blue-500 to-blue-700",
+  "category": "giai-tich",
+  "difficulty": "beginner",
+  "is_published": true,
+  "is_featured": true,
+  "order_index": 1,
+  "chapters": [
+    {
+      "id": "khai-niem-gioi-han",
+      "title": "Khái niệm giới hạn",
+      "description": "Định nghĩa và ý nghĩa của giới hạn",
+      "order_index": 0,
+      "steps": [
+        {
+          "id": "gioi-han-la-gi",
+          "title": "Giới hạn là gì?",
+          "description": "Giới thiệu khái niệm giới hạn",
+          "xp_reward": 10,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "intro1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Chào mừng đến với Giải tích! 🎉",
+                    "paragraphs": [
+                      "Giải tích là một nhánh quan trọng của toán học, nghiên cứu về sự thay đổi liên tục.",
+                      "Trong bài học này, chúng ta sẽ tìm hiểu về **giới hạn** - khái niệm nền tảng nhất."
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "def1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Định nghĩa Giới hạn",
+                    "paragraphs": [
+                      "Giới hạn của hàm số f(x) khi x tiến tới a là giá trị mà f(x) tiến đến khi x ngày càng gần a."
+                    ]
+                  }
+                },
+                {
+                  "id": "math1",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to a} f(x) = L"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ex1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Ví dụ minh họa",
+                    "paragraphs": [
+                      "Xét hàm số f(x) = x + 2. Tính giới hạn khi x → 3:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math2",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to 3} (x + 2) = 3 + 2 = 5"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 3,
+              "blocks": [
+                {
+                  "id": "quiz1",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính giới hạn: $\\lim_{x \\to 2} (3x - 1)$ = ?",
+                    "options": [
+                      { "value": "a", "label": "4" },
+                      { "value": "b", "label": "5" },
+                      { "value": "c", "label": "6" }
+                    ],
+                    "correct": "b",
+                    "explanation": "Thay x = 2 vào: 3(2) - 1 = 6 - 1 = 5"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dinh-nghia-epsilon-delta",
+          "title": "Định nghĩa ε-δ",
+          "description": "Định nghĩa chính xác của giới hạn",
+          "xp_reward": 15,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "eps1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Định nghĩa ε-δ",
+                    "paragraphs": [
+                      "Định nghĩa chính thức của giới hạn sử dụng ký hiệu ε (epsilon) và δ (delta).",
+                      "Đây là định nghĩa toán học nghiêm ngặt nhất."
+                    ]
+                  }
+                },
+                {
+                  "id": "math3",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\forall \\varepsilon > 0, \\exists \\delta > 0: 0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "mean1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Ý nghĩa",
+                    "paragraphs": [
+                      "Với mọi khoảng cách ε nhỏ tùy ý quanh L,",
+                      "Luôn tồn tại khoảng cách δ quanh a sao cho f(x) nằm trong khoảng ε."
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bai-tap-co-ban",
+          "title": "Bài tập cơ bản",
+          "description": "Luyện tập tính giới hạn",
+          "xp_reward": 20,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "ex2",
+                  "type": "text",
+                  "content": {
+                    "heading": "Ví dụ 1",
+                    "paragraphs": [
+                      "Tính: $\\lim_{x \\to 0} \\frac{\\sin x}{x}$"
+                    ]
+                  }
+                },
+                {
+                  "id": "math4",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1"
+                  }
+                },
+                {
+                  "id": "note1",
+                  "type": "text",
+                  "content": {
+                    "heading": "",
+                    "paragraphs": [
+                      "Đây là một giới hạn quan trọng cần nhớ!"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz2",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1}$ = ?",
+                    "options": [
+                      { "value": "a", "label": "1" },
+                      { "value": "b", "label": "2" },
+                      { "value": "c", "label": "0" }
+                    ],
+                    "correct": "b",
+                    "explanation": "Phân tích: $\\frac{x^2-1}{x-1} = \\frac{(x-1)(x+1)}{x-1} = x+1 \\to 2$"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tinh-gioi-han",
+      "title": "Tính giới hạn",
+      "description": "Các phương pháp tính giới hạn",
+      "order_index": 1,
+      "steps": [
+        {
+          "id": "dinh-ly-gioi-han",
+          "title": "Định lý về giới hạn",
+          "description": "Các định lý cơ bản",
+          "xp_reward": 10,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "thm1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Các định lý giới hạn",
+                    "paragraphs": [
+                      "Nếu $\\lim_{x \\to a} f(x) = L$ và $\\lim_{x \\to a} g(x) = M$ thì:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math5",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to a} [f(x) + g(x)] = L + M"
+                  }
+                },
+                {
+                  "id": "math6",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to a} [f(x) \\cdot g(x)] = L \\cdot M"
+                  }
+                },
+                {
+                  "id": "math7",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\frac{L}{M} \\quad (M \\neq 0)"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "gioi-han-dac-biet",
+          "title": "Giới hạn đặc biệt",
+          "description": "Các giới hạn quan trọng",
+          "xp_reward": 15,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "special1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Giới hạn quan trọng",
+                    "paragraphs": [
+                      "Ghi nhớ các giới hạn sau:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math8",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1"
+                  }
+                },
+                {
+                  "id": "math9",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2}"
+                  }
+                },
+                {
+                  "id": "math10",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to \\infty} \\left(1 + \\frac{1}{x}\\right)^x = e"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quy-tac-lhospital",
+          "title": "Quy tắc L'Hospital",
+          "description": "Xử lý dạng vô định",
+          "xp_reward": 20,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "lh1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Quy tắc L'Hospital",
+                    "paragraphs": [
+                      "Khi gặp dạng vô định $\\frac{0}{0}$ hoặc $\\frac{\\infty}{\\infty}$, ta có:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math11",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)}"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz3",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $\\lim_{x \\to 0} \\frac{e^x - 1}{x}$ bằng L'Hospital",
+                    "options": [
+                      { "value": "a", "label": "0" },
+                      { "value": "b", "label": "1" },
+                      { "value": "c", "label": "e" }
+                    ],
+                    "correct": "b",
+                    "explanation": "Đạo hàm tử: $(e^x)' = e^x$, mẫu: $(x)' = 1$. Giới hạn = $e^0/1 = 1$"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

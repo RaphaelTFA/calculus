@@ -1,0 +1,246 @@
+{
+  "slug": "tich-phan",
+  "title": "Tích phân",
+  "description": "Tích phân bất định, xác định và ứng dụng tính diện tích, thể tích.",
+  "icon": "∫",
+  "color": "from-purple-500 to-purple-700",
+  "category": "giai-tich",
+  "difficulty": "intermediate",
+  "is_published": true,
+  "is_featured": false,
+  "order_index": 3,
+  "chapters": [
+    {
+      "id": "nguyen-ham",
+      "title": "Nguyên hàm",
+      "description": "Tích phân bất định",
+      "order_index": 0,
+      "steps": [
+        {
+          "id": "nguyen-ham-la-gi",
+          "title": "Nguyên hàm là gì?",
+          "description": "Khái niệm nguyên hàm",
+          "xp_reward": 10,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "int1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Nguyên hàm",
+                    "paragraphs": [
+                      "Nguyên hàm là **phép toán ngược** của đạo hàm.",
+                      "Nếu $F'(x) = f(x)$ thì F(x) là nguyên hàm của f(x)."
+                    ]
+                  }
+                },
+                {
+                  "id": "math24",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int f(x)dx = F(x) + C"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bang-nguyen-ham",
+          "title": "Bảng nguyên hàm",
+          "description": "Công thức cơ bản",
+          "xp_reward": 12,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "table1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Bảng nguyên hàm cơ bản",
+                    "paragraphs": []
+                  }
+                },
+                {
+                  "id": "math25",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int x^n dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)"
+                  }
+                },
+                {
+                  "id": "math26",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int e^x dx = e^x + C"
+                  }
+                },
+                {
+                  "id": "math27",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int \\frac{1}{x} dx = \\ln|x| + C"
+                  }
+                },
+                {
+                  "id": "math28",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int \\sin x dx = -\\cos x + C"
+                  }
+                },
+                {
+                  "id": "math29",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int \\cos x dx = \\sin x + C"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bai-tap-nguyen-ham",
+          "title": "Bài tập nguyên hàm",
+          "description": "Luyện tập",
+          "xp_reward": 20,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "quiz9",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $\\int x^3 dx = ?$",
+                    "options": [
+                      { "value": "a", "label": "$\\frac{x^4}{4} + C$" },
+                      { "value": "b", "label": "$3x^2 + C$" },
+                      { "value": "c", "label": "$x^4 + C$" }
+                    ],
+                    "correct": "a",
+                    "explanation": "Công thức: $\\int x^n dx = \\frac{x^{n+1}}{n+1} + C$, với n=3: $\\frac{x^4}{4} + C$"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phuong-phap-tinh-tich-phan",
+      "title": "Phương pháp tính tích phân",
+      "description": "Các kỹ thuật tính tích phân",
+      "order_index": 1,
+      "steps": [
+        {
+          "id": "doi-bien-so",
+          "title": "Đổi biến số",
+          "description": "Phương pháp đổi biến",
+          "xp_reward": 15,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "sub1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Phương pháp đổi biến",
+                    "paragraphs": [
+                      "Đặt $u = g(x)$, khi đó $du = g'(x)dx$",
+                      "Tích phân ban đầu trở thành:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math30",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int f(g(x))g'(x)dx = \\int f(u)du"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tich-phan-tung-phan",
+          "title": "Tích phân từng phần",
+          "description": "Công thức và ứng dụng",
+          "xp_reward": 18,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "parts1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Công thức tích phân từng phần",
+                    "paragraphs": []
+                  }
+                },
+                {
+                  "id": "math31",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int u dv = uv - \\int v du"
+                  }
+                },
+                {
+                  "id": "note2",
+                  "type": "text",
+                  "content": {
+                    "heading": "",
+                    "paragraphs": [
+                      "Chọn u và dv sao cho $\\int v du$ đơn giản hơn $\\int u dv$"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bai-tap-tong-hop",
+          "title": "Bài tập tổng hợp",
+          "description": "Luyện tập",
+          "xp_reward": 25,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "quiz10",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Phương pháp nào phù hợp cho $\\int xe^x dx$?",
+                    "options": [
+                      { "value": "a", "label": "Đổi biến" },
+                      { "value": "b", "label": "Tích phân từng phần" },
+                      { "value": "c", "label": "Trực tiếp" }
+                    ],
+                    "correct": "b",
+                    "explanation": "Đặt $u=x, dv=e^x dx$. Dùng tích phân từng phần!"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

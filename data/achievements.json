@@ -1,0 +1,125 @@
+{
+  "achievements": [
+    {
+      "id": "khoi-dau",
+      "title": "Khởi đầu",
+      "description": "Đạt 100 XP",
+      "icon": "🌱",
+      "category": "xp",
+      "rarity": "common",
+      "xp_reward": 10,
+      "requirement_type": "xp",
+      "requirement_value": 100
+    },
+    {
+      "id": "tien-bo",
+      "title": "Tiến bộ",
+      "description": "Đạt 500 XP",
+      "icon": "📚",
+      "category": "xp",
+      "rarity": "uncommon",
+      "xp_reward": 25,
+      "requirement_type": "xp",
+      "requirement_value": 500
+    },
+    {
+      "id": "thac-si",
+      "title": "Thạc sĩ",
+      "description": "Đạt 1000 XP",
+      "icon": "🎓",
+      "category": "xp",
+      "rarity": "rare",
+      "xp_reward": 50,
+      "requirement_type": "xp",
+      "requirement_value": 1000
+    },
+    {
+      "id": "buoc-dau",
+      "title": "Bước đầu",
+      "description": "Hoàn thành bài học đầu tiên",
+      "icon": "👣",
+      "category": "progress",
+      "rarity": "common",
+      "xp_reward": 15,
+      "requirement_type": "steps",
+      "requirement_value": 1
+    },
+    {
+      "id": "sieng-nang",
+      "title": "Siêng năng",
+      "description": "Hoàn thành 10 bài học",
+      "icon": "🏃",
+      "category": "progress",
+      "rarity": "uncommon",
+      "xp_reward": 50,
+      "requirement_type": "steps",
+      "requirement_value": 10
+    },
+    {
+      "id": "ben-bi",
+      "title": "Bền bỉ",
+      "description": "Hoàn thành 50 bài học",
+      "icon": "💪",
+      "category": "progress",
+      "rarity": "rare",
+      "xp_reward": 100,
+      "requirement_type": "steps",
+      "requirement_value": 50
+    },
+    {
+      "id": "streak-3",
+      "title": "Streak 3 ngày",
+      "description": "Học liên tục 3 ngày",
+      "icon": "🔥",
+      "category": "streak",
+      "rarity": "common",
+      "xp_reward": 20,
+      "requirement_type": "streak",
+      "requirement_value": 3
+    },
+    {
+      "id": "streak-7",
+      "title": "Streak 7 ngày",
+      "description": "Học liên tục 1 tuần",
+      "icon": "⚡",
+      "category": "streak",
+      "rarity": "uncommon",
+      "xp_reward": 50,
+      "requirement_type": "streak",
+      "requirement_value": 7
+    },
+    {
+      "id": "streak-30",
+      "title": "Streak 30 ngày",
+      "description": "Học liên tục 1 tháng",
+      "icon": "🌟",
+      "category": "streak",
+      "rarity": "rare",
+      "xp_reward": 150,
+      "requirement_type": "streak",
+      "requirement_value": 30
+    },
+    {
+      "id": "hoan-thanh-khoa",
+      "title": "Hoàn thành khóa học",
+      "description": "Hoàn thành 1 khóa học",
+      "icon": "✅",
+      "category": "stories",
+      "rarity": "uncommon",
+      "xp_reward": 100,
+      "requirement_type": "stories",
+      "requirement_value": 1
+    },
+    {
+      "id": "nha-suu-tap",
+      "title": "Nhà sưu tập",
+      "description": "Hoàn thành 3 khóa học",
+      "icon": "🎯",
+      "category": "stories",
+      "rarity": "rare",
+      "xp_reward": 200,
+      "requirement_type": "stories",
+      "requirement_value": 3
+    }
+  ]
+}
