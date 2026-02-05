@@ -64,6 +64,28 @@ export const useAuthStore = create(
         }
       },
 
+      updateProfile: async (profileData) => {
+        set({ isLoading: true, error: null })
+
+        try {
+          const updatedUser = await api.put("/auth/profile", profileData)
+
+          set((state) => ({
+            user: {
+              ...state.user,
+              ...updatedUser,
+            },
+            isLoading: false,
+          }))
+
+          return updatedUser
+        } catch (error) {
+          set({ isLoading: false, error: error.message })
+          throw error
+        }
+      },
+
+
       logout: () => {
         set({ user: null, token: null, error: null })
         localStorage.removeItem('auth-storage')

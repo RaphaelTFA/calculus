@@ -24,12 +24,16 @@ export default function Profile() {
     navigate('/')
   }
 
-  const handleSaveProfile = () => {
-    updateProfile({
-      display_name: displayName,
-      username: username,
-    })
-    setShowEditProfile(false)
+  const handleSaveProfile = async () => {
+    try {
+      await updateProfile({
+        display_name: displayName,
+        username: username,
+      })
+      setShowEditProfile(false)
+    } catch (err) {
+      alert("Không thể cập nhật hồ sơ")
+    }
   }
 
   return (
