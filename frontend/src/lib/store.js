@@ -65,24 +65,16 @@ export const useAuthStore = create(
       },
 
       updateProfile: async (profileData) => {
-        set({ isLoading: true, error: null })
+        const res = await api.put("/auth/profile", profileData)
 
-        try {
-          const updatedUser = await api.put("/auth/profile", profileData)
+        set((state) => ({
+          user: {
+            ...state.user,
+            ...res.data,
+          },
+        }))
 
-          set((state) => ({
-            user: {
-              ...state.user,
-              ...updatedUser,
-            },
-            isLoading: false,
-          }))
-
-          return updatedUser
-        } catch (error) {
-          set({ isLoading: false, error: error.message })
-          throw error
-        }
+        return res.data
       },
 
 

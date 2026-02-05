@@ -60,29 +60,30 @@ async def get_me(current_user: User = Depends(get_current_user)):
 async def logout():
     return {"success": True}
 
-@router.put("/profile")
-def update_profile(
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(
     data: UpdateProfile,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    user = db.query(User).filter(User.id == current_user.id).first()
+    if data.username is None and data.display_name is None:
+        raise HTTPException(status_code=400, detail="No data to update")
+
+    result = await db.execute(
+        select(User).where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if data.username:
+    if data.username is not None:
         user.username = data.username
 
-    if data.display_name:
+    if data.display_name is not None:
         user.display_name = data.display_name
 
-    db.commit()
-    db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
 
-    return {
-        "id": user.id,
-        "username": user.username,
-        "display_name": user.display_name,
-        "email": user.email
-    }
+    return UserResponse.model_validate(user)
