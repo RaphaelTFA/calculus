@@ -55,15 +55,12 @@ export default function Profile() {
     }
 
     try {
-      await changePassword(oldPassword, newPassword)
-      alert("Đổi mật khẩu thành công")
-
-      setOldPassword("")
-      setNewPassword("")
-      setConfirmPassword("")
-      setShowChangePassword(false)
+        await changePassword(oldPassword, newPassword);
+        alert("Đổi mật khẩu thành công");
+        // ... reset state ...
     } catch (err) {
-      alert(err.message || "Không thể đổi mật khẩu")
+        console.error("Chi tiết lỗi:", err); // Thêm dòng này để xem lỗi ở Console browser
+        alert(err.message || "Không thể đổi mật khẩu");
     }
   }
 

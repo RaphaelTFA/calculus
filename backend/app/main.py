@@ -38,7 +38,7 @@ app.include_router(auth_router, prefix="/api/v1")
 app.include_router(stories_router, prefix="/api/v1")
 app.include_router(steps_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(auth.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

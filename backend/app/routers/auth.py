@@ -85,15 +85,20 @@ async def update_profile(
 @router.put("/change-password")
 async def change_password(
     data: ChangePassword,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db), # Sửa Session -> AsyncSession
     current_user: User = Depends(get_current_user),
 ):
-    user = db.query(User).filter(User.id == current_user.id).first()
+    # Sử dụng await và select thay vì db.query
+    result = await db.execute(select(User).where(User.id == current_user.id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
     if not verify_password(data.old_password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Mật khẩu cũ không đúng")
 
     user.hashed_password = hash_password(data.new_password)
-    db.commit()
-
+    
+    await db.commit() # Thêm await
     return {"success": True, "message": "Đổi mật khẩu thành công"}

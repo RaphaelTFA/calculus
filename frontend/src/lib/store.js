@@ -78,15 +78,14 @@ export const useAuthStore = create(
       },
 
       changePassword: async (oldPassword, newPassword) => {
-        try {
+          // Nếu trong auth.py router có prefix là "/auth" 
+          // và trong main.py include router đó với prefix "/api/v1"
+          // Thì đường dẫn này là ĐÚNG.
           const res = await api.put('/auth/change-password', {
-            old_password: oldPassword,
-            new_password: newPassword
+              old_password: oldPassword,
+              new_password: newPassword
           })
           return res
-        } catch (err) {
-          throw err
-        }
       },
 
       logout: () => {
