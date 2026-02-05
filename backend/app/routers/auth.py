@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse
+from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse, UpdateProfile
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -58,3 +59,30 @@ async def get_me(current_user: User = Depends(get_current_user)):
 @router.post("/logout")
 async def logout():
     return {"success": True}
+
+@router.put("/profile")
+def update_profile(
+    data: UpdateProfile,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    user = db.query(User).filter(User.id == current_user.id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if data.username:
+        user.username = data.username
+
+    if data.display_name:
+        user.display_name = data.display_name
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "display_name": user.display_name,
+        "email": user.email
+    }

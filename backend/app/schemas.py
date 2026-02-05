@@ -143,3 +143,7 @@ class SuccessResponse(BaseModel):
 class APIResponse(BaseModel):
     data: Optional[dict | list] = None
     error: Optional[dict] = None
+
+class UpdateProfile(BaseModel):
+    username: Optional[str] = None
+    display_name: Optional[str] = None

@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 from app.config import settings
 from app.database import init_db
-from app.routers import auth_router, stories_router, steps_router, progress_router
+from app.routers import auth_router, stories_router, steps_router, progress_router, auth
 
 # Path to data folder
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
@@ -38,6 +38,7 @@ app.include_router(auth_router, prefix="/api/v1")
 app.include_router(stories_router, prefix="/api/v1")
 app.include_router(steps_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
 @app.get("/")
 async def root():
