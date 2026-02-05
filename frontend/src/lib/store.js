@@ -70,12 +70,13 @@ export const useAuthStore = create(
         set((state) => ({
           user: {
             ...state.user,
-            ...res.data,
+            ...res,
           },
         }))
 
-        return res.data
+        return res
       },
+
 
 
       logout: () => {

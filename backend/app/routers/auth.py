@@ -66,9 +66,6 @@ async def update_profile(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if data.username is None and data.display_name is None:
-        raise HTTPException(status_code=400, detail="No data to update")
-
     result = await db.execute(
         select(User).where(User.id == current_user.id)
     )

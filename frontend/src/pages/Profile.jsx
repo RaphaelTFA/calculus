@@ -26,15 +26,19 @@ export default function Profile() {
 
   const handleSaveProfile = async () => {
     try {
-      await updateProfile({
+      const updatedUser = await updateProfile({
         display_name: displayName,
         username: username,
       })
+
+      console.log("UPDATED USER:", updatedUser)
       setShowEditProfile(false)
     } catch (err) {
+      console.error(err)
       alert("Không thể cập nhật hồ sơ")
     }
   }
+
 
   return (
     <div className="space-y-8 relative">
