@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, Link } from 'react-router-dom'
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -6,26 +6,27 @@ import {
   Server, 
   Settings,
   Menu,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react'
 import { useState } from 'react'
-import { clsx } from 'clsx'
+import { cn } from '../lib/utils'
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/courses', icon: BookOpen, label: 'Courses' },
-  { to: '/data', icon: Database, label: 'Data Manager' },
-  { to: '/server', icon: Server, label: 'Server Status' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/courses', icon: BookOpen, label: 'Courses' },
+  { to: '/admin/data', icon: Database, label: 'Data Manager' },
+  { to: '/admin/server', icon: Server, label: 'Server Status' },
+  { to: '/admin/settings', icon: Settings, label: 'Settings' },
 ]
 
-export default function Layout() {
+export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className={clsx(
+      <aside className={cn(
         "fixed inset-y-0 left-0 z-50 bg-gray-900 text-white transition-all duration-300",
         sidebarOpen ? "w-64" : "w-16"
       )}>
@@ -46,8 +47,8 @@ export default function Layout() {
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
-              className={({ isActive }) => clsx(
+              end={to === '/admin'}
+              className={({ isActive }) => cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
                 isActive 
                   ? "bg-blue-600 text-white" 
@@ -58,11 +59,22 @@ export default function Layout() {
               {sidebarOpen && <span>{label}</span>}
             </NavLink>
           ))}
+          
+          {/* Back to App */}
+          <div className="pt-4 border-t border-gray-800 mt-4">
+            <Link
+              to="/"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+            >
+              <ArrowLeft size={20} />
+              {sidebarOpen && <span>Back to App</span>}
+            </Link>
+          </div>
         </nav>
       </aside>
 
       {/* Main content */}
-      <main className={clsx(
+      <main className={cn(
         "transition-all duration-300",
         sidebarOpen ? "ml-64" : "ml-16"
       )}>

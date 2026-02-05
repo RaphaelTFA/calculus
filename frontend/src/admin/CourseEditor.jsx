@@ -5,12 +5,12 @@ import { useState } from 'react'
 
 const API_URL = '/api/v1'
 
-export default function CourseEditor() {
+export default function AdminCourseEditor() {
   const { slug } = useParams()
   const [expandedChapters, setExpandedChapters] = useState({})
   
   const { data: course, isLoading } = useQuery({
-    queryKey: ['course', slug],
+    queryKey: ['admin-course', slug],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/stories/${slug}`)
       return res.json()
@@ -49,9 +49,9 @@ export default function CourseEditor() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Course Info */}
-        <div className="col-span-1 space-y-4">
+        <div className="lg:col-span-1 space-y-4">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h3 className="font-semibold mb-4">Course Details</h3>
             
@@ -110,7 +110,7 @@ export default function CourseEditor() {
         </div>
 
         {/* Right: Chapters & Steps */}
-        <div className="col-span-2">
+        <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Chapters & Steps</h3>

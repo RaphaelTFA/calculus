@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { BookOpen, Users, Award, TrendingUp } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const API_URL = '/api/v1'
 
@@ -19,9 +20,9 @@ function StatCard({ icon: Icon, label, value, color }) {
   )
 }
 
-export default function Dashboard() {
+export default function AdminDashboard() {
   const { data: courses } = useQuery({
-    queryKey: ['courses'],
+    queryKey: ['admin-courses'],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/stories`)
       return res.json()
@@ -31,7 +32,7 @@ export default function Dashboard() {
   const stats = [
     { icon: BookOpen, label: 'Total Courses', value: courses?.length || 0, color: 'bg-blue-500' },
     { icon: Users, label: 'Active Users', value: '—', color: 'bg-green-500' },
-    { icon: Award, label: 'Achievements', value: 11, color: 'bg-yellow-500' },
+    { icon: Award, label: 'Achievements', value: 17, color: 'bg-yellow-500' },
     { icon: TrendingUp, label: 'Total XP Earned', value: '—', color: 'bg-purple-500' },
   ]
 
@@ -50,18 +51,18 @@ export default function Dashboard() {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-700 font-medium transition-colors">
+          <Link to="/admin/courses" className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-700 font-medium transition-colors text-center">
             + New Course
-          </button>
-          <button className="p-4 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition-colors">
+          </Link>
+          <Link to="/admin/data" className="p-4 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition-colors text-center">
             Sync Data
-          </button>
+          </Link>
           <button className="p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg text-yellow-700 font-medium transition-colors">
             Backup DB
           </button>
-          <button className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-700 font-medium transition-colors">
-            View Logs
-          </button>
+          <Link to="/admin/server" className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-700 font-medium transition-colors text-center">
+            View Status
+          </Link>
         </div>
       </div>
 
@@ -70,9 +71,10 @@ export default function Dashboard() {
         <h3 className="text-lg font-semibold mb-4">Courses</h3>
         <div className="space-y-3">
           {courses?.map(course => (
-            <div 
-              key={course.id} 
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+            <Link 
+              key={course.id}
+              to={`/admin/courses/${course.slug}`}
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{course.icon}</span>
@@ -88,7 +90,7 @@ export default function Dashboard() {
               }`}>
                 {course.is_published ? 'Published' : 'Draft'}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

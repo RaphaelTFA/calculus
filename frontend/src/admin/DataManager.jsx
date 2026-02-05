@@ -10,7 +10,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 
-export default function DataManager() {
+export default function AdminDataManager() {
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState(null)
 
