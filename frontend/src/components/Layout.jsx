@@ -1,7 +1,8 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Home, Compass, User, Flame, Zap, Settings, LogOut, HelpCircle, Bell } from 'lucide-react'
 import { useAuthStore, useUIStore } from '../lib/store'
 import Toast from './Toast'
+import AnimatedOutlet from './AnimatedOutlet'
 
 // shadcn/ui components
 import { Button } from './ui/button'
@@ -148,7 +149,7 @@ export default function Layout() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 pb-24 md:pb-8">
-        <Outlet />
+        <AnimatedOutlet />
       </main>
 
       {/* Mobile Bottom Navigation - 2 primary items only */}
