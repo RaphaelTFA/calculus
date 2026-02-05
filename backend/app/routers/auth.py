@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse, UpdateProfile
+from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse, UpdateProfile, ChangePassword
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -81,3 +81,19 @@ async def update_profile(
     await db.refresh(user)
 
     return UserResponse.model_validate(user)
+
+@router.put("/change-password")
+async def change_password(
+    data: ChangePassword,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    user = db.query(User).filter(User.id == current_user.id).first()
+
+    if not verify_password(data.old_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Mật khẩu cũ không đúng")
+
+    user.hashed_password = hash_password(data.new_password)
+    db.commit()
+
+    return {"success": True, "message": "Đổi mật khẩu thành công"}

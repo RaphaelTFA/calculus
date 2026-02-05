@@ -12,6 +12,13 @@ export default function Profile() {
 
   const [displayName, setDisplayName] = useState(user?.display_name || '')
 
+  const [showChangePassword, setShowChangePassword] = useState(false)
+
+  const [oldPassword, setOldPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const { changePassword } = useAuthStore()
+
   if (!isAuthenticated()) {
     navigate('/login')
     return null
@@ -33,6 +40,30 @@ export default function Profile() {
     } catch (err) {
       console.error(err)
       alert("Không thể cập nhật hồ sơ")
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (!oldPassword || !newPassword) {
+      alert("Vui lòng nhập đầy đủ")
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Mật khẩu xác nhận không khớp")
+      return
+    }
+
+    try {
+      await changePassword(oldPassword, newPassword)
+      alert("Đổi mật khẩu thành công")
+
+      setOldPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      setShowChangePassword(false)
+    } catch (err) {
+      alert(err.message || "Không thể đổi mật khẩu")
     }
   }
 
@@ -115,21 +146,56 @@ export default function Profile() {
           <div className="space-y-4">
 
             <div className="flex items-center justify-between">
-              <span>Dark Mode</span>
-              <input
-                type="checkbox"
-                checked={darkMode}
-                onChange={() => setDarkMode(!darkMode)}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
               <span>Thông báo</span>
               <input type="checkbox" defaultChecked />
             </div>
 
-            <button className="w-full btn-primary">
+            <button
+              className="w-full btn-primary"
+              onClick={() => {
+                setShowSettings(false)
+                setShowChangePassword(true)
+              }}
+            >
               Đổi mật khẩu
+            </button>
+
+
+          </div>
+        </Modal>
+      )}
+
+      {/* ================= CHANGE PASSWORD MODAL ================= */}
+      {showChangePassword && (
+        <Modal title="Đổi mật khẩu" onClose={() => setShowChangePassword(false)}>
+          <div className="space-y-4">
+
+            <Input
+              label="Mật khẩu cũ"
+              type="password"
+              value={oldPassword}
+              onChange={e => setOldPassword(e.target.value)}
+            />
+
+            <Input
+              label="Mật khẩu mới"
+              type="password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+            />
+
+            <Input
+              label="Xác nhận mật khẩu mới"
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+            />
+
+            <button
+              className="w-full btn-primary"
+              onClick={handleChangePassword}
+            >
+              Lưu
             </button>
 
           </div>

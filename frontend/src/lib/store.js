@@ -77,7 +77,17 @@ export const useAuthStore = create(
         return res
       },
 
-
+      changePassword: async (oldPassword, newPassword) => {
+        try {
+          const res = await api.put('/auth/change-password', {
+            old_password: oldPassword,
+            new_password: newPassword
+          })
+          return res
+        } catch (err) {
+          throw err
+        }
+      },
 
       logout: () => {
         set({ user: null, token: null, error: null })
