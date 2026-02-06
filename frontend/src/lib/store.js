@@ -64,6 +64,30 @@ export const useAuthStore = create(
         }
       },
 
+      updateProfile: async (profileData) => {
+        const res = await api.put("/auth/profile", profileData)
+
+        set((state) => ({
+          user: {
+            ...state.user,
+            ...res,
+          },
+        }))
+
+        return res
+      },
+
+      changePassword: async (oldPassword, newPassword) => {
+          // Nếu trong auth.py router có prefix là "/auth" 
+          // và trong main.py include router đó với prefix "/api/v1"
+          // Thì đường dẫn này là ĐÚNG.
+          const res = await api.put('/auth/change-password', {
+              old_password: oldPassword,
+              new_password: newPassword
+          })
+          return res
+      },
+
       logout: () => {
         set({ user: null, token: null, error: null })
         localStorage.removeItem('auth-storage')

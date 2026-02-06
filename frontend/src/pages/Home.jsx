@@ -355,7 +355,7 @@ export default function Home() {
  * Extract color from gradient or solid color string
  */
 function extractThemeColor(colorString) {
-  if (!colorString) return '#6366f1' // Default primary color
+  if (!colorString) return '#deae1e' // Default primary color
   
   // If it's a hex color, return it directly
   if (colorString.startsWith('#')) return colorString

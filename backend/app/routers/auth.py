@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse
+from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse, UpdateProfile, ChangePassword
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -58,3 +59,46 @@ async def get_me(current_user: User = Depends(get_current_user)):
 @router.post("/logout")
 async def logout():
     return {"success": True}
+
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(
+    data: UpdateProfile,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(User).where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if data.display_name is not None:
+        user.display_name = data.display_name
+        
+    await db.commit()
+    await db.refresh(user)
+
+    return UserResponse.model_validate(user)
+
+@router.put("/change-password")
+async def change_password(
+    data: ChangePassword,
+    db: AsyncSession = Depends(get_db), # Sửa Session -> AsyncSession
+    current_user: User = Depends(get_current_user),
+):
+    # Sử dụng await và select thay vì db.query
+    result = await db.execute(select(User).where(User.id == current_user.id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not verify_password(data.old_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Mật khẩu cũ không đúng")
+
+    user.hashed_password = hash_password(data.new_password)
+    
+    await db.commit() # Thêm await
+    return {"success": True, "message": "Đổi mật khẩu thành công"}
