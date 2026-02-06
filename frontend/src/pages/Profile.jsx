@@ -17,7 +17,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="bg-white min-h-screen space-y-8">
       {/* Profile Header */}
       <div className="card p-8 text-center">
         <div className="w-24 h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl text-white font-bold shadow-lg">

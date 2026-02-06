@@ -79,7 +79,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        sans: ['Figtree', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         'game': '0 4px 0 0 rgba(0,0,0,0.15)',

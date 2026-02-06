@@ -138,7 +138,7 @@ export default function Step() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-muted border-t-primary rounded-full animate-spin mx-auto" />
           <p className="text-muted-foreground font-medium">Loading...</p>
@@ -158,7 +158,7 @@ export default function Step() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Top Header - Progress + Energy */}
       <header className="px-4 py-4 flex items-center gap-4 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-40">
         {/* Close button */}

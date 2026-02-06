@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Giải Tích",
+    "slug": "giai-tich",
+    "icon": "📈"
+  },
+  {
+    "name": "Đại Số",
+    "slug": "dai-so",
+    "icon": "🔢"
+  },
+  {
+    "name": "Hình Học",
+    "slug": "hinh-hoc",
+    "icon": "🔺"
+  }
+]

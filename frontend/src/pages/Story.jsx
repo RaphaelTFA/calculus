@@ -98,7 +98,7 @@ export default function Story() {
 
   if (!story) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <p className="text-muted-foreground">Course not found</p>
       </div>
     )
@@ -107,7 +107,7 @@ export default function Story() {
   const needsEnrollment = !story.is_enrolled
 
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div className="min-h-screen bg-white pb-8">
       {/* Minimal Header */}
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-sm border-b">
         <div className="container max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
