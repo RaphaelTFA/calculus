@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import api from '../lib/api'
 import { useAuthStore } from '../lib/store'
+import { decodeStepId } from '../lib/utils'
 
 // shadcn/ui components
 import { Button } from '../components/ui/button'
@@ -21,8 +22,9 @@ import { Badge } from '../components/ui/badge'
 import { Progress } from '../components/ui/progress'
 
 export default function Step() {
-  const { id } = useParams()
+  const { slug, encodedId } = useParams()
   const navigate = useNavigate()
+  const id = decodeStepId(encodedId)
   const [step, setStep] = useState(null)
   const [slides, setSlides] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)

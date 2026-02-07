@@ -18,18 +18,27 @@ async def get_dashboard(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Get most recent enrollment
+    # Get all enrollments
     result = await db.execute(
         select(Enrollment)
         .where(Enrollment.user_id == current_user.id)
         .order_by(Enrollment.enrolled_at.desc())
-        .limit(1)
     )
-    enrollment = result.scalar_one_or_none()
+    enrollments = result.scalars().all()
     
     current_story = None
+    in_progress_stories = []
     
-    if enrollment:
+    # Get completed steps for user
+    progress_result = await db.execute(
+        select(StepProgress.step_id).where(
+            StepProgress.user_id == current_user.id,
+            StepProgress.is_completed == True
+        )
+    )
+    completed_steps = set(progress_result.scalars().all())
+    
+    for idx, enrollment in enumerate(enrollments):
         story_result = await db.execute(
             select(Story)
             .options(
@@ -42,15 +51,6 @@ async def get_dashboard(
         
         if story:
             progress = await calculate_story_progress(db, current_user.id, story.id)
-            
-            # Get completed steps
-            progress_result = await db.execute(
-                select(StepProgress.step_id).where(
-                    StepProgress.user_id == current_user.id,
-                    StepProgress.is_completed == True
-                )
-            )
-            completed_steps = set(progress_result.scalars().all())
             
             chapters = []
             found_current = False
@@ -80,7 +80,7 @@ async def get_dashboard(
                     steps=steps
                 ))
             
-            current_story = StoryDetailResponse(
+            story_response = StoryDetailResponse(
                 id=story.id,
                 slug=story.slug,
                 title=story.title,
@@ -93,12 +93,21 @@ async def get_dashboard(
                 is_enrolled=True,
                 chapters=chapters
             )
+            
+            # First enrollment is the current story
+            if idx == 0:
+                current_story = story_response
+            
+            # Add to in_progress list if not 100% complete
+            if progress < 100:
+                in_progress_stories.append(story_response)
     
     level = current_user.xp // 100 + 1
     next_level_xp = level * 100
     
     return DashboardResponse(
         current_story=current_story,
+        in_progress_stories=in_progress_stories,
         total_xp=current_user.xp,
         level=level,
         next_level_xp=next_level_xp

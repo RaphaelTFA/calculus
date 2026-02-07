@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import api from '../lib/api'
 import { useAuthStore } from '../lib/store'
+import { encodeStepId } from '../lib/utils'
 
 // shadcn/ui components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
@@ -290,7 +291,7 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
 
         {/* Active lesson card - appears at bottom if current lesson is in this chapter */}
         {currentLesson?.chapter?.id === chapter.id && (
-          <ActiveLessonCard lesson={currentLesson.step} />
+          <ActiveLessonCard lesson={currentLesson.step} courseSlug={currentLesson.step?.story_slug} />
         )}
       </Card>
     </div>
@@ -354,7 +355,8 @@ function LessonNode({ step, isCompleted, isCurrent, isLocked, isEnrolled }) {
 // ACTIVE LESSON CARD - Primary CTA area (Fitts's Law)
 // =============================================================================
 
-function ActiveLessonCard({ lesson }) {
+function ActiveLessonCard({ lesson, courseSlug }) {
+  const slug = courseSlug || lesson?.story_slug
   return (
     <div className="mt-6 pt-6 border-t">
       <Card className="border-primary/20 bg-gradient-to-br from-primary-50/50 to-white overflow-hidden">
@@ -381,7 +383,7 @@ function ActiveLessonCard({ lesson }) {
             size="lg" 
             className="w-full h-14 text-base font-bold"
           >
-            <Link to={`/step/${lesson.id}`} className="flex items-center justify-center gap-2">
+            <Link to={`/course/${slug}/step/${encodeStepId(lesson.id)}`} className="flex items-center justify-center gap-2">
               Continue
               <ArrowRight className="w-5 h-5" />
             </Link>

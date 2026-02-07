@@ -94,6 +94,7 @@ class SlideResponse(BaseModel):
 # Progress
 class DashboardResponse(BaseModel):
     current_story: Optional[StoryDetailResponse]
+    in_progress_stories: list[StoryDetailResponse] = []
     total_xp: int
     level: int
     next_level_xp: int
