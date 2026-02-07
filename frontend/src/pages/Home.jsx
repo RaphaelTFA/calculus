@@ -49,35 +49,23 @@ export default function Home() {
     }
   }
 
-  // Get course cards to display - in progress + suggested (up to 5)
+  // Get course cards to display - only in progress courses
   const getCourseCards = () => {
     if (!dashboardData) return []
     
-    const stories = []
-    
-    // Add in-progress courses first
-    if (dashboardData.current_story) {
-      stories.push({ ...dashboardData.current_story, status: 'in-progress' })
-    }
+    // Use in_progress_stories from API (already deduplicated and filtered)
     if (dashboardData.in_progress_stories && Array.isArray(dashboardData.in_progress_stories)) {
-      const currentSlug = dashboardData.current_story?.slug
-      const inProgress = dashboardData.in_progress_stories
-        .filter(s => s.slug !== currentSlug)
+      return dashboardData.in_progress_stories
         .map(s => ({ ...s, status: 'in-progress' }))
-      stories.push(...inProgress)
+        .slice(0, 5)
     }
     
-    // Add suggested courses
-    if (dashboardData.stories && Array.isArray(dashboardData.stories)) {
-      const existingSlugs = new Set(stories.map(s => s.slug))
-      const suggested = dashboardData.stories
-        .filter(s => !existingSlugs.has(s.slug))
-        .map(s => ({ ...s, status: 'suggested' }))
-        .slice(0, 5 - stories.length) // Fill up to 5 total
-      stories.push(...suggested)
+    // Fallback to current_story if in_progress_stories not available
+    if (dashboardData.current_story) {
+      return [{ ...dashboardData.current_story, status: 'in-progress' }]
     }
     
-    return stories.slice(0, 5) // Maximum 5 courses
+    return []
   }
 
   const courses = getCourseCards()
@@ -241,14 +229,9 @@ export default function Home() {
                   <BookOpen className="w-5 h-5" />
                   Your Courses
                 </h2>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">
-                    {courses.filter(c => c.status === 'in-progress').length} In Progress
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {courses.filter(c => c.status === 'suggested').length} Suggested
-                  </Badge>
-                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {courses.length} In Progress
+                </Badge>
               </div>
 
               {/* Carousel Container */}
@@ -321,13 +304,7 @@ export default function Home() {
           )}
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <QuickActionCard 
-              icon={BookOpen} 
-              title="Continue Learning" 
-              description="Pick up where you left off"
-              to="/explore"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <QuickActionCard 
               icon={Trophy} 
               title="View Leaderboard" 
@@ -397,9 +374,9 @@ function CourseCard({ story }) {
   const isInProgress = story.status === 'in-progress'
 
   return (
-    <Link to={`/story/${story.slug}`} className="block h-full">
+    <Link to={`/course/${story.slug}`} className="block h-full group">
       <Card 
-        className="relative overflow-hidden shadow-xl bg-white border-0 h-full hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02]"
+        className="relative overflow-hidden shadow-xl bg-white border-0 h-full hover:shadow-2xl transition-all duration-300 cursor-pointer"
         style={{ borderTop: `6px solid ${themeColor}` }}
       >
         {/* Decorative colored accent */}
@@ -432,14 +409,6 @@ function CourseCard({ story }) {
                   className="border-0 font-bold text-xs bg-blue-100 text-blue-700 pointer-events-none"
                 >
                   In Progress
-                </Badge>
-              )}
-              {!isInProgress && (
-                <Badge 
-                  variant="outline"
-                  className="font-bold text-xs pointer-events-none"
-                >
-                  Suggested
                 </Badge>
               )}
               {isStarted && (
@@ -487,15 +456,22 @@ function CourseCard({ story }) {
 
           {/* CTA Button - Now just visual, parent Link handles navigation */}
           <div 
-            className="w-full md:w-auto font-bold text-base h-12 px-8 rounded-md border-2 flex items-center justify-center gap-2 transition-colors pointer-events-none"
+            className={`cta-${story.slug} w-full md:w-auto font-bold text-base h-12 px-8 rounded-md border-2 flex items-center justify-center gap-2 transition-all duration-200 pointer-events-none`}
             style={{ 
               borderColor: themeColor,
-              color: themeColor
+              color: themeColor,
+              backgroundColor: 'transparent'
             }}
           >
             {isStarted ? 'Continue' : 'Start Course'}
             <ArrowRight className="w-5 h-5" />
           </div>
+          <style>{`
+            .group:hover .cta-${story.slug} {
+              background-color: ${themeColor} !important;
+              color: white !important;
+            }
+          `}</style>
         </CardContent>
       </Card>
     </Link>

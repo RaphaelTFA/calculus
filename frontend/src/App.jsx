@@ -25,10 +25,10 @@ export default function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="explore" element={<Explore />} />
-        <Route path="story/:slug" element={<Story />} />
+        <Route path="course/:slug" element={<Story />} />
         <Route path="profile" element={<Profile />} />
       </Route>
-      <Route path="/step/:id" element={<Step />} />
+      <Route path="/course/:slug/step/:encodedId" element={<Step />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       

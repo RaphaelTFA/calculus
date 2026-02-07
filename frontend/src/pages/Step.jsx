@@ -2,13 +2,22 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Menu } from 'lucide-react'
 import api from '../lib/api'
-import './Step.css'
+import { useAuthStore } from '../lib/store'
+import { decodeStepId } from '../lib/utils'
+
+// shadcn/ui components
+import { Button } from '../components/ui/button'
+import { Card, CardContent } from '../components/ui/card'
+import { Badge } from '../components/ui/badge'
+import { Progress } from '../components/ui/progress'
 
 export default function Step() {
-  const { id } = useParams()
+  const { slug, encodedId } = useParams()
   const navigate = useNavigate()
-  const [story, setStory] = useState(null)
-  const [allSteps, setAllSteps] = useState([])
+  const id = decodeStepId(encodedId)
+  const [step, setStep] = useState(null)
+  const [slides, setSlides] = useState([])
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [activeNodeId, setActiveNodeId] = useState(parseInt(id))
   const [selectedLessonId, setSelectedLessonId] = useState(null)
