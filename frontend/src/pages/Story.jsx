@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import api from '../lib/api'
 import { useAuthStore } from '../lib/store'
+import { encodeStepId } from '../lib/utils'
 
 // shadcn/ui components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
@@ -153,6 +154,7 @@ export default function Story() {
                 index={cIndex}
                 isEnrolled={story.is_enrolled}
                 currentLesson={currentLesson}
+                storySlug={slug}
               />
             ))}
           </div>
@@ -248,6 +250,7 @@ function CourseOverviewCard({ story, totalLessons, completedLessons, needsEnroll
 // =============================================================================
 
 function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
+  const [selectedLesson, setSelectedLesson] = useState(null)
   const steps = chapter.steps || []
   
   return (
@@ -282,6 +285,7 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
                   isLocked={isLocked}
                   isEnrolled={isEnrolled}
                   isLast={stepIndex === steps.length - 1}
+                  onSelect={() => setSelectedLesson(step)}
                 />
               )
             })}
@@ -290,9 +294,12 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
 
         {/* Active lesson card - appears at bottom if current lesson is in this chapter */}
         {currentLesson?.chapter?.id === chapter.id && (
-          <ActiveLessonCard lesson={currentLesson.step} />
+          <ActiveLessonCard lesson={currentLesson.step} courseSlug={storySlug} />
         )}
       </Card>
+
+      {/* Lesson Modal */}
+      <LessonModal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />
     </div>
   )
 }
@@ -301,15 +308,17 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
 // LESSON NODE - Individual lesson in the path
 // =============================================================================
 
-function LessonNode({ step, isCompleted, isCurrent, isLocked, isEnrolled }) {
+function LessonNode({ step, isCompleted, isCurrent, isLocked, isEnrolled, onSelect }) {
   return (
-    <div className={`relative flex items-center gap-4 p-3 rounded-xl transition-all ${
-      isCurrent 
-        ? 'bg-primary-50 ring-2 ring-primary ring-offset-2' 
-        : isCompleted
-          ? 'bg-muted/50'
-          : 'opacity-60'
-    }`}>
+    <div 
+      onClick={onSelect}
+      className={`relative flex items-center gap-4 p-3 rounded-xl transition-all cursor-pointer hover:bg-primary/5 ${
+        isCurrent 
+          ? 'bg-primary-50 ring-2 ring-primary ring-offset-2' 
+          : isCompleted
+            ? 'bg-muted/50'
+            : 'opacity-60'
+      }`}>
       {/* Status icon */}
       <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
         isCompleted 
@@ -354,7 +363,7 @@ function LessonNode({ step, isCompleted, isCurrent, isLocked, isEnrolled }) {
 // ACTIVE LESSON CARD - Primary CTA area (Fitts's Law)
 // =============================================================================
 
-function ActiveLessonCard({ lesson }) {
+function ActiveLessonCard({ lesson, courseSlug }) {
   return (
     <div className="mt-6 pt-6 border-t">
       <Card className="border-primary/20 bg-gradient-to-br from-primary-50/50 to-white overflow-hidden">
@@ -381,7 +390,7 @@ function ActiveLessonCard({ lesson }) {
             size="lg" 
             className="w-full h-14 text-base font-bold"
           >
-            <Link to={`/step/${lesson.id}`} className="flex items-center justify-center gap-2">
+            <Link to={`/course/${courseSlug}/step/${encodeStepId(lesson.id)}`} className="flex items-center justify-center gap-2">
               Continue
               <ArrowRight className="w-5 h-5" />
             </Link>
@@ -389,5 +398,53 @@ function ActiveLessonCard({ lesson }) {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+// =============================================================================
+// LESSON MODAL - Popup card when clicking a lesson
+// =============================================================================
+
+function LessonModal({ lesson, onClose }) {
+  if (!lesson) return null
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+        onClick={onClose}
+      />
+      
+      {/* Modal Card */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-8 space-y-6">
+            {/* Title - bold black at top center */}
+            <h2 className="text-center text-2xl font-bold text-black">
+              {lesson.title}
+            </h2>
+            
+            {/* Description if available */}
+            {lesson.description && (
+              <p className="text-center text-gray-600 text-sm">
+                {lesson.description}
+              </p>
+            )}
+            
+            {/* Start Button - large blue rounded */}
+            <Button 
+              asChild 
+              size="lg" 
+              className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl"
+            >
+              <Link to={`/step/${lesson.id}`} onClick={onClose}>
+                Bắt đầu
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

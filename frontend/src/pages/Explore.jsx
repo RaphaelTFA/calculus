@@ -4,13 +4,14 @@ import { motion } from 'framer-motion'
 const learningPaths = [
   {
     id: 1,
+    slug: 'giai-tich-co-ban',
     title: 'Giải Tích Cơ Bản',
     description: 'Khám phá các khái niệm nền tảng của giải tích: giới hạn, đạo hàm, tích phân.',
     iconUrl: 'https://ds055uzetaobb.cloudfront.net/category-images/Foundations_of_Algebra-6MUKk8.png',
     modules: [
-      { id: 101, title: 'Giới hạn', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Arithmetic_Thinking-KaQBTB.png?width=204', isNew: false },
-      { id: 102, title: 'Đạo hàm', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Coordinate_Plane-TjmV5y.png?width=204', isNew: true },
-      { id: 103, title: 'Tích phân', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Visual_Algebra_1-wiJeeI.png?width=204', isNew: false },
+      { id: 1, title: 'Giới hạn', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Arithmetic_Thinking-KaQBTB.png?width=204', isNew: false },
+      { id: 2, title: 'Đạo hàm', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Coordinate_Plane-TjmV5y.png?width=204', isNew: true },
+      { id: 3, title: 'Tích phân', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Visual_Algebra_1-wiJeeI.png?width=204', isNew: false },
     ],
   },
 ]
@@ -58,8 +59,8 @@ function PathSection({ path }) {
       {/* 2. GRAY TRAY - Pinned further to the left */}
       {/* 'rounded-l-3xl' ensures the left side is rounded while it spans to the right */}
       <div className="bg-[#F8F8F8] rounded-l-[24px] py-10 pl-8 flex gap-6 overflow-x-auto scrollbar-hide">
-        {path.modules.map((module) => (
-          <ModuleCard key={module.id} module={module} />
+        {path.modules.map((course) => (
+          <CourseCard key={course.id} course={course} />
         ))}
       </div>
 
@@ -67,28 +68,28 @@ function PathSection({ path }) {
   )
 }
 
-function ModuleCard({ module }) {
+function CourseCard({ course }) {
   return (
-    <Link to={`/step/${module.id}`} className="flex-shrink-0 w-[176px] flex flex-col gap-6 no-underline group">
+    <Link to={`/step/${course.id}`} className="flex-shrink-0 w-[176px] flex flex-col gap-6 no-underline group">
       <motion.div
         whileHover={{ y: -2 }}
         className="relative w-[176px] h-[176px] bg-white border-2 border-[#E5E5E5] rounded-[24px] shadow-[0_4px_0_0_#E5E5E5] group-hover:shadow-[0_6px_0_0_#E5E5E5] flex items-center justify-center transition-all duration-200"
       >
-        {module.isNew && (
+        {course.isNew && (
           <div className="absolute top-2.5 right-2.5 bg-[#15B441] text-white text-[10px] font-[700] px-2 py-0.5 rounded-[10px] uppercase tracking-wider z-10">
             NEW
           </div>
         )}
         
         <img 
-          src={module.illustration} 
+          src={course.illustration} 
           className="w-[102px] h-[102px] object-contain"
-          alt={module.title}
+          alt={course.title}
         />
       </motion.div>
       
       <div className="text-[16px] text-center font-[500] text-[#111] leading-tight px-1">
-        {module.title}
+        {course.title}
       </div>
     </Link>
   )
