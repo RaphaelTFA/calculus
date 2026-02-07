@@ -14,7 +14,6 @@ import {
 } from 'lucide-react'
 import api from '../lib/api'
 import { useAuthStore } from '../lib/store'
-import { encodeStepId } from '../lib/utils'
 
 // shadcn/ui components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
@@ -390,7 +389,7 @@ function ActiveLessonCard({ lesson, courseSlug }) {
             size="lg" 
             className="w-full h-14 text-base font-bold"
           >
-            <Link to={`/course/${courseSlug}/step/${encodeStepId(lesson.id)}`} className="flex items-center justify-center gap-2">
+            <Link to={`/step/${lesson.id}`} className="flex items-center justify-center gap-2">
               Continue
               <ArrowRight className="w-5 h-5" />
             </Link>
