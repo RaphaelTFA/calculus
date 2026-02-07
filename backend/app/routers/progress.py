@@ -26,10 +26,32 @@ async def get_dashboard(
     )
     enrollments = result.scalars().all()
     
-    current_story = None
-    in_progress_stories = []
+    if not enrollments:
+        level = current_user.xp // 100 + 1
+        next_level_xp = level * 100
+        return DashboardResponse(
+            current_story=None,
+            in_progress_stories=[],
+            total_xp=current_user.xp,
+            level=level,
+            next_level_xp=next_level_xp
+        )
     
-    # Get completed steps for user
+    # Get all story IDs from enrollments
+    story_ids = [e.story_id for e in enrollments]
+    
+    # Batch load all stories with chapters and steps in ONE query
+    stories_result = await db.execute(
+        select(Story)
+        .options(
+            selectinload(Story.chapters).selectinload(Chapter.steps),
+            joinedload(Story.category)
+        )
+        .where(Story.id.in_(story_ids))
+    )
+    stories_map = {s.id: s for s in stories_result.unique().scalars().all()}
+    
+    # Get completed steps for user (single query)
     progress_result = await db.execute(
         select(StepProgress.step_id).where(
             StepProgress.user_id == current_user.id,
@@ -38,69 +60,69 @@ async def get_dashboard(
     )
     completed_steps = set(progress_result.scalars().all())
     
+    current_story = None
+    in_progress_stories = []
+    
     for idx, enrollment in enumerate(enrollments):
-        story_result = await db.execute(
-            select(Story)
-            .options(
-                selectinload(Story.chapters).selectinload(Chapter.steps),
-                joinedload(Story.category)
-            )
-            .where(Story.id == enrollment.story_id)
-        )
-        story = story_result.scalar_one_or_none()
+        story = stories_map.get(enrollment.story_id)
+        if not story:
+            continue
+            
+        # Calculate progress in-memory (no extra queries!)
+        total_steps = sum(len(ch.steps) for ch in story.chapters)
+        story_step_ids = {step.id for ch in story.chapters for step in ch.steps}
+        completed_count = len(completed_steps & story_step_ids)
+        progress = int((completed_count / total_steps) * 100) if total_steps > 0 else 0
         
-        if story:
-            progress = await calculate_story_progress(db, current_user.id, story.id)
-            
-            chapters = []
-            found_current = False
-            
-            for chapter in story.chapters:
-                steps = []
-                for step in chapter.steps:
-                    is_completed = step.id in completed_steps
-                    is_current = not is_completed and not found_current
-                    
-                    if is_current:
-                        found_current = True
-                    
-                    steps.append(StepResponse(
-                        id=step.id,
-                        title=step.title,
-                        description=step.description,
-                        xp_reward=step.xp_reward,
-                        is_completed=is_completed,
-                        is_current=is_current
-                    ))
+        chapters = []
+        found_current = False
+        
+        for chapter in story.chapters:
+            steps = []
+            for step in chapter.steps:
+                is_completed = step.id in completed_steps
+                is_current = not is_completed and not found_current
                 
-                chapters.append(ChapterResponse(
-                    id=chapter.id,
-                    title=chapter.title,
-                    description=chapter.description,
-                    steps=steps
+                if is_current:
+                    found_current = True
+                
+                steps.append(StepResponse(
+                    id=step.id,
+                    title=step.title,
+                    description=step.description,
+                    xp_reward=step.xp_reward,
+                    is_completed=is_completed,
+                    is_current=is_current
                 ))
             
-            story_response = StoryDetailResponse(
-                id=story.id,
-                slug=story.slug,
-                title=story.title,
-                description=story.description,
-                icon=story.icon,
-                color=story.color,
-                category_name=story.category.name if story.category else None,
-                chapter_count=len(chapters),
-                progress=progress,
-                is_enrolled=True,
-                chapters=chapters
-            )
-            
-            # First enrollment is the current story
-            if idx == 0:
-                current_story = story_response
-            
-            # Add to in_progress list if not 100% complete
-            if progress < 100:
-                in_progress_stories.append(story_response)
+            chapters.append(ChapterResponse(
+                id=chapter.id,
+                title=chapter.title,
+                description=chapter.description,
+                steps=steps
+            ))
+        
+        story_response = StoryDetailResponse(
+            id=story.id,
+            slug=story.slug,
+            title=story.title,
+            description=story.description,
+            icon=story.icon,
+            color=story.color,
+            category_name=story.category.name if story.category else None,
+            chapter_count=len(chapters),
+            progress=progress,
+            is_enrolled=True,
+            chapters=chapters
+        )
+        
+        # First enrollment is the current story
+        if idx == 0:
+            current_story = story_response
+        
+        # Add to in_progress list if not 100% complete
+        if progress < 100:
+            in_progress_stories.append(story_response)
     
     level = current_user.xp // 100 + 1
     next_level_xp = level * 100
