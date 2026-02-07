@@ -27,7 +27,30 @@ async def get_dashboard(
     )
     enrollment = result.scalar_one_or_none()
     
-    current_story = None
+    if not enrollments:
+        level = current_user.xp // 100 + 1
+        next_level_xp = level * 100
+        return DashboardResponse(
+            current_story=None,
+            in_progress_stories=[],
+            total_xp=current_user.xp,
+            level=level,
+            next_level_xp=next_level_xp
+        )
+    
+    # Get all story IDs from enrollments
+    story_ids = [e.story_id for e in enrollments]
+    
+    # Batch load all stories with chapters and steps in ONE query
+    stories_result = await db.execute(
+        select(Story)
+        .options(
+            selectinload(Story.chapters).selectinload(Chapter.steps),
+            joinedload(Story.category)
+        )
+        .where(Story.id.in_(story_ids))
+    )
+    stories_map = {s.id: s for s in stories_result.unique().scalars().all()}
     
     if enrollment:
         story_result = await db.execute(
