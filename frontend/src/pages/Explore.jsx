@@ -69,14 +69,12 @@ function PathSection({ path }) {
 }
 
 function CourseCard({ course }) {
-function CourseCard({ course }) {
   return (
     <Link to={`/course/${course.slug}`} className="flex-shrink-0 w-[176px] flex flex-col gap-6 no-underline group">
       <motion.div
         whileHover={{ y: -2 }}
         className="relative w-[176px] h-[176px] bg-white border-2 border-[#E5E5E5] rounded-[24px] shadow-[0_4px_0_0_#E5E5E5] group-hover:shadow-[0_6px_0_0_#E5E5E5] flex items-center justify-center transition-all duration-200"
       >
-        {course.isNew && (
         {course.isNew && (
           <div className="absolute top-2.5 right-2.5 bg-[#15B441] text-white text-[10px] font-[700] px-2 py-0.5 rounded-[10px] uppercase tracking-wider z-10">
             NEW
@@ -85,15 +83,12 @@ function CourseCard({ course }) {
         
         <img 
           src={course.illustration} 
-          src={course.illustration} 
           className="w-[102px] h-[102px] object-contain"
-          alt={course.title}
           alt={course.title}
         />
       </motion.div>
       
       <div className="text-[16px] text-center font-[500] text-[#111] leading-tight px-1">
-        {course.title}
         {course.title}
       </div>
     </Link>
