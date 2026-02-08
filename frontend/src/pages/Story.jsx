@@ -294,7 +294,7 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson, storySlug }
 
         {/* Active lesson card - appears at bottom if current lesson is in this chapter */}
         {currentLesson?.chapter?.id === chapter.id && (
-          <ActiveLessonCard lesson={currentLesson.step} courseSlug={currentLesson.step?.story_slug} />
+          <ActiveLessonCard lesson={currentLesson.step} courseSlug={storySlug} />
         )}
       </Card>
 
