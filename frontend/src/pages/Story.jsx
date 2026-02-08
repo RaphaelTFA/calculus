@@ -249,7 +249,7 @@ function CourseOverviewCard({ story, totalLessons, completedLessons, needsEnroll
 // RIGHT COLUMN - Chapter Section with Lesson Path
 // =============================================================================
 
-function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
+function ChapterSection({ chapter, index, isEnrolled, currentLesson, storySlug }) {
   const [selectedLesson, setSelectedLesson] = useState(null)
   const steps = chapter.steps || []
   
@@ -299,7 +299,7 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson }) {
       </Card>
 
       {/* Lesson Modal */}
-      <LessonModal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />
+      <LessonModal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} storySlug={storySlug} />
     </div>
   )
 }
@@ -406,7 +406,7 @@ function ActiveLessonCard({ lesson, courseSlug }) {
 // LESSON MODAL - Popup card when clicking a lesson
 // =============================================================================
 
-function LessonModal({ lesson, onClose }) {
+function LessonModal({ lesson, onClose, storySlug }) {
   if (!lesson) return null
 
   return (
@@ -439,7 +439,7 @@ function LessonModal({ lesson, onClose }) {
               size="lg" 
               className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl"
             >
-              <Link to={`/step/${lesson.id}`} onClick={onClose}>
+              <Link to={`/course/${storySlug}/step/${encodeStepId(lesson.id)}`} onClick={onClose}>
                 Bắt đầu
               </Link>
             </Button>
