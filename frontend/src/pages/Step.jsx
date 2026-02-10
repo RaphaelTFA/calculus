@@ -1,16 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight, Check, X, Sparkles, RotateCcw, HelpCircle } from 'lucide-react'
+import {
+  X as XIcon, Check, Sparkles, RotateCcw, HelpCircle,
+  Eye,
+  Lightbulb, AlertTriangle, Info, GraduationCap,
+  Copy, CheckCheck, Play, GripVertical
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import api from '../lib/api'
 import { useAuthStore } from '../lib/store'
-import { decodeStepId, encodeStepId } from '../lib/utils'
+import { decodeStepId, encodeStepId, cn } from '../lib/utils'
 import 'katex/dist/katex.min.css'
 import { InlineMath, BlockMath } from 'react-katex'
 
-// shadcn/ui components
 import { Button } from '../components/ui/button'
-import { Card, CardContent } from '../components/ui/card'
+
+// ─── MAIN COMPONENT ─────────────────────────────────────────────────────────
 
 export default function Step() {
   const { slug, encodedId } = useParams()
@@ -20,26 +25,26 @@ export default function Step() {
 
   const [step, setStep] = useState(null)
   const [slides, setSlides] = useState([])
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [story, setStory] = useState(null)
   const [allSteps, setAllSteps] = useState([])
+
+  // Slide navigation
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
+
+  // Quiz state: per-block
   const [quizAnswers, setQuizAnswers] = useState({})
   const [quizSubmitted, setQuizSubmitted] = useState({})
-  const [quizResults, setQuizResults] = useState({}) // { blockId: { correct: bool, xp: number } }
+  const [quizResults, setQuizResults] = useState({})
   const [totalXpEarned, setTotalXpEarned] = useState(0)
-  const [showCompleteScreen, setShowCompleteScreen] = useState(false)
-  const [feedbackState, setFeedbackState] = useState(null) // { blockId, correct, xp, explanation }
-  const [showExplanation, setShowExplanation] = useState(false)
 
-  useEffect(() => {
-    loadData()
-  }, [id, slug])
+  const [showCompleteScreen, setShowCompleteScreen] = useState(false)
+
+  useEffect(() => { loadData() }, [id, slug])
 
   const loadData = async () => {
     setLoading(true)
     try {
-      // Load story data for navigation context
       const fullStory = await api.get(`/stories/${slug}`)
       setStory(fullStory)
 
@@ -53,22 +58,23 @@ export default function Step() {
 
       const steps = []
       fullStory.chapters?.forEach(ch => {
-        ch.steps?.forEach(s => {
-          steps.push({ ...s, chapter_id: ch.id })
-        })
+        ch.steps?.forEach(s => steps.push({ ...s, chapter_id: ch.id }))
       })
       setAllSteps(steps)
 
-      // Load step details
-      const stepData = await api.get(`/steps/${id}`)
-      setStep(stepData)
+      const [stepData, slidesData] = await Promise.all([
+        api.get(`/steps/${id}`),
+        api.get(`/steps/${id}/slides`)
+      ])
 
-      // Load slides
-      const slidesData = await api.get(`/steps/${id}/slides`)
+      setStep(stepData)
       setSlides(slidesData)
       setCurrentSlideIndex(0)
       setQuizAnswers({})
       setQuizSubmitted({})
+      setQuizResults({})
+      setTotalXpEarned(0)
+      setShowCompleteScreen(false)
     } catch (e) {
       console.error('Error loading step:', e)
     } finally {
@@ -76,110 +82,89 @@ export default function Step() {
     }
   }
 
+  // Slide navigation helpers
   const currentSlide = slides[currentSlideIndex]
-  const progress = slides.length > 0 ? ((currentSlideIndex + 1) / slides.length) * 100 : 0
+  const progress = slides.length > 0 ? ((currentSlideIndex) / (slides.length - 1 || 1)) * 100 : 0
+  const isLastSlide = currentSlideIndex === slides.length - 1
 
-  const goToNextSlide = () => {
-    if (currentSlideIndex < slides.length - 1) {
-      setCurrentSlideIndex(prev => prev + 1)
-    }
-  }
+  const goNext = useCallback(() => {
+    if (currentSlideIndex < slides.length - 1) setCurrentSlideIndex(i => i + 1)
+  }, [currentSlideIndex, slides.length])
 
-  const goToPrevSlide = () => {
-    if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(prev => prev - 1)
-    }
-  }
+  // Does the current slide have an unanswered quiz?
+  const currentQuizBlocks = useMemo(() => {
+    if (!currentSlide?.blocks) return []
+    return currentSlide.blocks.filter(b => (b.type || b.block_type) === 'quiz')
+  }, [currentSlide])
 
-  const handleComplete = async () => {
-    // Show celebration screen first
-    setShowCompleteScreen(true)
-  }
+  const hasQuiz = currentQuizBlocks.length > 0
+  const allQuizzesAnswered = currentQuizBlocks.every(b => quizSubmitted[b.id])
+  const allQuizzesCorrect = currentQuizBlocks.every(b => quizResults[b.id]?.correct)
 
-  const handleCompleteAndNavigate = async () => {
-    try {
-      await api.post(`/steps/${id}/complete`, { score: 100 })
-      // Navigate to next step or back to course
-      const currentIdx = allSteps.findIndex(s => s.id === parseInt(id))
-      if (currentIdx < allSteps.length - 1) {
-        const nextStep = allSteps[currentIdx + 1]
-        navigate(`/course/${slug}/step/${encodeStepId(nextStep.id)}`)
-      } else {
-        navigate(`/course/${slug}`)
-      }
-    } catch (e) {
-      console.error('Error completing step:', e)
-      // Still navigate even if completion fails
-      navigate(`/course/${slug}`)
-    }
-  }
+  // The footer button logic:
+  // - If slide has quiz and not all submitted → "Check" (disabled until all selected)
+  // - If slide has quiz and submitted but wrong → "Try Again"
+  // - Otherwise → "Continue" (or "Complete" on last slide)
+  const allQuizzesSelected = currentQuizBlocks.every(b => quizAnswers[b.id] != null)
 
+  // Quiz handlers
   const handleQuizAnswer = (blockId, answer) => {
     setQuizAnswers(prev => ({ ...prev, [blockId]: answer }))
   }
 
   const handleQuizSubmit = (blockId, isCorrect, explanation) => {
-    const xpReward = isCorrect ? 15 : 0
+    const xp = isCorrect ? 15 : 0
     setQuizSubmitted(prev => ({ ...prev, [blockId]: true }))
-    setQuizResults(prev => ({ ...prev, [blockId]: { correct: isCorrect, xp: xpReward } }))
-    if (isCorrect) {
-      setTotalXpEarned(prev => prev + xpReward)
-    }
-    setFeedbackState({ blockId, correct: isCorrect, xp: xpReward, explanation })
-    setShowExplanation(false)
+    setQuizResults(prev => ({ ...prev, [blockId]: { correct: isCorrect, xp, explanation } }))
+    if (isCorrect) setTotalXpEarned(prev => prev + xp)
   }
 
-  const handleFeedbackContinue = () => {
-    const wasCorrect = feedbackState?.correct
-    const blockId = feedbackState?.blockId
-    
-    setFeedbackState(null)
-    setShowExplanation(false)
-    
-    if (wasCorrect) {
-      // Only advance to next slide if answer was correct
-      if (currentSlideIndex < slides.length - 1) {
-        setCurrentSlideIndex(prev => prev + 1)
+  const handleQuizRetry = (blockId) => {
+    setQuizSubmitted(prev => ({ ...prev, [blockId]: false }))
+    setQuizAnswers(prev => ({ ...prev, [blockId]: null }))
+    setQuizResults(prev => {
+      const copy = { ...prev }
+      delete copy[blockId]
+      return copy
+    })
+  }
+
+  // Completion
+  const handleComplete = () => setShowCompleteScreen(true)
+
+  const handleCompleteAndNavigate = async () => {
+    try {
+      await api.post(`/steps/${id}/complete`, { score: 100 })
+      const currentIdx = allSteps.findIndex(s => s.id === parseInt(id))
+      if (currentIdx < allSteps.length - 1) {
+        const next = allSteps[currentIdx + 1]
+        navigate(`/course/${slug}/step/${encodeStepId(next.id)}`)
+      } else {
+        navigate(`/course/${slug}`)
       }
-    } else {
-      // Reset quiz state to allow retry
-      setQuizSubmitted(prev => ({ ...prev, [blockId]: false }))
-      setQuizAnswers(prev => ({ ...prev, [blockId]: null }))
+    } catch {
+      navigate(`/course/${slug}`)
     }
   }
 
-  const handleShowExplanation = () => {
-    setShowExplanation(true)
-  }
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
-        e.preventDefault()
-        goToNextSlide()
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        goToPrevSlide()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentSlideIndex, slides.length])
-
+  // ── LOADING ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
+          <p className="text-stone-500 text-sm">Loading lesson…</p>
+        </div>
       </div>
     )
   }
 
+  // ── EMPTY ──
   if (!step || slides.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="text-center text-white">
-          <p className="mb-4">No slides found for this step</p>
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-stone-500 mb-4">No content found for this lesson.</p>
           <Button asChild variant="outline">
             <Link to={`/course/${slug}`}>Back to Course</Link>
           </Button>
@@ -188,12 +173,10 @@ export default function Step() {
     )
   }
 
-  const isLastSlide = currentSlideIndex === slides.length - 1
-
-  // Show completion celebration screen
+  // ── COMPLETION SCREEN ──
   if (showCompleteScreen) {
     return (
-      <CompleteScreen 
+      <CompleteScreen
         xpEarned={totalXpEarned || (step?.xp_reward || 10)}
         stepTitle={step?.title}
         onContinue={handleCompleteAndNavigate}
@@ -201,190 +184,185 @@ export default function Step() {
     )
   }
 
-  return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
-      {/* Header */}
-      <header className="h-14 bg-[#12121a] border-b border-white/10 flex items-center px-4 shrink-0">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => navigate(`/course/${slug}`)}
-          className="text-white/70 hover:text-white hover:bg-white/10"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        
-        <div className="flex-1 ml-4">
-          <h1 className="text-white font-medium truncate">{step.title}</h1>
-          <p className="text-white/50 text-sm truncate">{story?.title}</p>
-        </div>
+  // Footer button handler
+  const handleFooterAction = () => {
+    if (hasQuiz && !allQuizzesAnswered) {
+      // Submit all quizzes on this slide
+      currentQuizBlocks.forEach(b => {
+        if (!quizSubmitted[b.id] && quizAnswers[b.id] != null) {
+          const content = b.content || b.block_data || {}
+          const isCorrect = String(quizAnswers[b.id]) === String(content.correct)
+          handleQuizSubmit(b.id, isCorrect, content.explanation)
+        }
+      })
+      return
+    }
+    if (hasQuiz && allQuizzesAnswered && !allQuizzesCorrect) {
+      // Retry wrong quizzes
+      currentQuizBlocks.forEach(b => {
+        if (!quizResults[b.id]?.correct) handleQuizRetry(b.id)
+      })
+      return
+    }
+    // Continue / Complete
+    if (isLastSlide) {
+      handleComplete()
+    } else {
+      goNext()
+    }
+  }
 
-        <div className="flex items-center gap-2 text-white/50 text-sm">
-          <span>{currentSlideIndex + 1} / {slides.length}</span>
+  // Footer button label & style
+  let footerLabel = 'Continue'
+  let footerStyle = 'bg-emerald-500 hover:bg-emerald-600 text-white'
+  let footerDisabled = false
+
+  if (hasQuiz && !allQuizzesAnswered) {
+    footerLabel = 'Check'
+    footerStyle = 'bg-blue-500 hover:bg-blue-600 text-white'
+    footerDisabled = !allQuizzesSelected
+  } else if (hasQuiz && allQuizzesAnswered && !allQuizzesCorrect) {
+    footerLabel = 'Try Again'
+    footerStyle = 'bg-stone-700 hover:bg-stone-800 text-white'
+  } else if (isLastSlide) {
+    footerLabel = 'Complete'
+    footerStyle = 'bg-emerald-500 hover:bg-emerald-600 text-white'
+  }
+
+  // ── MAIN RENDER ──
+  return (
+    <div className="h-[100dvh] flex flex-col bg-stone-100 overflow-hidden">
+      {/* ── Header ── 1/10 of screen */}
+      <header className="h-[10vh] shrink-0 flex items-center justify-center relative bg-white">
+        {/* Exit button — top left */}
+        <button
+          onClick={() => navigate(`/course/${slug}`)}
+          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition"
+          title="Exit lesson"
+        >
+          <XIcon className="w-5 h-5" />
+        </button>
+
+        {/* Progress bar — centered, ~50% width */}
+        <div className="w-1/2 max-w-md">
+          <div className="h-2.5 bg-stone-200 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-emerald-500 rounded-full"
+              initial={false}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            />
+          </div>
         </div>
       </header>
 
-      {/* Progress bar */}
-      <div className="h-1 bg-white/5">
-        <div 
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* Slide Content */}
-      <main className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-auto pb-24">
-        <div className="w-full max-w-3xl">
-          <SlideRenderer 
-            slide={currentSlide} 
-            quizAnswers={quizAnswers}
-            quizSubmitted={quizSubmitted}
-            onQuizAnswer={handleQuizAnswer}
-            onQuizSubmit={handleQuizSubmit}
-          />
+      {/* ── Body ── 8/10 of screen */}
+      <main className="h-[80vh] shrink-0 overflow-y-auto">
+        <div className="h-full flex items-center justify-center px-4 sm:px-8">
+          <div className="w-full max-w-2xl -mt-8">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlideIndex}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -24 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="space-y-6"
+              >
+                {currentSlide?.blocks?.map((block, blockIdx) => (
+                  <BlockRenderer
+                    key={block.id || `${currentSlideIndex}-${blockIdx}`}
+                    block={block}
+                    quizAnswer={quizAnswers[block.id]}
+                    quizSubmitted={quizSubmitted[block.id]}
+                    quizResult={quizResults[block.id]}
+                    onQuizAnswer={(ans) => handleQuizAnswer(block.id, ans)}
+                    onQuizSubmit={(correct, explanation) => handleQuizSubmit(block.id, correct, explanation)}
+                    onQuizRetry={() => handleQuizRetry(block.id)}
+                  />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </main>
 
-      {/* Feedback Panel - slides up from bottom */}
-      <AnimatePresence>
-        {feedbackState && (
-          <FeedbackPanel
-            correct={feedbackState.correct}
-            xp={feedbackState.xp}
-            explanation={feedbackState.explanation}
-            showExplanation={showExplanation}
-            onShowExplanation={handleShowExplanation}
-            onContinue={handleFeedbackContinue}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Navigation - only show when no feedback panel */}
-      {!feedbackState && (
-        <footer className="h-20 bg-[#12121a] border-t border-white/10 flex items-center justify-between px-4 md:px-8 shrink-0">
-          <Button
-            variant="ghost"
-            onClick={goToPrevSlide}
-            disabled={currentSlideIndex === 0}
-            className="text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30"
-          >
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            Back
-          </Button>
-
-          <div className="flex gap-1">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlideIndex(idx)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  idx === currentSlideIndex 
-                    ? 'bg-blue-500 w-6' 
-                    : idx < currentSlideIndex 
-                      ? 'bg-blue-500/50' 
-                      : 'bg-white/20'
-                }`}
-              />
-            ))}
-          </div>
-
-          {isLastSlide ? (
-            <Button
-              onClick={handleComplete}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              Complete
-              <Check className="w-4 h-4 ml-1" />
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              onClick={goToNextSlide}
-              className="text-white/70 hover:text-white hover:bg-white/10"
-            >
-              Next
-              <ChevronRight className="w-5 h-5 ml-1" />
-            </Button>
+      {/* ── Footer ── 1/10 of screen */}
+      <footer className="h-[10vh] shrink-0 flex items-center justify-center bg-white">
+        <Button
+          onClick={handleFooterAction}
+          disabled={footerDisabled}
+          className={cn(
+            'h-12 px-10 text-base font-bold rounded-2xl shadow-sm transition-all disabled:opacity-40',
+            footerStyle
           )}
-        </footer>
-      )}
+        >
+          {footerLabel}
+        </Button>
+      </footer>
     </div>
   )
 }
 
-// =============================================================================
-// SLIDE RENDERER
-// =============================================================================
 
-function SlideRenderer({ slide, quizAnswers, quizSubmitted, onQuizAnswer, onQuizSubmit }) {
-  if (!slide) return null
-
-  return (
-    <div className="space-y-6">
-      {slide.blocks?.map((block, idx) => (
-        <BlockRenderer 
-          key={block.id || idx} 
-          block={block}
-          quizAnswers={quizAnswers}
-          quizSubmitted={quizSubmitted}
-          onQuizAnswer={onQuizAnswer}
-          onQuizSubmit={onQuizSubmit}
-        />
-      ))}
-    </div>
-  )
-}
-
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
 // BLOCK RENDERER
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
 
-function BlockRenderer({ block, quizAnswers, quizSubmitted, onQuizAnswer, onQuizSubmit }) {
+function BlockRenderer({ block, quizAnswer, quizSubmitted, quizResult, onQuizAnswer, onQuizSubmit, onQuizRetry }) {
   const type = block.type || block.block_type
 
   switch (type) {
-    case 'text':
-      return <TextBlock block={block} />
-    case 'math':
-      return <MathBlock block={block} />
-    case 'image':
-      return <ImageBlock block={block} />
-    case 'quiz':
-      return (
-        <QuizBlock 
-          block={block}
-          answer={quizAnswers[block.id]}
-          submitted={quizSubmitted[block.id]}
-          onAnswer={(ans) => onQuizAnswer(block.id, ans)}
-          onSubmit={() => onQuizSubmit(block.id)}
-        />
-      )
-    case 'code':
-      return <CodeBlock block={block} />
+    case 'text':       return <TextBlock block={block} />
+    case 'math':       return <MathBlock block={block} />
+    case 'image':      return <ImageBlock block={block} />
+    case 'quiz':       return (
+      <QuizBlock
+        block={block}
+        answer={quizAnswer}
+        submitted={quizSubmitted}
+        result={quizResult}
+        onAnswer={onQuizAnswer}
+        onSubmit={onQuizSubmit}
+        onRetry={onQuizRetry}
+      />
+    )
+    case 'code':       return <CodeBlock block={block} />
+    case 'callout':    return <CalloutBlock block={block} />
+    case 'reveal':     return <RevealBlock block={block} />
+    case 'video':      return <VideoBlock block={block} />
+    case 'fill_blank': return <FillBlankBlock block={block} />
+    case 'ordering':   return <OrderingBlock block={block} />
+    case 'interactive_graph': return <InteractiveGraphBlock block={block} />
     default:
-      return <div className="text-white/50">Unknown block type: {type}</div>
+      return <div className="text-stone-400 text-sm italic">Unsupported block type: {type}</div>
   }
 }
 
-// =============================================================================
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // TEXT BLOCK
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function TextBlock({ block }) {
   const content = block.content || block.block_data || {}
-  
+
   return (
-    <div className="text-white space-y-3">
+    <div className="space-y-3">
       {content.heading && (
-        <h2 className="text-2xl md:text-3xl font-bold">{content.heading}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-stone-900 leading-tight">
+          <MathText text={content.heading} />
+        </h2>
       )}
       {content.paragraphs?.map((p, idx) => (
-        <p key={idx} className="text-lg text-white/80 leading-relaxed" 
-           dangerouslySetInnerHTML={{ __html: formatText(p) }} />
+        <p key={idx} className="text-base text-stone-700 leading-[1.8]">
+          <MathText text={formatText(p)} html />
+        </p>
       ))}
       {content.content && (
-        <div className="text-lg text-white/80 leading-relaxed"
-             dangerouslySetInnerHTML={{ __html: formatText(content.content) }} />
+        <div className="text-base text-stone-700 leading-[1.8]">
+          <MathText text={formatText(content.content)} html />
+        </div>
       )}
     </div>
   )
@@ -392,364 +370,633 @@ function TextBlock({ block }) {
 
 function formatText(text) {
   if (!text) return ''
-  // Convert **bold** to <strong>
-  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  // Convert *italic* to <em>
-  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>')
-  // Convert _italic_ to <em>
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-stone-900">$1</strong>')
+  text = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
   text = text.replace(/_(.*?)_/g, '<em>$1</em>')
   return text
 }
 
-// =============================================================================
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MATH BLOCK
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function MathBlock({ block }) {
   const content = block.content || block.block_data || {}
   const latex = content.latex || ''
-  const displayMode = content.display_mode !== 'inline'
+  const label = content.label
+  const isInline = content.display_mode === 'inline'
 
   try {
     return (
-      <div className="text-white text-center py-4">
-        {displayMode ? (
-          <BlockMath math={latex} />
-        ) : (
-          <InlineMath math={latex} />
+      <div className="my-4">
+        {label && (
+          <p className="text-xs font-medium text-stone-400 uppercase tracking-wider mb-1">
+            {label}
+          </p>
         )}
+        <div className={cn(
+          'bg-stone-50/80 rounded-xl border border-stone-100 px-6 py-5',
+          isInline && 'inline-block bg-transparent border-0 p-0'
+        )}>
+          {isInline ? (
+            <InlineMath math={latex} />
+          ) : (
+            <div className="text-center overflow-x-auto">
+              <BlockMath math={latex} />
+            </div>
+          )}
+        </div>
       </div>
     )
-  } catch (e) {
-    return <div className="text-red-400">Error rendering math: {latex}</div>
+  } catch {
+    return (
+      <div className="bg-red-50 text-red-600 rounded-lg p-3 text-sm">
+        Error rendering math: <code className="font-mono text-xs">{latex}</code>
+      </div>
+    )
   }
 }
 
-// =============================================================================
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // IMAGE BLOCK
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function ImageBlock({ block }) {
   const content = block.content || block.block_data || {}
-  
+  const [loaded, setLoaded] = useState(false)
+
   return (
-    <div className="flex flex-col items-center gap-2">
-      <img 
-        src={content.src} 
-        alt={content.alt || ''} 
-        className="max-w-full rounded-lg"
-      />
+    <figure className="my-6">
+      <div className="relative overflow-hidden rounded-xl bg-stone-100">
+        {!loaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-stone-300 border-t-stone-500 rounded-full animate-spin" />
+          </div>
+        )}
+        <img
+          src={content.src}
+          alt={content.alt || ''}
+          onLoad={() => setLoaded(true)}
+          className={cn(
+            'w-full transition-opacity duration-300',
+            loaded ? 'opacity-100' : 'opacity-0'
+          )}
+        />
+      </div>
       {content.caption && (
-        <p className="text-white/50 text-sm">{content.caption}</p>
+        <figcaption className="mt-2 text-center text-sm text-stone-400 italic">
+          <MathText text={content.caption} />
+        </figcaption>
       )}
-    </div>
+    </figure>
   )
 }
 
-// =============================================================================
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // CODE BLOCK
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function CodeBlock({ block }) {
   const content = block.content || block.block_data || {}
-  
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content.code || '')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
-    <div className="rounded-lg overflow-hidden">
-      <div className="bg-[#1e1e2e] px-4 py-2 text-white/50 text-sm border-b border-white/10">
-        {content.language || 'code'}
+    <div className="my-4 rounded-xl overflow-hidden border border-stone-200 bg-[#1e1e2e]">
+      <div className="flex items-center justify-between px-4 py-2 bg-[#181825] border-b border-stone-700/30">
+        <span className="text-xs font-mono text-stone-400">{content.language || 'code'}</span>
+        <button
+          onClick={handleCopy}
+          className="text-stone-400 hover:text-stone-200 transition p-1 rounded"
+        >
+          {copied ? <CheckCheck className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+        </button>
       </div>
-      <pre className="bg-[#1e1e2e] p-4 overflow-x-auto">
-        <code className="text-green-400 text-sm font-mono">
-          {content.code}
-        </code>
+      <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
+        <code className="text-green-300 font-mono">{content.code}</code>
       </pre>
     </div>
   )
 }
 
-// =============================================================================
-// QUIZ BLOCK
-// =============================================================================
 
-function QuizBlock({ block, answer, submitted, onAnswer, onSubmit }) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// QUIZ BLOCK — Interactive inline quiz
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRetry }) {
   const content = block.content || block.block_data || {}
   const question = content.question || ''
   const options = content.options || []
   const correctAnswer = content.correct
   const explanation = content.explanation
 
-  const handleSubmit = () => {
-    // Use loose comparison to handle type mismatches (string vs number)
-    const isCorrect = String(answer) === String(correctAnswer)
-    onSubmit(block.id, isCorrect, explanation)
-  }
-
-  // Use loose comparison for display as well
-  const isCorrect = submitted && String(answer) === String(correctAnswer)
+  const isCorrect = result?.correct
 
   return (
-    <Card className="bg-[#1a1a2e] border-white/10 overflow-hidden">
-      <CardContent className="p-6 space-y-4">
-        {/* Question */}
-        <div className="text-white text-lg font-medium">
-          {question.includes('$') ? (
-            <MathText text={question} />
-          ) : (
-            question
-          )}
-        </div>
+    <div className="space-y-5">
+      {/* Question */}
+      <p className="text-lg font-semibold text-stone-800 leading-relaxed text-center">
+        <MathText text={question} />
+      </p>
 
-        {/* Options */}
-        <div className="space-y-2">
-          {options.map((opt, idx) => {
-            const optValue = opt.value || opt.id || idx
-            const optLabel = opt.label || opt.text
-            const isSelected = answer === optValue
-            const showCorrect = submitted && String(optValue) === String(correctAnswer)
-            const showWrong = submitted && isSelected && String(optValue) !== String(correctAnswer)
-
-            return (
-              <motion.button
-                key={optValue}
-                onClick={() => !submitted && onAnswer(optValue)}
-                disabled={submitted}
-                animate={showWrong ? { x: [0, -8, 8, -8, 8, 0] } : {}}
-                transition={{ duration: 0.4 }}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  showCorrect
-                    ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-                    : showWrong
-                      ? 'bg-red-500/10 border-red-400/50 text-red-400'
-                      : isSelected
-                        ? 'bg-blue-500/20 border-blue-500 text-white'
-                        : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-                }`}
-              >
-                <span className="flex items-center gap-3">
-                  <span className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
-                    showCorrect ? 'border-emerald-500 bg-emerald-500 text-white' :
-                    showWrong ? 'border-red-400 bg-red-500/20' :
-                    isSelected ? 'border-blue-500 bg-blue-500/20' : 'border-white/30'
-                  }`}>
-                    {showCorrect ? <Check className="w-4 h-4" /> : 
-                     showWrong ? <X className="w-4 h-4" /> : 
-                     String.fromCharCode(65 + idx)}
-                  </span>
-                  {optLabel}
-                </span>
-              </motion.button>
-            )
-          })}
-        </div>
-
-        {/* Submit button */}
-        {!submitted && answer && (
+      {/* Feedback banner */}
+      <AnimatePresence>
+        {submitted && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
+            className={cn(
+              'text-center py-2 px-4 rounded-xl text-sm font-bold',
+              isCorrect ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
+            )}
           >
-            <Button 
-              onClick={handleSubmit}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-semibold text-base"
-            >
-              Check Answer
-            </Button>
+            {isCorrect ? `Correct! +${result.xp} XP` : 'Not quite — try again'}
           </motion.div>
         )}
-      </CardContent>
-    </Card>
+      </AnimatePresence>
+
+      {/* Options */}
+      <div className="space-y-2.5 max-w-lg mx-auto">
+        {options.map((opt, idx) => {
+          const optValue = opt.value ?? opt.id ?? idx
+          const optLabel = opt.label || opt.text || (typeof opt === 'string' ? opt : String(opt))
+          const isSelected = answer === optValue
+          const showCorrectMark = submitted && String(optValue) === String(correctAnswer)
+          const showWrongMark = submitted && isSelected && String(optValue) !== String(correctAnswer)
+
+          return (
+            <motion.button
+              key={optValue}
+              onClick={() => !submitted && onAnswer(optValue)}
+              disabled={submitted}
+              animate={showWrongMark ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+              transition={{ duration: 0.35 }}
+              className={cn(
+                'w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all duration-200 flex items-center gap-3',
+                showCorrectMark
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                  : showWrongMark
+                    ? 'bg-red-50 border-red-300 text-red-700'
+                    : isSelected
+                      ? 'bg-blue-50 border-blue-400 text-blue-800 shadow-sm'
+                      : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300 hover:bg-stone-50'
+              )}
+            >
+              <span className={cn(
+                'w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+                showCorrectMark ? 'border-emerald-400 bg-emerald-500 text-white' :
+                showWrongMark   ? 'border-red-400 bg-red-100' :
+                isSelected      ? 'border-blue-400 bg-blue-100 text-blue-700' :
+                                  'border-stone-300 text-stone-400'
+              )}>
+                {showCorrectMark ? <Check className="w-3.5 h-3.5" /> :
+                 showWrongMark   ? <XIcon className="w-3.5 h-3.5" /> :
+                                   String.fromCharCode(65 + idx)}
+              </span>
+              <span className="text-sm leading-snug">
+                <MathText text={typeof optLabel === 'string' ? optLabel : String(optLabel)} />
+              </span>
+            </motion.button>
+          )
+        })}
+      </div>
+
+      {/* Explanation — auto-shown when answered correctly */}
+      <AnimatePresence>
+        {submitted && isCorrect && explanation && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-amber-50/70 border border-amber-200/60 rounded-xl p-4 text-sm text-stone-700 leading-relaxed max-w-lg mx-auto">
+              <p className="font-semibold text-amber-700 text-xs uppercase tracking-wider mb-1">Explanation</p>
+              <MathText text={explanation} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
-// =============================================================================
-// FEEDBACK PANEL - Slides up from bottom
-// =============================================================================
 
-function FeedbackPanel({ correct, xp, explanation, showExplanation, onShowExplanation, onContinue }) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// CALLOUT BLOCK — Theorem / Tip / Warning / Info
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const calloutConfig = {
+  info:    { icon: Info,           bg: 'bg-blue-50',    border: 'border-blue-200', iconColor: 'text-blue-500',    title: 'Info' },
+  tip:     { icon: Lightbulb,     bg: 'bg-amber-50',   border: 'border-amber-200', iconColor: 'text-amber-500',  title: 'Tip' },
+  warning: { icon: AlertTriangle, bg: 'bg-orange-50',  border: 'border-orange-200', iconColor: 'text-orange-500', title: 'Warning' },
+  theorem: { icon: GraduationCap, bg: 'bg-violet-50',  border: 'border-violet-200', iconColor: 'text-violet-500', title: 'Theorem' },
+  note:    { icon: Info,          bg: 'bg-stone-50',   border: 'border-stone-200', iconColor: 'text-stone-500',   title: 'Note' },
+}
+
+function CalloutBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  const variant = content.variant || content.callout_type || 'info'
+  const cfg = calloutConfig[variant] || calloutConfig.info
+  const Icon = cfg.icon
+
   return (
-    <motion.div
-      initial={{ y: '100%' }}
-      animate={{ y: 0 }}
-      exit={{ y: '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      className={`fixed bottom-0 left-0 right-0 z-50 ${
-        correct ? 'bg-emerald-500' : 'bg-[#3a3a4a]'
-      }`}
-    >
-      <div className="max-w-3xl mx-auto px-4 py-5">
-        {/* Main feedback row */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            {/* Icon */}
-            {correct ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: 0.1 }}
-                className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
-              >
-                <Sparkles className="w-5 h-5 text-white" />
-              </motion.div>
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                <RotateCcw className="w-5 h-5 text-white/70" />
-              </div>
-            )}
-            
-            {/* Text */}
-            <div>
-              <motion.p 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-white font-bold text-lg"
-              >
-                {correct ? 'Correct!' : 'Incorrect'}
-              </motion.p>
-              {correct && xp > 0 && (
-                <motion.p
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-white/90 text-sm font-medium"
-                >
-                  +{xp} XP
-                </motion.p>
-              )}
+    <div className={cn('my-6 rounded-xl border p-5', cfg.bg, cfg.border)}>
+      <div className="flex items-start gap-3">
+        <Icon className={cn('w-5 h-5 mt-0.5 shrink-0', cfg.iconColor)} />
+        <div className="space-y-1.5 min-w-0">
+          <p className={cn('text-sm font-bold uppercase tracking-wider', cfg.iconColor)}>
+            {content.title || cfg.title}
+          </p>
+          {content.body && (
+            <div className="text-sm text-stone-700 leading-relaxed">
+              <MathText text={content.body} />
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            {explanation && (
-              <Button
-                variant="ghost"
-                onClick={onShowExplanation}
-                className={`${correct ? 'text-white/80 hover:text-white hover:bg-white/10' : 'bg-white/10 text-white hover:bg-white/20'} font-medium`}
-              >
-                <HelpCircle className="w-4 h-4 mr-1" />
-                Why?
-              </Button>
-            )}
-            <Button
-              onClick={onContinue}
-              className={`font-bold px-6 ${
-                correct 
-                  ? 'bg-white text-emerald-600 hover:bg-white/90' 
-                  : 'bg-white/90 text-gray-800 hover:bg-white'
-              }`}
-            >
-              {correct ? 'Continue' : 'Try Again'}
-            </Button>
-          </div>
+          )}
+          {content.content && (
+            <div className="text-sm text-stone-700 leading-relaxed">
+              <MathText text={content.content} />
+            </div>
+          )}
+          {content.latex && (
+            <div className="mt-2 overflow-x-auto">
+              <BlockMath math={content.latex} />
+            </div>
+          )}
         </div>
+      </div>
+    </div>
+  )
+}
 
-        {/* Explanation (expandable) */}
-        <AnimatePresence>
-          {showExplanation && explanation && (
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REVEAL BLOCK — Step-by-step solution
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function RevealBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  const steps = content.steps || content.items || []
+  const [revealedCount, setRevealedCount] = useState(0)
+
+  return (
+    <div className="my-6 rounded-xl border border-stone-200 bg-white overflow-hidden">
+      <div className="px-5 py-3 bg-stone-50 border-b border-stone-100 flex items-center justify-between">
+        <span className="text-sm font-semibold text-stone-700 flex items-center gap-2">
+          <Eye className="w-4 h-4" />
+          {content.title || 'Step-by-step Solution'}
+        </span>
+        <span className="text-xs text-stone-400">{revealedCount} / {steps.length} steps</span>
+      </div>
+      <div className="p-5 space-y-3">
+        {steps.map((s, idx) => {
+          const isRevealed = idx < revealedCount
+          const stepText = typeof s === 'string' ? s : (s.content || s.text || '')
+          return (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
+              key={idx}
+              initial={false}
+              animate={{ opacity: isRevealed ? 1 : 0.3 }}
+              className="flex items-start gap-3"
             >
-              <div className={`mt-4 p-4 rounded-xl ${correct ? 'bg-white/10' : 'bg-white/5'}`}>
-                <p className="text-white/90 text-sm leading-relaxed">
-                  {explanation}
-                </p>
+              <span className={cn(
+                'w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shrink-0 mt-0.5',
+                isRevealed ? 'bg-blue-100 text-blue-700' : 'bg-stone-100 text-stone-400'
+              )}>
+                {idx + 1}
+              </span>
+              <div className="text-sm text-stone-700 leading-relaxed min-w-0">
+                {isRevealed ? <MathText text={stepText} /> : <span className="text-stone-300">• • •</span>}
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
+          )
+        })}
+
+        {revealedCount < steps.length ? (
+          <Button
+            onClick={() => setRevealedCount(prev => prev + 1)}
+            variant="outline"
+            className="w-full mt-2 rounded-xl text-sm"
+          >
+            <Eye className="w-3.5 h-3.5 mr-1.5" /> Reveal Next Step
+          </Button>
+        ) : (
+          <Button
+            onClick={() => setRevealedCount(0)}
+            variant="ghost"
+            className="w-full mt-2 rounded-xl text-sm text-stone-400"
+          >
+            <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Reset
+          </Button>
+        )}
       </div>
-    </motion.div>
+    </div>
   )
 }
 
-// =============================================================================
-// COMPLETE SCREEN - Celebration
-// =============================================================================
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIDEO BLOCK
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function VideoBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  return (
+    <div className="my-6">
+      <div className="rounded-xl overflow-hidden bg-black aspect-video">
+        <video
+          src={content.src}
+          controls
+          className="w-full h-full"
+          poster={content.poster}
+        />
+      </div>
+      {content.caption && (
+        <p className="mt-2 text-center text-sm text-stone-400 italic">{content.caption}</p>
+      )}
+    </div>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FILL-IN-THE-BLANK BLOCK
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function FillBlankBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  const template = content.template || ''
+  const blanks = content.blanks || []
+  const [values, setValues] = useState({})
+  const [checked, setChecked] = useState(false)
+  const [results, setResults] = useState({})
+
+  const parts = template.split(/(___\d+___)/g)
+
+  const handleChange = (id, val) => {
+    setValues(prev => ({ ...prev, [id]: val }))
+    setChecked(false)
+  }
+
+  const handleCheck = () => {
+    const res = {}
+    blanks.forEach((b, idx) => {
+      const blankId = b.id || idx
+      const userVal = (values[blankId] || '').trim().toLowerCase()
+      const correct = (Array.isArray(b.answer) ? b.answer : [b.answer]).map(a => String(a).trim().toLowerCase())
+      res[blankId] = correct.includes(userVal)
+    })
+    setResults(res)
+    setChecked(true)
+  }
+
+  return (
+    <div className="my-6 rounded-xl border border-stone-200 p-5 bg-white">
+      <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">Fill in the blanks</p>
+      <div className="text-base text-stone-700 leading-[2] flex flex-wrap items-baseline gap-1">
+        {parts.map((part, idx) => {
+          const match = part.match(/___(\d+)___/)
+          if (match) {
+            const blankIdx = parseInt(match[1]) - 1
+            const blank = blanks[blankIdx]
+            const blankId = blank?.id ?? blankIdx
+            const isCorrect = checked && results[blankId] === true
+            const isWrong = checked && results[blankId] === false
+            return (
+              <input
+                key={idx}
+                type="text"
+                value={values[blankId] || ''}
+                onChange={(e) => handleChange(blankId, e.target.value)}
+                placeholder={blank?.placeholder || '???'}
+                className={cn(
+                  'inline-block w-28 px-2 py-0.5 border-b-2 text-center text-sm font-medium bg-transparent outline-none transition',
+                  isCorrect ? 'border-emerald-500 text-emerald-700' :
+                  isWrong ? 'border-red-400 text-red-600' :
+                  'border-stone-300 focus:border-blue-400 text-stone-800'
+                )}
+              />
+            )
+          }
+          return <span key={idx}><MathText text={part} /></span>
+        })}
+      </div>
+      <Button onClick={handleCheck} className="mt-4 rounded-xl" size="sm">
+        Check
+      </Button>
+    </div>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ORDERING BLOCK — Drag to reorder
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function OrderingBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  const correctOrder = content.correct_order || content.items || []
+  const [items, setItems] = useState(() =>
+    [...correctOrder].sort(() => Math.random() - 0.5)
+  )
+  const [checked, setChecked] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(false)
+  const [dragIdx, setDragIdx] = useState(null)
+
+  const moveItem = (from, to) => {
+    setItems(prev => {
+      const arr = [...prev]
+      const [item] = arr.splice(from, 1)
+      arr.splice(to, 0, item)
+      return arr
+    })
+    setChecked(false)
+  }
+
+  const handleCheck = () => {
+    const correct = items.every((item, idx) => {
+      const expected = typeof correctOrder[idx] === 'string' ? correctOrder[idx] : correctOrder[idx]?.text
+      const actual = typeof item === 'string' ? item : item?.text
+      return actual === expected
+    })
+    setIsCorrect(correct)
+    setChecked(true)
+  }
+
+  return (
+    <div className="my-6 rounded-xl border border-stone-200 p-5 bg-white">
+      <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">
+        {content.title || 'Put in the correct order'}
+      </p>
+      {content.question && (
+        <p className="text-sm text-stone-600 mb-3"><MathText text={content.question} /></p>
+      )}
+      <div className="space-y-1.5">
+        {items.map((item, idx) => {
+          const label = typeof item === 'string' ? item : (item?.text || item?.label)
+          return (
+            <div
+              key={idx}
+              draggable
+              onDragStart={() => setDragIdx(idx)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => { if (dragIdx !== null) moveItem(dragIdx, idx); setDragIdx(null) }}
+              className={cn(
+                'flex items-center gap-2 px-3 py-2.5 rounded-lg border bg-white cursor-grab active:cursor-grabbing transition-colors',
+                checked && isCorrect ? 'border-emerald-200 bg-emerald-50' :
+                checked && !isCorrect ? 'border-red-200 bg-red-50' :
+                'border-stone-200 hover:border-stone-300'
+              )}
+            >
+              <GripVertical className="w-4 h-4 text-stone-300 shrink-0" />
+              <span className="text-sm text-stone-700 font-medium">
+                <MathText text={label} />
+              </span>
+            </div>
+          )
+        })}
+      </div>
+      <div className="flex items-center gap-2 mt-3">
+        <Button onClick={handleCheck} size="sm" className="rounded-xl">Check Order</Button>
+        {checked && (
+          <span className={cn('text-sm font-medium', isCorrect ? 'text-emerald-600' : 'text-red-500')}>
+            {isCorrect ? 'Correct!' : 'Not quite — try rearranging'}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INTERACTIVE GRAPH / EXPERIMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function InteractiveGraphBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  const [param, setParam] = useState(content.default_value ?? 1)
+  const min = content.min ?? -5
+  const max = content.max ?? 5
+  const step = content.step ?? 0.1
+
+  return (
+    <div className="my-6 rounded-xl border border-violet-200 bg-violet-50/40 p-5">
+      <p className="text-xs font-semibold text-violet-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <Play className="w-3.5 h-3.5" /> Interactive Experiment
+      </p>
+      {content.title && (
+        <p className="text-base font-medium text-stone-800 mb-2">{content.title}</p>
+      )}
+      {content.description && (
+        <p className="text-sm text-stone-600 leading-relaxed mb-4">
+          <MathText text={content.description} />
+        </p>
+      )}
+
+      {/* Slider control */}
+      {(content.param_name || content.slider) && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-stone-600 font-medium">{content.param_name || 'Value'}</span>
+            <span className="font-mono text-violet-700 font-bold">{param}</span>
+          </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={param}
+            onChange={e => setParam(parseFloat(e.target.value))}
+            className="w-full accent-violet-500"
+          />
+          <div className="flex justify-between text-xs text-stone-400">
+            <span>{min}</span>
+            <span>{max}</span>
+          </div>
+        </div>
+      )}
+
+      {content.latex && (
+        <div className="mt-3 overflow-x-auto">
+          <BlockMath math={content.latex.replace(/\{x\}/g, `{${param}}`)} />
+        </div>
+      )}
+
+      {content.functions && (
+        <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm text-stone-500 font-mono space-y-1">
+          {content.functions.map((fn, idx) => (
+            <div key={idx}>f(x) = {fn.expression || fn}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPLETION SCREEN
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function CompleteScreen({ xpEarned, stepTitle, onContinue }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-white flex flex-col items-center justify-center p-8"
+      className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-8"
     >
-      {/* Floating shapes decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="absolute top-1/4 left-1/4 w-16 h-16 bg-blue-100 rounded-2xl"
-        />
-        <motion.div
-          animate={{ y: [0, 15, 0], rotate: [0, -15, 0] }}
-          transition={{ duration: 5, repeat: Infinity, delay: 0.5 }}
-          className="absolute top-1/3 right-1/4 w-12 h-12 bg-emerald-100 rounded-full"
-        />
-        <motion.div
-          animate={{ y: [0, -10, 0], rotate: [0, 20, 0] }}
-          transition={{ duration: 3.5, repeat: Infinity, delay: 1 }}
-          className="absolute bottom-1/3 left-1/3 w-10 h-10 bg-amber-100 rounded-xl"
-        />
-        <motion.div
-          animate={{ y: [0, 12, 0], rotate: [0, -10, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, delay: 0.3 }}
-          className="absolute top-1/2 right-1/3 w-8 h-8 bg-purple-100 rounded-lg"
-        />
+        {[
+          { color: 'bg-blue-100', size: 'w-16 h-16', radius: 'rounded-2xl', top: '25%', left: '25%', dur: 4 },
+          { color: 'bg-emerald-100', size: 'w-12 h-12', radius: 'rounded-full', top: '33%', left: '75%', dur: 5 },
+          { color: 'bg-amber-100', size: 'w-10 h-10', radius: 'rounded-xl', top: '66%', left: '33%', dur: 3.5 },
+          { color: 'bg-violet-100', size: 'w-8 h-8', radius: 'rounded-lg', top: '50%', left: '66%', dur: 4.5 },
+        ].map((d, i) => (
+          <motion.div
+            key={i}
+            animate={{ y: [0, -15, 0], rotate: [0, 10, 0] }}
+            transition={{ duration: d.dur, repeat: Infinity, delay: i * 0.3 }}
+            className={cn('absolute', d.color, d.size, d.radius)}
+            style={{ top: d.top, left: d.left }}
+          />
+        ))}
       </div>
 
-      {/* Content */}
       <div className="relative z-10 text-center space-y-8">
-        {/* Icon */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.2 }}
-          className="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center shadow-lg shadow-emerald-500/30"
+          className="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center shadow-lg shadow-emerald-200"
         >
           <Check className="w-12 h-12 text-white" strokeWidth={3} />
         </motion.div>
 
-        {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Lesson complete!
-          </h1>
-          <p className="text-gray-500 text-lg">
-            Nice — let's keep the momentum going
-          </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-2">Lesson complete!</h1>
+          <p className="text-stone-500 text-lg">Nice — let's keep the momentum going</p>
         </motion.div>
 
-        {/* XP Display */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="py-6"
-        >
-          <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-2">
-            Total XP
-          </p>
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }}>
+          <p className="text-xs font-bold tracking-widest text-stone-400 uppercase mb-2">Total XP</p>
           <motion.div
             initial={{ scale: 1 }}
-            animate={{ scale: [1, 1.1, 1] }}
+            animate={{ scale: [1, 1.08, 1] }}
             transition={{ delay: 0.7, duration: 0.3 }}
             className="relative inline-block"
           >
-            <span className="text-6xl md:text-7xl font-bold text-gray-900">
-              {xpEarned}
-            </span>
-            <span className="text-2xl md:text-3xl font-bold text-emerald-500 ml-2">
-              brain cells activated!
-            </span>
-            {/* Sparkle effect */}
+            <span className="text-6xl sm:text-7xl font-bold text-stone-900">{xpEarned}</span>
+            <span className="text-xl sm:text-2xl font-bold text-emerald-500 ml-2">XP earned</span>
             <motion.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
@@ -761,16 +1008,10 @@ function CompleteScreen({ xpEarned, stepTitle, onContinue }) {
           </motion.div>
         </motion.div>
 
-        {/* Continue Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="pt-4"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
           <Button
             onClick={onContinue}
-            className="h-14 px-12 text-lg font-bold bg-gray-900 hover:bg-gray-800 text-white rounded-2xl shadow-lg"
+            className="h-14 px-12 text-lg font-bold bg-stone-900 hover:bg-stone-800 text-white rounded-2xl shadow-sm"
           >
             Continue
           </Button>
@@ -780,15 +1021,36 @@ function CompleteScreen({ xpEarned, stepTitle, onContinue }) {
   )
 }
 
-// Helper to render text with inline math
-function MathText({ text }) {
-  const parts = text.split(/(\$[^$]+\$)/g)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MATH TEXT HELPER — Renders inline $math$ within text
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function MathText({ text, html = false }) {
+  if (!text) return null
+  const str = String(text)
+
+  // Split on $...$ patterns
+  const parts = str.split(/(\$[^$]+\$)/g)
+  const hasMath = parts.some(p => p.startsWith('$') && p.endsWith('$'))
+
+  if (!hasMath && html) {
+    return <span dangerouslySetInnerHTML={{ __html: str }} />
+  }
+
   return (
     <>
       {parts.map((part, idx) => {
-        if (part.startsWith('$') && part.endsWith('$')) {
+        if (part.startsWith('$') && part.endsWith('$') && part.length > 1) {
           const latex = part.slice(1, -1)
-          return <InlineMath key={idx} math={latex} />
+          try {
+            return <InlineMath key={idx} math={latex} />
+          } catch {
+            return <code key={idx} className="text-red-500 text-xs">{latex}</code>
+          }
+        }
+        if (html) {
+          return <span key={idx} dangerouslySetInnerHTML={{ __html: part }} />
         }
         return <span key={idx}>{part}</span>
       })}
