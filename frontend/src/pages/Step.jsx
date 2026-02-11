@@ -84,8 +84,13 @@ export default function Step() {
 
   // Slide navigation helpers
   const currentSlide = slides[currentSlideIndex]
-  const progress = slides.length > 0 ? ((currentSlideIndex) / (slides.length - 1 || 1)) * 100 : 0
+  // Progress: 0% at start, 100% only after completing last slide
+  const progress = slides.length > 0 ? (currentSlideIndex / slides.length) * 100 : 0
   const isLastSlide = currentSlideIndex === slides.length - 1
+
+  // Explanation popup state
+  const [showExplanation, setShowExplanation] = useState(false)
+  const [currentExplanation, setCurrentExplanation] = useState('')
 
   const goNext = useCallback(() => {
     if (currentSlideIndex < slides.length - 1) setCurrentSlideIndex(i => i + 1)
@@ -197,14 +202,7 @@ export default function Step() {
       })
       return
     }
-    if (hasQuiz && allQuizzesAnswered && !allQuizzesCorrect) {
-      // Retry wrong quizzes
-      currentQuizBlocks.forEach(b => {
-        if (!quizResults[b.id]?.correct) handleQuizRetry(b.id)
-      })
-      return
-    }
-    // Continue / Complete
+    // Continue / Complete (works for both correct and incorrect)
     if (isLastSlide) {
       handleComplete()
     } else {
@@ -212,22 +210,24 @@ export default function Step() {
     }
   }
 
-  // Footer button label & style
-  let footerLabel = 'Continue'
-  let footerStyle = 'bg-emerald-500 hover:bg-emerald-600 text-white'
-  let footerDisabled = false
-
-  if (hasQuiz && !allQuizzesAnswered) {
-    footerLabel = 'Check'
-    footerStyle = 'bg-blue-500 hover:bg-blue-600 text-white'
-    footerDisabled = !allQuizzesSelected
-  } else if (hasQuiz && allQuizzesAnswered && !allQuizzesCorrect) {
-    footerLabel = 'Try Again'
-    footerStyle = 'bg-stone-700 hover:bg-stone-800 text-white'
-  } else if (isLastSlide) {
-    footerLabel = 'Complete'
-    footerStyle = 'bg-emerald-500 hover:bg-emerald-600 text-white'
+  // Handle Why button click
+  const handleWhyClick = () => {
+    const explanations = currentQuizBlocks
+      .map(b => (b.content || b.block_data || {}).explanation)
+      .filter(Boolean)
+    setCurrentExplanation(explanations.join('\n\n') || 'No explanation available.')
+    setShowExplanation(true)
   }
+
+  // Quiz state for footer styling
+  const quizIsAnswered = hasQuiz && allQuizzesAnswered
+  const quizIsCorrect = quizIsAnswered && allQuizzesCorrect
+  const quizIsIncorrect = quizIsAnswered && !allQuizzesCorrect
+
+  // Calculate XP for current slide
+  const currentSlideXp = currentQuizBlocks.reduce((sum, b) => {
+    return sum + (quizResults[b.id]?.xp || 0)
+  }, 0)
 
   // ── MAIN RENDER ──
   return (
@@ -287,19 +287,139 @@ export default function Step() {
         </div>
       </main>
 
-      {/* ── Footer ── 1/10 of screen */}
-      <footer className="h-[10vh] shrink-0 flex items-center justify-center bg-white">
-        <Button
-          onClick={handleFooterAction}
-          disabled={footerDisabled}
-          className={cn(
-            'h-12 px-10 text-base font-bold rounded-2xl shadow-sm transition-all disabled:opacity-40',
-            footerStyle
-          )}
-        >
-          {footerLabel}
-        </Button>
+      {/* ── Footer ── handles quiz feedback states */}
+      <footer className={cn(
+        'h-[10vh] shrink-0 flex items-center justify-center transition-colors duration-300',
+        quizIsCorrect ? 'bg-emerald-500' :
+        quizIsIncorrect ? 'bg-stone-400' :
+        'bg-white'
+      )}>
+        {quizIsAnswered ? (
+          // Answered state - show feedback
+          <div className="flex items-center gap-6">
+            {/* Feedback indicator */}
+            <div className="flex items-center gap-2">
+              {quizIsCorrect ? (
+                <>
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                  </div>
+                  <div className="text-white">
+                    <p className="font-bold text-sm">Correct!</p>
+                    <p className="text-xs opacity-90">+{currentSlideXp} XP</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <XIcon className="w-5 h-5 text-white" strokeWidth={3} />
+                  </div>
+                  <p className="font-bold text-white text-sm">Incorrect</p>
+                </>
+              )}
+            </div>
+
+            {/* Why? button */}
+            <Button
+              onClick={handleWhyClick}
+              variant="ghost"
+              className={cn(
+                'h-10 px-4 text-sm font-semibold rounded-xl',
+                quizIsCorrect ? 'text-white hover:bg-white/20' : 'text-white hover:bg-white/20'
+              )}
+            >
+              <HelpCircle className="w-4 h-4 mr-1.5" />
+              Why?
+            </Button>
+
+            {/* Continue button */}
+            <Button
+              onClick={handleFooterAction}
+              className={cn(
+                'h-10 px-6 text-sm font-bold rounded-xl',
+                quizIsCorrect 
+                  ? 'bg-white text-emerald-600 hover:bg-white/90' 
+                  : 'bg-white text-stone-600 hover:bg-white/90'
+              )}
+            >
+              Continue
+            </Button>
+          </div>
+        ) : (
+          // Not answered yet - show Check or Continue
+          <Button
+            onClick={handleFooterAction}
+            disabled={hasQuiz && !allQuizzesSelected}
+            className={cn(
+              'h-12 px-10 text-base font-bold rounded-2xl shadow-sm transition-all disabled:opacity-40',
+              hasQuiz && !allQuizzesAnswered
+                ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                : isLastSlide
+                  ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                  : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+            )}
+          >
+            {hasQuiz && !allQuizzesAnswered ? 'Check' : (isLastSlide ? 'Complete' : 'Continue')}
+          </Button>
+        )}
       </footer>
+
+      {/* ── Explanation Modal with Blur ── */}
+      <AnimatePresence>
+        {showExplanation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onClick={() => setShowExplanation(false)}
+          >
+            {/* Blur backdrop */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            
+            {/* Modal content */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="px-6 py-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-amber-500" />
+                  <h3 className="font-bold text-amber-800">Explanation</h3>
+                </div>
+                <button
+                  onClick={() => setShowExplanation(false)}
+                  className="p-1 rounded-lg hover:bg-amber-100 text-amber-600 transition"
+                >
+                  <XIcon className="w-5 h-5" />
+                </button>
+              </div>
+              
+              {/* Body */}
+              <div className="px-6 py-5 max-h-[60vh] overflow-y-auto">
+                <div className="text-stone-700 leading-relaxed">
+                  <MathText text={currentExplanation} />
+                </div>
+              </div>
+              
+              {/* Footer */}
+              <div className="px-6 py-4 bg-stone-50 border-t border-stone-100">
+                <Button
+                  onClick={() => setShowExplanation(false)}
+                  className="w-full h-10 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold"
+                >
+                  Got it!
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -497,35 +617,18 @@ function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRet
   const question = content.question || ''
   const options = content.options || []
   const correctAnswer = content.correct
-  const explanation = content.explanation
 
   const isCorrect = result?.correct
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Question */}
-      <p className="text-lg font-semibold text-stone-800 leading-relaxed text-center">
+      <p className="text-xl font-bold text-stone-900 leading-relaxed text-center">
         <MathText text={question} />
       </p>
 
-      {/* Feedback banner */}
-      <AnimatePresence>
-        {submitted && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'text-center py-2 px-4 rounded-xl text-sm font-bold',
-              isCorrect ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
-            )}
-          >
-            {isCorrect ? `Correct! +${result.xp} XP` : 'Not quite — try again'}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Options */}
-      <div className="space-y-2.5 max-w-lg mx-auto">
+      {/* Options - Horizontal layout with square boxes */}
+      <div className="flex flex-wrap justify-center gap-3">
         {options.map((opt, idx) => {
           const optValue = opt.value ?? opt.id ?? idx
           const optLabel = opt.label || opt.text || (typeof opt === 'string' ? opt : String(opt))
@@ -538,54 +641,65 @@ function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRet
               key={optValue}
               onClick={() => !submitted && onAnswer(optValue)}
               disabled={submitted}
-              animate={showWrongMark ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-              transition={{ duration: 0.35 }}
+              animate={showWrongMark ? { x: [0, -4, 4, -3, 3, 0] } : {}}
+              transition={{ duration: 0.3 }}
               className={cn(
-                'w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all duration-200 flex items-center gap-3',
+                'relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-3 transition-all duration-200 flex flex-col items-center justify-center p-2',
                 showCorrectMark
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                  ? 'bg-emerald-50 border-emerald-400 text-emerald-800 shadow-lg shadow-emerald-100'
                   : showWrongMark
-                    ? 'bg-red-50 border-red-300 text-red-700'
+                    ? 'bg-red-50 border-red-400 text-red-700 shadow-lg shadow-red-100'
                     : isSelected
-                      ? 'bg-blue-50 border-blue-400 text-blue-800 shadow-sm'
-                      : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300 hover:bg-stone-50'
+                      ? 'bg-blue-50 border-blue-400 text-blue-800 shadow-lg shadow-blue-100'
+                      : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:shadow-md'
               )}
             >
+              {/* Corner indicator */}
+              {(showCorrectMark || showWrongMark) && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className={cn(
+                    'absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center',
+                    showCorrectMark ? 'bg-emerald-500' : 'bg-red-500'
+                  )}
+                >
+                  {showCorrectMark ? (
+                    <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                  ) : (
+                    <XIcon className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                  )}
+                </motion.div>
+              )}
+
+              {/* Option label */}
               <span className={cn(
-                'w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                showCorrectMark ? 'border-emerald-400 bg-emerald-500 text-white' :
-                showWrongMark   ? 'border-red-400 bg-red-100' :
-                isSelected      ? 'border-blue-400 bg-blue-100 text-blue-700' :
-                                  'border-stone-300 text-stone-400'
+                'text-xs font-bold mb-1 transition-colors',
+                showCorrectMark ? 'text-emerald-500' :
+                showWrongMark   ? 'text-red-500' :
+                isSelected      ? 'text-blue-500' :
+                                  'text-stone-400'
               )}>
-                {showCorrectMark ? <Check className="w-3.5 h-3.5" /> :
-                 showWrongMark   ? <XIcon className="w-3.5 h-3.5" /> :
-                                   String.fromCharCode(65 + idx)}
+                {String.fromCharCode(65 + idx)}
               </span>
-              <span className="text-sm leading-snug">
+
+              {/* Option content */}
+              <span className="text-sm sm:text-base font-semibold leading-tight text-center">
                 <MathText text={typeof optLabel === 'string' ? optLabel : String(optLabel)} />
               </span>
+
+              {/* Selection ring for non-submitted */}
+              {isSelected && !submitted && (
+                <motion.div
+                  layoutId="selection-ring"
+                  className="absolute inset-0 rounded-2xl border-3 border-blue-400"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+              )}
             </motion.button>
           )
         })}
       </div>
-
-      {/* Explanation — auto-shown when answered correctly */}
-      <AnimatePresence>
-        {submitted && isCorrect && explanation && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-amber-50/70 border border-amber-200/60 rounded-xl p-4 text-sm text-stone-700 leading-relaxed max-w-lg mx-auto">
-              <p className="font-semibold text-amber-700 text-xs uppercase tracking-wider mb-1">Explanation</p>
-              <MathText text={explanation} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
