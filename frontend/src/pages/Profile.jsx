@@ -6,7 +6,7 @@ import api from '../lib/api' // Đảm bảo bạn đã import api
 
 export default function Profile() {
   const navigate = useNavigate()
-  const { user, logout, isAuthenticated, updateProfile, changePassword } = useAuthStore()
+  const { user, logout, isAuthenticated, updateProfile, changePassword, fetchUser } = useAuthStore()
 
   const [showEditProfile, setShowEditProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -23,6 +23,13 @@ export default function Profile() {
     confirm_password: ''
   })
   const [passwordError, setPasswordError] = useState('')
+
+  // Fetch fresh user data when profile page loads
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchUser()
+    }
+  }, [])
 
   if (!isAuthenticated()) {
     navigate('/login')

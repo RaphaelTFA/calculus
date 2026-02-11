@@ -21,7 +21,7 @@ export default function Step() {
   const { slug, encodedId } = useParams()
   const navigate = useNavigate()
   const id = decodeStepId(encodedId)
-  const { user } = useAuthStore()
+  const { user, updateUserStats, fetchUser } = useAuthStore()
 
   const [step, setStep] = useState(null)
   const [slides, setSlides] = useState([])
@@ -139,7 +139,16 @@ export default function Step() {
 
   const handleCompleteAndNavigate = async () => {
     try {
-      await api.post(`/steps/${id}/complete`, { score: 100 })
+      const result = await api.post(`/steps/${id}/complete`, { score: 100 })
+      
+      // Update user XP and streak in store immediately
+      if (result) {
+        updateUserStats(result)
+      }
+      
+      // Also fetch fresh user data from server to ensure sync
+      await fetchUser()
+      
       const currentIdx = allSteps.findIndex(s => s.id === parseInt(id))
       if (currentIdx < allSteps.length - 1) {
         const next = allSteps[currentIdx + 1]

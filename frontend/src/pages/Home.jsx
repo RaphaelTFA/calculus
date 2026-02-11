@@ -28,13 +28,17 @@ import { Progress } from '../components/ui/progress'
 import { Separator } from '../components/ui/separator'
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, fetchUser } = useAuthStore()
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
+    // Fetch fresh user data to ensure XP/streak is synced
+    if (isAuthenticated()) {
+      fetchUser()
+    }
     loadDashboard()
   }, [])
 

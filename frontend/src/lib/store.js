@@ -96,6 +96,18 @@ export const useAuthStore = create(
       isAuthenticated: () => !!get().token,
       
       clearError: () => set({ error: null }),
+
+      // Update user stats (XP, streak) after step completion
+      updateUserStats: (stats) => {
+        set((state) => ({
+          user: state.user ? {
+            ...state.user,
+            xp: stats.total_xp ?? state.user.xp,
+            current_streak: stats.streak?.current_streak ?? state.user.current_streak,
+            longest_streak: stats.streak?.longest_streak ?? state.user.longest_streak,
+          } : null
+        }))
+      },
     }),
     {
       name: 'auth-storage',
