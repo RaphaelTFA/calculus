@@ -56,6 +56,7 @@ class StoryListResponse(BaseModel):
     slug: str
     title: str
     thumbnail_url: Optional[str] = None
+    illustration: Optional[str] = None
     description: Optional[str]
     icon: Optional[str]
     color: Optional[str]
