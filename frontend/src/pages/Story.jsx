@@ -275,6 +275,7 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson, storySlug }
               const isCurrentStep = currentLesson?.step?.id === step.id
               const isCompleted = step.is_completed
               const isLocked = !isEnrolled || (!isCompleted && !isCurrentStep)
+              
               return (
                 <LessonNode
                   key={step.id}

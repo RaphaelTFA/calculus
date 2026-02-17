@@ -92,7 +92,6 @@ async def get_stories(
 =======
 
         logger.debug(f"[stories.get_stories] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r} exercises={exercises_count}")
->>>>>>> 27a12db (feat: add exercise count to story and step responses, enforce enrollment check for lesson access)
         
         response.append(StoryListResponse(
             id=story.id,
@@ -202,7 +201,6 @@ async def get_story(
 =======
 
     logger.debug(f"[stories.get_story] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r} exercises={exercises_count}")
->>>>>>> 27a12db (feat: add exercise count to story and step responses, enforce enrollment check for lesson access)
     
     return StoryDetailResponse(
         id=story.id,

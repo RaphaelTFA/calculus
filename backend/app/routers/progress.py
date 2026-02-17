@@ -120,7 +120,6 @@ async def get_dashboard(
                         if b.get('type') == 'quiz' or b.get('block_type') == 'quiz':
                             exercises_count += 1
 
->>>>>>> 27a12db (feat: add exercise count to story and step responses, enforce enrollment check for lesson access)
         story_response = StoryDetailResponse(
             id=story.id,
             slug=story.slug,
