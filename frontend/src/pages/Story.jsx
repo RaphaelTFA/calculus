@@ -274,8 +274,7 @@ function ChapterSection({ chapter, index, isEnrolled, currentLesson, storySlug }
             {steps.map((step, stepIndex) => {
               const isCurrentStep = currentLesson?.step?.id === step.id
               const isCompleted = step.is_completed
-              const isLocked = !isCompleted && !isCurrentStep
-              
+              const isLocked = !isEnrolled || (!isCompleted && !isCurrentStep)
               return (
                 <LessonNode
                   key={step.id}

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from datetime import datetime, date, timedelta
 from app.database import get_db
-from app.models import Step, Slide, StepProgress, Chapter, Story, User
+from app.models import Step, Slide, StepProgress, Chapter, Story, User, Enrollment
 from app.schemas import StepDetailResponse, SlideResponse, StepCompleteRequest
 from app.auth import get_current_user
 
@@ -89,13 +89,27 @@ async def complete_step(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Get step
-    result = await db.execute(select(Step).where(Step.id == step_id))
+    # Get step (include chapter/story so we can validate enrollment)
+    result = await db.execute(
+        select(Step)
+        .options(selectinload(Step.chapter).selectinload(Chapter.story))
+        .where(Step.id == step_id)
+    )
     step = result.scalar_one_or_none()
     
     if not step:
         raise HTTPException(status_code=404, detail="Step not found")
-    
+
+    # Require enrollment in the parent story before allowing completion
+    enroll_res = await db.execute(
+        select(Enrollment).where(
+            Enrollment.user_id == current_user.id,
+            Enrollment.story_id == step.chapter.story_id
+        )
+    )
+    if enroll_res.scalar_one_or_none() is None:
+        raise HTTPException(status_code=403, detail="You must enroll in the course to study this lesson")
+
     # Check/create progress
     progress_result = await db.execute(
         select(StepProgress).where(

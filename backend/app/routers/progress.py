@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload, joinedload
 from app.database import get_db
-from app.models import User, Enrollment, Story, StepProgress, Chapter, Achievement, UserAchievement
+from app.models import User, Enrollment, Story, Step, StepProgress, Chapter, Achievement, UserAchievement
 from app.schemas import (
     DashboardResponse, StoryDetailResponse, ChapterResponse, StepResponse,
     UserStatsResponse, UserProgressResponse, AchievementResponse
@@ -44,7 +44,7 @@ async def get_dashboard(
     stories_result = await db.execute(
         select(Story)
         .options(
-            selectinload(Story.chapters).selectinload(Chapter.steps),
+            selectinload(Story.chapters).selectinload(Chapter.steps).selectinload(Step.slides),
             joinedload(Story.category)
         )
         .where(Story.id.in_(story_ids))
@@ -102,6 +102,25 @@ async def get_dashboard(
                 steps=steps
             ))
         
+<<<<<<< HEAD
+=======
+        logger.debug(f"[progress.get_dashboard] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
+
+        # Count exercises (quiz blocks) from preloaded slides
+        exercises_count = 0
+        for ch in getattr(story, 'chapters', []) or []:
+            for st in getattr(ch, 'steps', []) or []:
+                for slide in getattr(st, 'slides', []) or []:
+                    blocks = slide.blocks or []
+                    if not isinstance(blocks, list):
+                        continue
+                    for b in blocks:
+                        if not isinstance(b, dict):
+                            continue
+                        if b.get('type') == 'quiz' or b.get('block_type') == 'quiz':
+                            exercises_count += 1
+
+>>>>>>> 27a12db (feat: add exercise count to story and step responses, enforce enrollment check for lesson access)
         story_response = StoryDetailResponse(
             id=story.id,
             slug=story.slug,
@@ -111,6 +130,7 @@ async def get_dashboard(
             color=story.color,
             category_name=story.category.name if story.category else None,
             chapter_count=len(chapters),
+            exercises=exercises_count,
             progress=progress,
             is_enrolled=True,
             chapters=chapters

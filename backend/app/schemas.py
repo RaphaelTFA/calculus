@@ -61,6 +61,7 @@ class StoryListResponse(BaseModel):
     color: Optional[str]
     category_name: Optional[str]
     chapter_count: int = 0
+    exercises: int = 0
     progress: int = 0
     is_enrolled: bool = False
     is_completed: bool = False

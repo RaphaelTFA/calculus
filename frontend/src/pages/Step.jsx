@@ -43,6 +43,14 @@ export default function Step() {
       const fullStory = await api.get(`/stories/${slug}`)
       setStory(fullStory)
 
+      // Prevent accessing lesson content unless the course is started (enrolled)
+      if (!fullStory.is_enrolled) {
+        // redirect back to course page where user can enroll
+        navigate(`/course/${slug}`)
+        setLoading(false)
+        return
+      }
+
       const steps = []
       fullStory.chapters?.forEach(ch => {
         ch.steps?.forEach(s => {

@@ -10,6 +10,23 @@ from app.auth import get_current_user_optional, get_current_user
 
 router = APIRouter(prefix="/stories", tags=["stories"])
 
+
+def _count_quiz_blocks_in_story(story) -> int:
+    """Count quiz blocks across all slides in a Story object (in-memory)."""
+    total = 0
+    for ch in getattr(story, 'chapters', []) or []:
+        for st in getattr(ch, 'steps', []) or []:
+            for slide in getattr(st, 'slides', []) or []:
+                blocks = slide.blocks or []
+                if not isinstance(blocks, list):
+                    continue
+                for b in blocks:
+                    if not isinstance(b, dict):
+                        continue
+                    if b.get('type') == 'quiz' or b.get('block_type') == 'quiz':
+                        total += 1
+    return total
+
 @router.get("", response_model=list[StoryListResponse])
 async def get_stories(
     search: Optional[str] = None,
@@ -20,8 +37,11 @@ async def get_stories(
     db: AsyncSession = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    # Use joinedload to eagerly load category
-    query = select(Story).options(joinedload(Story.category)).where(Story.is_published == True)
+    # Use joinedload to eagerly load category and slides so we can compute exercise count
+    query = select(Story).options(
+        joinedload(Story.category),
+        selectinload(Story.chapters).selectinload(Chapter.steps).selectinload(Step.slides)
+    ).where(Story.is_published == True)
     
     if search:
         query = query.where(Story.title.ilike(f"%{search}%"))
@@ -63,8 +83,16 @@ async def get_stories(
         # Access category safely - already loaded
         category_name = story.category.name if story.category else None
         
+        # Count exercises (quiz blocks) from preloaded slides
+        exercises_count = _count_quiz_blocks_in_story(story)
+        
         # Story is completed when progress is 100%
         is_completed = progress == 100
+<<<<<<< HEAD
+=======
+
+        logger.debug(f"[stories.get_stories] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r} exercises={exercises_count}")
+>>>>>>> 27a12db (feat: add exercise count to story and step responses, enforce enrollment check for lesson access)
         
         response.append(StoryListResponse(
             id=story.id,
@@ -75,6 +103,7 @@ async def get_stories(
             color=story.color,
             category_name=category_name,
             chapter_count=chapter_count,
+            exercises=exercises_count,
             progress=progress,
             is_enrolled=is_enrolled,
             is_completed=is_completed
@@ -92,7 +121,7 @@ async def get_story(
         select(Story)
         .options(
             joinedload(Story.category),
-            selectinload(Story.chapters).selectinload(Chapter.steps)
+            selectinload(Story.chapters).selectinload(Chapter.steps).selectinload(Step.slides)
         )
         .where(Story.slug == slug)
     )
@@ -163,9 +192,17 @@ async def get_story(
     
     # Access category safely
     category_name = story.category.name if story.category else None
+
+    # Count exercises (quiz blocks)
+    exercises_count = _count_quiz_blocks_in_story(story)
     
     # Story is completed when progress is 100%
     is_completed = progress == 100
+<<<<<<< HEAD
+=======
+
+    logger.debug(f"[stories.get_story] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r} exercises={exercises_count}")
+>>>>>>> 27a12db (feat: add exercise count to story and step responses, enforce enrollment check for lesson access)
     
     return StoryDetailResponse(
         id=story.id,
@@ -176,6 +213,7 @@ async def get_story(
         color=story.color,
         category_name=category_name,
         chapter_count=len(chapters),
+        exercises=exercises_count,
         progress=progress,
         is_enrolled=is_enrolled,
         is_completed=is_completed,
