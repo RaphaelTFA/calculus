@@ -35,10 +35,13 @@ const api = {
     
     if (!res.ok) {
       const error = await res.json().catch(() => ({ detail: 'Request failed' }))
+      console.error(`[api] GET ${endpoint} failed:`, error)
       throw new Error(error.detail || 'Request failed')
     }
     
-    return await res.json()
+    const data = await res.json()
+    console.debug(`[api] GET ${endpoint} response:`, data)
+    return data
   },
 
   async post(endpoint, data) {

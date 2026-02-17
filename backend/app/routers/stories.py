@@ -88,15 +88,15 @@ async def get_stories(
         
         # Story is completed when progress is 100%
         is_completed = progress == 100
-<<<<<<< HEAD
-=======
 
-        logger.debug(f"[stories.get_stories] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r} exercises={exercises_count}")
+        print(f"[stories.get_stories] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
         
         response.append(StoryListResponse(
             id=story.id,
             slug=story.slug,
             title=story.title,
+            thumbnail_url=story.thumbnail_url,
+            illustration=story.illustration,
             description=story.description,
             icon=story.icon,
             color=story.color,
@@ -197,15 +197,15 @@ async def get_story(
     
     # Story is completed when progress is 100%
     is_completed = progress == 100
-<<<<<<< HEAD
-=======
 
-    logger.debug(f"[stories.get_story] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r} exercises={exercises_count}")
+    print(f"[stories.get_story] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
     
     return StoryDetailResponse(
         id=story.id,
         slug=story.slug,
         title=story.title,
+        thumbnail_url=story.thumbnail_url,
+        illustration=story.illustration,
         description=story.description,
         icon=story.icon,
         color=story.color,

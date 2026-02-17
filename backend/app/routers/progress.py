@@ -102,28 +102,14 @@ async def get_dashboard(
                 steps=steps
             ))
         
-<<<<<<< HEAD
-=======
-        logger.debug(f"[progress.get_dashboard] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
-
-        # Count exercises (quiz blocks) from preloaded slides
-        exercises_count = 0
-        for ch in getattr(story, 'chapters', []) or []:
-            for st in getattr(ch, 'steps', []) or []:
-                for slide in getattr(st, 'slides', []) or []:
-                    blocks = slide.blocks or []
-                    if not isinstance(blocks, list):
-                        continue
-                    for b in blocks:
-                        if not isinstance(b, dict):
-                            continue
-                        if b.get('type') == 'quiz' or b.get('block_type') == 'quiz':
-                            exercises_count += 1
+        print(f"[progress.get_dashboard] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
 
         story_response = StoryDetailResponse(
             id=story.id,
             slug=story.slug,
             title=story.title,
+            thumbnail_url=story.thumbnail_url,
+            illustration=story.illustration,
             description=story.description,
             icon=story.icon,
             color=story.color,

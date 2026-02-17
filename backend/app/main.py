@@ -58,9 +58,11 @@ async def seed_from_json():
     async with async_session() as db:
         # Check if data exists
         result = await db.execute(select(Story).limit(1))
-        if result.scalar_one_or_none():
-            print("📊 Data already exists, skipping seed")
-            return
+        db_has_stories = result.scalar_one_or_none() is not None
+        if db_has_stories:
+            print("📊 Data already exists — ensuring media fields (thumbnail/illustration) are present")
+        else:
+            print("📊 Database empty — seeding data from JSON files")
         
         # 1. Load categories from JSON
         categories_file = DATA_DIR / "categories.json"
@@ -74,6 +76,13 @@ async def seed_from_json():
             categories_data = data.get("categories", data) if isinstance(data, dict) else data
             
             for cat in categories_data:
+                # Upsert category if it already exists
+                existing_cat = await db.execute(select(Category).where(Category.slug == cat["slug"]))
+                existing_cat = existing_cat.scalar_one_or_none()
+                if existing_cat:
+                    categories_map[cat["slug"]] = existing_cat
+                    continue
+
                 category = Category(
                     name=cat["name"],
                     slug=cat["slug"],
@@ -95,11 +104,32 @@ async def seed_from_json():
                 category_slug = course_data.get("category", "giai-tich")
                 category = categories_map.get(category_slug)
                 
-                # Create story
+                # Check if story exists
+                existing_story_res = await db.execute(select(Story).where(Story.slug == course_data["slug"]))
+                existing_story = existing_story_res.scalar_one_or_none()
+
+                if existing_story:
+                    # Ensure media fields are present / up-to-date
+                    updated = False
+                    if course_data.get("thumbnail_url") and existing_story.thumbnail_url != course_data.get("thumbnail_url"):
+                        existing_story.thumbnail_url = course_data.get("thumbnail_url")
+                        updated = True
+                    if course_data.get("illustration") and existing_story.illustration != course_data.get("illustration"):
+                        existing_story.illustration = course_data.get("illustration")
+                        updated = True
+                    if updated:
+                        print(f"  ↺ Updated media for course: {course_data['slug']}")
+                    else:
+                        print(f"  ↺ Course exists: {course_data['slug']}")
+                    continue
+
+                # Create story (new)
                 story = Story(
                     slug=course_data["slug"],
                     title=course_data["title"],
                     description=course_data.get("description", ""),
+                    thumbnail_url=course_data.get("thumbnail_url"),
+                    illustration=course_data.get("illustration"),
                     icon=course_data.get("icon", "📖"),
                     color=course_data.get("color", "from-blue-500 to-blue-700"),
                     difficulty=course_data.get("difficulty", "beginner"),

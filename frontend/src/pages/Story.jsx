@@ -39,10 +39,12 @@ export default function Story() {
 
   const loadStory = async () => {
     try {
+      console.debug('[Story] fetching', slug)
       const data = await api.get(`/stories/${slug}`)
+      console.debug('[Story] /stories/:slug response', { slug, illustration: data?.illustration, thumbnail_url: data?.thumbnail_url })
       setStory(data)
     } catch (e) {
-      console.error(e)
+      console.error('[Story] loadStory error', e)
     } finally {
       setLoading(false)
     }
@@ -180,24 +182,23 @@ function CourseOverviewCard({ story, totalLessons, completedLessons, needsEnroll
   // Fallback: illustration, then thumbnail, then icon
   let illustrationUrl = story.illustration;
   if (!illustrationUrl && story.thumbnail_url) illustrationUrl = story.thumbnail_url;
+  useEffect(() => {
+    console.debug('[CourseOverviewCard] story values', { slug: story.slug, illustration: story.illustration, thumbnail_url: story.thumbnail_url, used: illustrationUrl })
+  }, [story, illustrationUrl]);
   // Use a friendlier, round font (e.g. font-sans, font-[Quicksand] if available)
   return (
     <div className="group relative cursor-pointer select-none" tabIndex={0} role="button">
       <Card className="overflow-hidden border-0 shadow-lg bg-white rounded-3xl transition-all duration-200 group-hover:shadow-xl group-hover:scale-[1.02] focus:shadow-xl focus:scale-[1.02] font-sans text-left">
         <div className="flex flex-col items-start pt-8 pb-4 px-8">
           <div className="w-24 h-24 rounded-2xl bg-[#F4F8FF] flex items-center justify-center mb-6 shadow-sm">
-            {illustrationUrl ? (
-              <img
-                src={illustrationUrl}
-                alt={story.title}
-                className="w-20 h-20 object-contain rounded-xl"
-                loading="lazy"
-                draggable="false"
-                onError={e => { e.target.style.display = 'none'; }}
-              />
-            ) : (
-              <span className="text-5xl text-blue-500">{story.icon || '📐'}</span>
-            )}
+            <img
+              src={illustrationUrl}
+              alt={story.illustration ? 'Course illustration' : 'Course thumbnail'}
+              className="w-20 h-20 object-contain rounded-xl"
+              loading="lazy"
+              draggable="false"
+              onError={e => { console.warn('[CourseOverviewCard] image failed to load', illustrationUrl); e.target.style.display = 'none'; }}
+            />
           </div>
           <h2 className="text-2xl font-extrabold text-stone-900 mb-2 leading-tight tracking-tight">{story.title}</h2>
           <p className="text-stone-500 text-lg mb-3 leading-relaxed max-w-[90%]">
