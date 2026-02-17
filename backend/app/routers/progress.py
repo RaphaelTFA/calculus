@@ -10,6 +10,9 @@ from app.schemas import (
 )
 from app.auth import get_current_user
 from app.routers.stories import calculate_story_progress
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/progress", tags=["progress"])
 
@@ -102,7 +105,7 @@ async def get_dashboard(
                 steps=steps
             ))
         
-        print(f"[progress.get_dashboard] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
+        logger.debug(f"[progress.get_dashboard] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
 
         story_response = StoryDetailResponse(
             id=story.id,

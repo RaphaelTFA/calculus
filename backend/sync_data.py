@@ -14,6 +14,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from app.models import Base, Category, Story, Chapter, Step
 from app.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
@@ -27,7 +30,7 @@ async def sync_data():
     
     async with async_session() as session:
         # 1. Sync categories
-        print("📁 Syncing categories...")
+        logger.debug("📁 Syncing categories...")
         categories_file = DATA_DIR / "categories.json"
         if categories_file.exists():
             with open(categories_file, 'r', encoding='utf-8') as f:
@@ -45,12 +48,12 @@ async def sync_data():
                         icon=cat.get("icon", "📚")
                     )
                     session.add(category)
-                    print(f"  ✅ Added category: {cat['name']}")
+                    logger.debug(f"  ✅ Added category: {cat['name']}")
         
         await session.commit()
         
         # 2. Sync courses
-        print("\n📚 Syncing courses...")
+        logger.debug("\n📚 Syncing courses...")
         courses_dir = DATA_DIR / "courses"
         if courses_dir.exists():
             for course_file in courses_dir.glob("*.json"):
@@ -71,7 +74,7 @@ async def sync_data():
                 existing_story = result.scalar_one_or_none()
                 
                 if existing_story:
-                    print(f"  ⚠️ Course '{course_data['title']}' already exists, skipping...")
+                    logger.debug(f"  ⚠️ Course '{course_data['title']}' already exists, skipping...")
                     continue
                 
                 # Create story
@@ -92,7 +95,7 @@ async def sync_data():
                 session.add(story)
                 await session.flush()  # Get story.id
                 
-                print(f"  ✅ Added course: {course_data['title']}")
+                logger.debug(f"  ✅ Added course: {course_data['title']}")
                 
                 # Create chapters
                 for ch_idx, chapter_data in enumerate(course_data.get("chapters", [])):
@@ -105,7 +108,7 @@ async def sync_data():
                     session.add(chapter)
                     await session.flush()
                     
-                    print(f"    📖 Chapter: {chapter_data['title']}")
+                    logger.debug(f"    📖 Chapter: {chapter_data['title']}")
                     
                     # Create steps
                     for st_idx, step_data in enumerate(chapter_data.get("steps", [])):
@@ -121,10 +124,10 @@ async def sync_data():
                             chapter_id=chapter.id
                         )
                         session.add(step)
-                        print(f"      📝 Step: {step_data['title']}")
+                        logger.debug(f"      📝 Step: {step_data['title']}")
         
         await session.commit()
-        print("\n✨ Data sync completed!")
+        logger.debug("\n✨ Data sync completed!")
 
 if __name__ == "__main__":
     asyncio.run(sync_data())

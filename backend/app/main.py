@@ -7,6 +7,17 @@ from app.config import settings
 from app.database import init_db
 from app.routers import auth_router, stories_router, steps_router, progress_router, auth
 
+# Reduce noisy Uvicorn logs and show only SQL logs
+import logging
+# Default root level: show only warnings/errors (suppress app prints)
+logging.basicConfig(level=logging.WARNING, format="%(levelname)s:%(name)s:%(message)s")
+# Ensure SQLAlchemy SQL statements are visible
+logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+logging.getLogger("sqlalchemy.engine.Engine").setLevel(logging.INFO)
+
+# Module logger
+logger = logging.getLogger(__name__)
+
 # Path to data folder
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
@@ -60,9 +71,9 @@ async def seed_from_json():
         result = await db.execute(select(Story).limit(1))
         db_has_stories = result.scalar_one_or_none() is not None
         if db_has_stories:
-            print("📊 Data already exists — ensuring media fields (thumbnail/illustration) are present")
+            logger.debug("📊 Data already exists — ensuring media fields (thumbnail/illustration) are present")
         else:
-            print("📊 Database empty — seeding data from JSON files")
+            logger.debug("📊 Database empty — seeding data from JSON files")
         
         # 1. Load categories from JSON
         categories_file = DATA_DIR / "categories.json"
@@ -91,7 +102,7 @@ async def seed_from_json():
                 db.add(category)
                 await db.flush()
                 categories_map[cat["slug"]] = category
-                print(f"  ✅ Category: {cat['name']}")
+                logger.debug(f"  ✅ Category: {cat['name']}")
         
         # 2. Load courses from JSON files
         courses_dir = DATA_DIR / "courses"
@@ -118,9 +129,9 @@ async def seed_from_json():
                         existing_story.illustration = course_data.get("illustration")
                         updated = True
                     if updated:
-                        print(f"  ↺ Updated media for course: {course_data['slug']}")
+                        logger.debug(f"  ↺ Updated media for course: {course_data['slug']}")
                     else:
-                        print(f"  ↺ Course exists: {course_data['slug']}")
+                        logger.debug(f"  ↺ Course exists: {course_data['slug']}")
                     continue
 
                 # Create story (new)
@@ -139,7 +150,7 @@ async def seed_from_json():
                 )
                 db.add(story)
                 await db.flush()
-                print(f"📚 Course: {course_data['title']}")
+                logger.debug(f"📚 Course: {course_data['title']}")
                 
                 # Create chapters
                 for chapter_data in course_data.get("chapters", []):
@@ -151,7 +162,7 @@ async def seed_from_json():
                     )
                     db.add(chapter)
                     await db.flush()
-                    print(f"  📖 Chapter: {chapter_data['title']}")
+                    logger.debug(f"  📖 Chapter: {chapter_data['title']}")
                     
                     # Create steps
                     for step_data in chapter_data.get("steps", []):
@@ -163,7 +174,7 @@ async def seed_from_json():
                         )
                         db.add(step)
                         await db.flush()
-                        print(f"    📝 Step: {step_data['title']}")
+                        logger.debug(f"    📝 Step: {step_data['title']}")
                         
                         # Create slides
                         for slide_data in step_data.get("slides", []):
@@ -175,7 +186,7 @@ async def seed_from_json():
                             db.add(slide)
         
         await db.commit()
-        print("✅ Data seeded from JSON files!")
+        logger.debug("✅ Data seeded from JSON files!")
 
 
 async def seed_achievements():
@@ -222,4 +233,4 @@ async def seed_achievements():
             db.add(achievement)
         
         await db.commit()
-        print("✅ Achievements seeded!")
+        logger.debug("✅ Achievements seeded!")

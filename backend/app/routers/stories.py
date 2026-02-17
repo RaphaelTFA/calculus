@@ -7,6 +7,9 @@ from app.database import get_db
 from app.models import Story, Chapter, Step, Enrollment, StepProgress, User, Category
 from app.schemas import StoryListResponse, StoryDetailResponse, ChapterResponse, StepResponse
 from app.auth import get_current_user_optional, get_current_user
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/stories", tags=["stories"])
 
@@ -89,7 +92,7 @@ async def get_stories(
         # Story is completed when progress is 100%
         is_completed = progress == 100
 
-        print(f"[stories.get_stories] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
+        logger.debug(f"[stories.get_stories] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
         
         response.append(StoryListResponse(
             id=story.id,
@@ -198,7 +201,7 @@ async def get_story(
     # Story is completed when progress is 100%
     is_completed = progress == 100
 
-    print(f"[stories.get_story] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
+    logger.debug(f"[stories.get_story] slug={story.slug} illustration={story.illustration!r} thumbnail_url={story.thumbnail_url!r}")
     
     return StoryDetailResponse(
         id=story.id,
