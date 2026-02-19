@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 from app.config import settings
 from app.database import init_db
-from app.routers import auth_router, stories_router, steps_router, progress_router, auth
+from app.routers import auth_router, stories_router, steps_router, progress_router, categories_router, auth
 
 # Reduce noisy Uvicorn logs and show only SQL logs
 import logging
@@ -49,6 +49,7 @@ app.include_router(auth_router, prefix="/api/v1")
 app.include_router(stories_router, prefix="/api/v1")
 app.include_router(steps_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
+app.include_router(categories_router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 
 @app.get("/")

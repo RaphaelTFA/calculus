@@ -1,22 +1,38 @@
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
-const learningPaths = [
-  {
-    id: 1,
-    slug: 'giai-tich-co-ban',
-    title: 'Giải Tích Cơ Bản',
-    description: 'Khám phá các khái niệm nền tảng của giải tích: giới hạn, đạo hàm, tích phân.',
-    iconUrl: 'https://ds055uzetaobb.cloudfront.net/category-images/Foundations_of_Algebra-6MUKk8.png',
-    courses: [
-      { slug: 'gioi-han', title: 'Giới hạn', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Arithmetic_Thinking-KaQBTB.png?width=204', isNew: false },
-      { slug: 'dao-ham', title: 'Đạo hàm', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Coordinate_Plane-TjmV5y.png?width=204', isNew: true },
-      { slug: 'tich-phan', title: 'Tích phân', illustration: 'https://ds055uzetaobb.cloudfront.net/brioche/chapter/Visual_Algebra_1-wiJeeI.png?width=204', isNew: false },
-    ],
-  },
-]
+// Load learningPaths from backend (/api/v1/categories) which reads `data/categories.json`.
+function useLearningPaths() {
+  const [learningPaths, setLearningPaths] = useState([])
+
+  useEffect(() => {
+    let mounted = true
+    fetch('/api/v1/categories')
+      .then(res => res.json())
+      .then(data => {
+        // support multiple possible formats: { learningPaths: [...] } | { categories: [...], learningPaths: [...] } | [...]
+        const raw = data.learningPaths ?? data.learning_paths ?? (Array.isArray(data) ? data : data.categories) ?? []
+        const mapped = (raw || []).map(p => ({
+          id: p.id ?? p.slug,
+          slug: p.slug,
+          title: p.title ?? p.name,
+          description: p.description ?? p.summary ?? '',
+          iconUrl: p.iconUrl ?? p.icon_url ?? p.icon ?? '',
+          courses: p.courses ?? []
+        }))
+        if (mounted) setLearningPaths(mapped)
+      })
+      .catch(() => { if (mounted) setLearningPaths([]) })
+
+    return () => { mounted = false }
+  }, [])
+
+  return learningPaths
+}
 
 export default function Explore() {
+  const learningPaths = useLearningPaths()
   return (
     // Changed: Removed px-10, added pl-6. Added font-cofo.
     <div className="bg-white min-h-screen w-full pl-4 py-12 font-cofo select-none">
