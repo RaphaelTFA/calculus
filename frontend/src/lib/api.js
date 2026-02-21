@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:8000/api/v1'
+const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
+const API_BASE = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
 // Helper to get token from localStorage
 const getToken = () => {
