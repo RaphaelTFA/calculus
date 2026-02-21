@@ -9,6 +9,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    sourcemap: false, // Ngăn chặn việc tạo ra file .map
+    minify: 'esbuild', // Nén code để biến các file jsx thành js hỗn độn
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // Gom nhóm các file lại
+      },
+    },
+  },
   server: {
     port: 3000,
     proxy: {
