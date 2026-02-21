@@ -1,18 +1,25 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import categoriesData from '../../../data/categories.json';
 
-// Load learningPaths from backend (/api/v1/categories) which reads `data/categories.json`.
+// Load learningPaths directly from project `data/categories.json` (served as a static JSON).
 function useLearningPaths() {
   const [learningPaths, setLearningPaths] = useState([])
 
   useEffect(() => {
     let mounted = true
-    fetch('/api/v1/categories')
-      .then(res => res.json())
-      .then(data => {
+
+    async function load() {
+      try {
+        // Try direct JSON file first (requested change). If not available, fall back to API.
+        const data = categoriesData
+
         // support multiple possible formats: { learningPaths: [...] } | { categories: [...], learningPaths: [...] } | [...]
         const raw = data.learningPaths ?? data.learning_paths ?? (Array.isArray(data) ? data : data.categories) ?? []
+        if(!raw) {
+          console.warn('Warning: No learning paths found in the fetched data. Check the structure of categories.json or API response.')
+        }
         const mapped = (raw || []).map(p => ({
           id: p.id ?? p.slug,
           slug: p.slug,
@@ -21,10 +28,15 @@ function useLearningPaths() {
           iconUrl: p.iconUrl ?? p.icon_url ?? p.icon ?? '',
           courses: p.courses ?? []
         }))
-        if (mounted) setLearningPaths(mapped)
-      })
-      .catch(() => { if (mounted) setLearningPaths([]) })
 
+        if (mounted) setLearningPaths(mapped)
+      } catch (err) {
+        console.error('Error loading learning paths:', err)
+        if (mounted) setLearningPaths([])
+      }
+    }
+
+    load()
     return () => { mounted = false }
   }, [])
 
