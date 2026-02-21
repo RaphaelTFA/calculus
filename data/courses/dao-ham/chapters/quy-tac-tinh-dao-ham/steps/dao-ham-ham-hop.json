@@ -1,0 +1,66 @@
+{
+  "id": "dao-ham-ham-hop",
+  "title": "Đạo hàm hàm hợp",
+  "description": "Chain rule",
+  "xp_reward": 18,
+  "order_index": 2,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "chain1",
+          "type": "text",
+          "content": {
+            "heading": "Quy tắc dây chuyền (Chain Rule)",
+            "paragraphs": [
+              "Nếu y = f(u) và u = g(x):"
+            ]
+          }
+        },
+        {
+          "id": "math22",
+          "type": "math",
+          "content": {
+            "latex": "\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}"
+          }
+        },
+        {
+          "id": "math23",
+          "type": "math",
+          "content": {
+            "latex": "[f(g(x))]' = f'(g(x)) \\cdot g'(x)"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "quiz7",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $(\\sin(2x))' = ?$",
+            "options": [
+              {
+                "value": "a",
+                "label": "$\\cos(2x)$"
+              },
+              {
+                "value": "b",
+                "label": "$2\\cos(2x)$"
+              },
+              {
+                "value": "c",
+                "label": "$-2\\sin(2x)$"
+              }
+            ],
+            "correct": "b",
+            "explanation": "Chain rule: $(\\sin u)' = \\cos u \\cdot u'$. Với $u=2x$, ta có $\\cos(2x) \\cdot 2 = 2\\cos(2x)$"
+          }
+        }
+      ]
+    }
+  ]
+}

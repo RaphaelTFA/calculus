@@ -1,0 +1,87 @@
+{
+  "id": "dao-ham-co-ban",
+  "title": "Đạo hàm cơ bản",
+  "description": "Đạo hàm các hàm cơ bản",
+  "xp_reward": 15,
+  "order_index": 2,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "basic1",
+          "type": "text",
+          "content": {
+            "heading": "Bảng đạo hàm cơ bản",
+            "paragraphs": [
+              "Các công thức cần nhớ:"
+            ]
+          }
+        },
+        {
+          "id": "math14",
+          "type": "math",
+          "content": {
+            "latex": "(x^n)' = nx^{n-1}"
+          }
+        },
+        {
+          "id": "math15",
+          "type": "math",
+          "content": {
+            "latex": "(e^x)' = e^x"
+          }
+        },
+        {
+          "id": "math16",
+          "type": "math",
+          "content": {
+            "latex": "(\\ln x)' = \\frac{1}{x}"
+          }
+        },
+        {
+          "id": "math17",
+          "type": "math",
+          "content": {
+            "latex": "(\\sin x)' = \\cos x"
+          }
+        },
+        {
+          "id": "math18",
+          "type": "math",
+          "content": {
+            "latex": "(\\cos x)' = -\\sin x"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "quiz5",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $(x^5)' = ?$",
+            "options": [
+              {
+                "value": "a",
+                "label": "$5x^4$"
+              },
+              {
+                "value": "b",
+                "label": "$x^4$"
+              },
+              {
+                "value": "c",
+                "label": "$5x^5$"
+              }
+            ],
+            "correct": "a",
+            "explanation": "Công thức: $(x^n)' = nx^{n-1}$, nên $(x^5)' = 5x^4$"
+          }
+        }
+      ]
+    }
+  ]
+}

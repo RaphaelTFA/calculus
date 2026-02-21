@@ -1,0 +1,49 @@
+{
+  "id": "quy-tac-tich-thuong",
+  "title": "Quy tắc tích, thương",
+  "description": "Đạo hàm tích và thương",
+  "xp_reward": 15,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "prod1",
+          "type": "text",
+          "content": {
+            "heading": "Quy tắc tích (Product Rule)",
+            "paragraphs": []
+          }
+        },
+        {
+          "id": "math20",
+          "type": "math",
+          "content": {
+            "latex": "[f(x) \\cdot g(x)]' = f'(x)g(x) + f(x)g'(x)"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "quot1",
+          "type": "text",
+          "content": {
+            "heading": "Quy tắc thương (Quotient Rule)",
+            "paragraphs": []
+          }
+        },
+        {
+          "id": "math21",
+          "type": "math",
+          "content": {
+            "latex": "\\left[\\frac{f(x)}{g(x)}\\right]' = \\frac{f'(x)g(x) - f(x)g'(x)}{[g(x)]^2}"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "khao-sat-ham-so",
+  "title": "Khảo sát hàm số",
+  "description": "Vẽ đồ thị hàm số",
+  "xp_reward": 20,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "survey1",
+          "type": "text",
+          "content": {
+            "heading": "Các bước khảo sát",
+            "paragraphs": [
+              "1. Tìm tập xác định",
+              "2. Tính đạo hàm $f'(x)$, tìm cực trị",
+              "3. Xét tính đồng biến, nghịch biến",
+              "4. Tìm tiệm cận (nếu có)",
+              "5. Vẽ đồ thị"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

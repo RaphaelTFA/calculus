@@ -1,0 +1,56 @@
+{
+  "id": "bai-toan-toi-uu",
+  "title": "Bài toán tối ưu",
+  "description": "Ứng dụng thực tế",
+  "xp_reward": 25,
+  "order_index": 2,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "opt1",
+          "type": "text",
+          "content": {
+            "heading": "Bài toán tối ưu hóa",
+            "paragraphs": [
+              "Đạo hàm giúp tìm giá trị lớn nhất/nhỏ nhất:",
+              "• Chi phí tối thiểu",
+              "• Lợi nhuận tối đa",
+              "• Diện tích lớn nhất",
+              "• Thời gian ngắn nhất"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "quiz8",
+          "type": "quiz",
+          "content": {
+            "question": "Muốn tìm giá trị nhỏ nhất của hàm số, ta cần tìm điểm nào?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Điểm cực đại"
+              },
+              {
+                "value": "b",
+                "label": "Điểm cực tiểu"
+              },
+              {
+                "value": "c",
+                "label": "Điểm uốn"
+              }
+            ],
+            "correct": "b",
+            "explanation": "Giá trị nhỏ nhất thường đạt được tại điểm cực tiểu!"
+          }
+        }
+      ]
+    }
+  ]
+}

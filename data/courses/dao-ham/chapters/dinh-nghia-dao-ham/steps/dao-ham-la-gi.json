@@ -1,0 +1,75 @@
+{
+  "id": "dao-ham-la-gi",
+  "title": "Đạo hàm là gì?",
+  "description": "Khái niệm đạo hàm",
+  "xp_reward": 10,
+  "order_index": 0,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "der1",
+          "type": "text",
+          "content": {
+            "heading": "Giới thiệu Đạo hàm 📈",
+            "paragraphs": [
+              "Đạo hàm đo **tốc độ thay đổi** của một hàm số.",
+              "Nếu y = f(x), đạo hàm cho biết y thay đổi nhanh như thế nào khi x thay đổi."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "def2",
+          "type": "text",
+          "content": {
+            "heading": "Định nghĩa",
+            "paragraphs": [
+              "Đạo hàm của f(x) tại điểm x:"
+            ]
+          }
+        },
+        {
+          "id": "math12",
+          "type": "math",
+          "content": {
+            "latex": "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "quiz4",
+          "type": "quiz",
+          "content": {
+            "question": "Đạo hàm cho biết điều gì?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Giá trị của hàm"
+              },
+              {
+                "value": "b",
+                "label": "Tốc độ thay đổi"
+              },
+              {
+                "value": "c",
+                "label": "Điểm cực trị"
+              }
+            ],
+            "correct": "b",
+            "explanation": "Đạo hàm đo tốc độ thay đổi của hàm số!"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "tim-cuc-tri",
+  "title": "Tìm cực trị",
+  "description": "Cực đại, cực tiểu",
+  "xp_reward": 15,
+  "order_index": 0,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ext1",
+          "type": "text",
+          "content": {
+            "heading": "Điểm cực trị",
+            "paragraphs": [
+              "Điểm cực trị là điểm mà tại đó hàm số đạt giá trị lớn nhất hoặc nhỏ nhất cục bộ.",
+              "**Điều kiện cần**: Tại điểm cực trị x₀, ta có $f'(x_0) = 0$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "ext2",
+          "type": "text",
+          "content": {
+            "heading": "Quy tắc tìm cực trị",
+            "paragraphs": [
+              "1. Tìm $f'(x) = 0$",
+              "2. Xét dấu $f'(x)$ hoặc dùng đạo hàm cấp 2",
+              "3. Nếu $f''(x_0) > 0$: cực tiểu",
+              "4. Nếu $f''(x_0) < 0$: cực đại"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

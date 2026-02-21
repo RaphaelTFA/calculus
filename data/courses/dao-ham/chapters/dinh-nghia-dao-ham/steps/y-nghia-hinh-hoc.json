@@ -1,0 +1,32 @@
+{
+  "id": "y-nghia-hinh-hoc",
+  "title": "Ý nghĩa hình học",
+  "description": "Tiếp tuyến và đạo hàm",
+  "xp_reward": 10,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "geo1",
+          "type": "text",
+          "content": {
+            "heading": "Ý nghĩa hình học",
+            "paragraphs": [
+              "Đạo hàm f'(a) là **hệ số góc** của tiếp tuyến với đồ thị tại điểm x = a.",
+              "Phương trình tiếp tuyến:"
+            ]
+          }
+        },
+        {
+          "id": "math13",
+          "type": "math",
+          "content": {
+            "latex": "y - f(a) = f'(a)(x - a)"
+          }
+        }
+      ]
+    }
+  ]
+}
