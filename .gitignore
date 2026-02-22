@@ -3,3 +3,6 @@ node_modules
 calculus.db
 .venv
 dist
+*.db
+*.log
+*.pyc
