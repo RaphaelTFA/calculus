@@ -61,6 +61,50 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "ia-dao-ham-ham-hop",
+          "type": "interaction",
+          "content": {
+            "interactionType": "C",
+            "lesson": {
+              "interactionType": "C",
+              "parameterSpec": {
+                "time": { "start": 0, "end": 6.28318, "step": 0.025 }
+              },
+              "systemSpec": {
+                "initialState": { "x": 1, "y": 0 },
+                "evolutionRule": {
+                  "type": "expression",
+                  "expression": "[-2*sin(2*t), cos(t)]",
+                  "variables": ["t"]
+                }
+              },
+              "representationSpec": {
+                "encoding": "motion",
+                "viewBox": { "xMin": -1.5, "xMax": 1.5, "yMin": -1.5, "yMax": 1.5 }
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "type": "timeReached",
+                    "value": 1.57,
+                    "message": "Quy tắc dây chuyền: dx/dt = −2·sin(2t), dy/dt = cos(t). Vận tốc của hàm hợp bằng tích các vận tốc thành phần!"
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 5.5,
+                    "message": "Đường Lissajous x=cos(2t), y=sin(t) — kết quả của hai hàm hợp nhau theo quy tắc dây chuyền."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }

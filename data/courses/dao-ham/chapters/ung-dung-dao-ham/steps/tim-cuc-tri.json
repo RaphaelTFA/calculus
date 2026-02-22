@@ -38,6 +38,39 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "ia-tim-cuc-tri",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "meta": { "parameterLabel": "Tham số p" },
+              "parameter": { "min": -2, "max": 6, "initial": -2 },
+              "system": {
+                "resolution": 200,
+                "view": { "xMin": -3, "xMax": 3, "yMin": -5, "yMax": 10 },
+                "model": "Math.pow(x, 4) - (p * Math.pow(x, 2))"
+              },
+              "reflections": [
+                {
+                  "id": "one-min",
+                  "triggerSpec": { "field": "currentValue", "op": "<", "value": 0 },
+                  "text": "p < 0: Hàm có một cực tiểu duy nhất tại x = 0."
+                },
+                {
+                  "id": "two-min",
+                  "triggerSpec": { "field": "currentValue", "op": ">", "value": 2 },
+                  "text": "p > 2: Xuất hiện hai cực tiểu tại x = ±√(p/2)! Điểm x = 0 đổi vai thành cực đại cục bộ."
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

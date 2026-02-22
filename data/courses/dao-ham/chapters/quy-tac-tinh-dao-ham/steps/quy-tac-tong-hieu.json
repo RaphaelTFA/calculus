@@ -54,6 +54,39 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "ia-quy-tac-tong-hieu",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "meta": { "parameterLabel": "Hệ số a" },
+              "parameter": { "min": -3, "max": 3, "initial": 1 },
+              "system": {
+                "resolution": 200,
+                "view": { "xMin": -3, "xMax": 3, "yMin": -8, "yMax": 8 },
+                "model": "p * x * x + 2 * x"
+              },
+              "reflections": [
+                {
+                  "id": "sum-neg",
+                  "triggerSpec": { "field": "currentValue", "op": "<", "value": 0 },
+                  "text": "a < 0: Parabol mở xuống. Đạo hàm (ax²+2x)' = 2ax+2. Quy tắc tổng: đạo hàm từng phần rồi cộng lại!"
+                },
+                {
+                  "id": "sum-pos",
+                  "triggerSpec": { "field": "currentValue", "op": ">", "value": 1.5 },
+                  "text": "a > 1.5: Parabol mở lên mạnh. (f+g)' = f'+g' — đơn giản là cộng từng đạo hàm!"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

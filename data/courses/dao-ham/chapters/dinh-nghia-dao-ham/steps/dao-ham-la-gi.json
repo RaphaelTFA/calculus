@@ -70,6 +70,39 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "ia-dao-ham-la-gi",
+          "type": "interaction",
+          "content": {
+            "interactionType": "A",
+            "lesson": {
+              "interactionType": "A",
+              "parameterSpec": {
+                "resolutionLevels": [2, 4, 6, 8, 10, 12, 16, 20, 24, 30, 40, 50, 64]
+              },
+              "systemSpec": {
+                "function": "x*x",
+                "derivative": "2*x",
+                "domain": [-3, 3],
+                "range": [-1, 9],
+                "anchor": 1
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "conditionSpec": { "field": "resolution", "op": ">=", "value": 30 },
+                    "message": "Khi h → 0, đường cát tuyến (xanh) tiến dần về tiếp tuyến (đỏ). Đó chính là ý nghĩa của đạo hàm!"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }

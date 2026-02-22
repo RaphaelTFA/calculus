@@ -27,6 +27,39 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "ia-y-nghia-hinh-hoc",
+          "type": "interaction",
+          "content": {
+            "interactionType": "A",
+            "lesson": {
+              "interactionType": "A",
+              "parameterSpec": {
+                "resolutionLevels": [2, 4, 6, 8, 12, 16, 24, 32, 48, 64]
+              },
+              "systemSpec": {
+                "function": "Math.sin(x)",
+                "derivative": "Math.cos(x)",
+                "domain": [-3.14, 3.14],
+                "range": [-1.5, 1.5],
+                "anchor": 0.8
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "conditionSpec": { "field": "resolution", "op": ">=", "value": 32 },
+                    "message": "Hệ số góc đường cát tuyến hội tụ về f'(0.8) = cos(0.8) ≈ 0.697. Đó là hệ số góc tiếp tuyến — ý nghĩa hình học của đạo hàm!"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }

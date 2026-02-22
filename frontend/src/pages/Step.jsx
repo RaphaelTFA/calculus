@@ -14,6 +14,7 @@ import 'katex/dist/katex.min.css'
 import { InlineMath, BlockMath } from 'react-katex'
 
 import { Button } from '../components/ui/button'
+import InteractionSlide from '../components/interactions'
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────────────────────
 
@@ -95,6 +96,12 @@ export default function Step() {
   const goNext = useCallback(() => {
     if (currentSlideIndex < slides.length - 1) setCurrentSlideIndex(i => i + 1)
   }, [currentSlideIndex, slides.length])
+
+  // Is the current slide an interaction-only slide?
+  const isInteractionSlide = useMemo(() => {
+    const blocks = currentSlide?.blocks || []
+    return blocks.length === 1 && (blocks[0].type || blocks[0].block_type) === 'interaction'
+  }, [currentSlide])
 
   // Does the current slide have an unanswered quiz?
   const currentQuizBlocks = useMemo(() => {
@@ -266,34 +273,60 @@ export default function Step() {
       </header>
 
       {/* ── Body ── 8/10 of screen */}
-      <main className="h-[80vh] shrink-0 overflow-y-auto">
-        <div className="h-full flex items-center justify-center px-4 sm:px-8">
-          <div className="w-full max-w-2xl -mt-8">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlideIndex}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -24 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
-                className="space-y-6"
-              >
-                {currentSlide?.blocks?.map((block, blockIdx) => (
-                  <BlockRenderer
-                    key={block.id || `${currentSlideIndex}-${blockIdx}`}
-                    block={block}
-                    quizAnswer={quizAnswers[block.id]}
-                    quizSubmitted={quizSubmitted[block.id]}
-                    quizResult={quizResults[block.id]}
-                    onQuizAnswer={(ans) => handleQuizAnswer(block.id, ans)}
-                    onQuizSubmit={(correct, explanation) => handleQuizSubmit(block.id, correct, explanation)}
-                    onQuizRetry={() => handleQuizRetry(block.id)}
+      <main className="h-[80vh] shrink-0 overflow-hidden">
+        {isInteractionSlide ? (
+          // Full-bleed interaction slide — no scroll container, no max-width
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlideIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="w-full h-full"
+            >
+              {(() => {
+                const block = currentSlide.blocks[0]
+                const content = block.content || block.block_data || {}
+                return (
+                  <InteractionSlide
+                    interactionType={content.interactionType}
+                    lesson={content.lesson}
                   />
-                ))}
-              </motion.div>
-            </AnimatePresence>
+                )
+              })()}
+            </motion.div>
+          </AnimatePresence>
+        ) : (
+          // Normal slide — scrollable, constrained width
+          <div className="h-full overflow-y-auto flex items-center justify-center px-4 sm:px-8">
+            <div className="w-full max-w-2xl -mt-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentSlideIndex}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -24 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="space-y-6"
+                >
+                  {currentSlide?.blocks?.map((block, blockIdx) => (
+                    <BlockRenderer
+                      key={block.id || `${currentSlideIndex}-${blockIdx}`}
+                      block={block}
+                      quizAnswer={quizAnswers[block.id]}
+                      quizSubmitted={quizSubmitted[block.id]}
+                      quizResult={quizResults[block.id]}
+                      onQuizAnswer={(ans) => handleQuizAnswer(block.id, ans)}
+                      onQuizSubmit={(correct, explanation) => handleQuizSubmit(block.id, correct, explanation)}
+                      onQuizRetry={() => handleQuizRetry(block.id)}
+                    />
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* ── Footer ── handles quiz feedback states */}
@@ -463,9 +496,27 @@ function BlockRenderer({ block, quizAnswer, quizSubmitted, quizResult, onQuizAns
     case 'fill_blank': return <FillBlankBlock block={block} />
     case 'ordering':   return <OrderingBlock block={block} />
     case 'interactive_graph': return <InteractiveGraphBlock block={block} />
+    case 'interaction':       return <InteractionBlock block={block} />
     default:
       return <div className="text-stone-400 text-sm italic">Unsupported block type: {type}</div>
   }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INTERACTION BLOCK — Full engine embedded in a normal slide (non-fullbleed)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function InteractionBlock({ block }) {
+  const content = block.content || block.block_data || {}
+  return (
+    <div className="my-4 rounded-xl overflow-hidden border border-violet-200" style={{ height: 420 }}>
+      <InteractionSlide
+        interactionType={content.interactionType}
+        lesson={content.lesson}
+      />
+    </div>
+  )
 }
 
 

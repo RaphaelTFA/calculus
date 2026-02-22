@@ -82,6 +82,39 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "ia-dao-ham-co-ban",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "meta": { "parameterLabel": "Số mũ n" },
+              "parameter": { "min": 1, "max": 5, "initial": 2 },
+              "system": {
+                "resolution": 200,
+                "view": { "xMin": -2, "xMax": 2, "yMin": -6, "yMax": 6 },
+                "model": "Math.pow(Math.abs(x), Math.round(p)) * (x >= 0 ? 1 : (Math.round(p) % 2 === 0 ? 1 : -1))"
+              },
+              "reflections": [
+                {
+                  "id": "power-low",
+                  "triggerSpec": { "field": "currentValue", "op": "<=", "value": 1.5 },
+                  "text": "n = 1: f(x) = x, đạo hàm f'(x) = 1 — hằng số!"
+                },
+                {
+                  "id": "power-high",
+                  "triggerSpec": { "field": "currentValue", "op": ">=", "value": 4.5 },
+                  "text": "n = 5: f(x) = x⁵, đạo hàm f'(x) = 5x⁴. Theo công thức (xⁿ)' = nxⁿ⁻¹!"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

@@ -105,24 +105,72 @@ async def sync_data():
         logger.debug("\n✨ Data sync completed!")
 
 async def process_course(session, course_data):
+    from sqlalchemy import select, delete
+    from app.models import Slide
+
     # Get category
-    from sqlalchemy import select
     result = await session.execute(
         select(Category).where(Category.slug == course_data.get("category_slug", "giai-tich"))
     )
     category = result.scalar_one_or_none()
-    
+
     # Check if course exists
     result = await session.execute(
         select(Story).where(Story.slug == course_data["slug"])
     )
     existing_story = result.scalar_one_or_none()
-    
+
     if existing_story:
-        logger.debug(f"  ⚠️ Course '{course_data['title']}' already exists, skipping...")
+        logger.debug(f"  🔄 Course '{course_data['title']}' exists — syncing slides...")
+        story = existing_story
+
+        # Load all chapters for this story, ordered
+        from sqlalchemy.orm import selectinload
+        result = await session.execute(
+            select(Chapter)
+            .where(Chapter.story_id == story.id)
+            .order_by(Chapter.order_index)
+        )
+        db_chapters = result.scalars().all()
+
+        json_chapters = sorted(course_data.get("chapters", []), key=lambda x: x.get("order_index", 0))
+
+        for ch_idx, chapter_data in enumerate(json_chapters):
+            if ch_idx >= len(db_chapters):
+                break
+            db_chapter = db_chapters[ch_idx]
+
+            # Load steps for this chapter, ordered
+            result = await session.execute(
+                select(Step)
+                .where(Step.chapter_id == db_chapter.id)
+                .order_by(Step.order_index)
+            )
+            db_steps = result.scalars().all()
+
+            json_steps = sorted(chapter_data.get("steps", []), key=lambda x: x.get("order_index", 0))
+
+            for st_idx, step_data in enumerate(json_steps):
+                if st_idx >= len(db_steps):
+                    break
+                db_step = db_steps[st_idx]
+
+                # Delete all existing slides for this step and re-insert from JSON
+                await session.execute(
+                    delete(Slide).where(Slide.step_id == db_step.id)
+                )
+                for sl_idx, slide_data in enumerate(step_data.get("slides", [])):
+                    slide = Slide(
+                        step_id=db_step.id,
+                        order_index=sl_idx,
+                        blocks=slide_data.get("blocks", [])
+                    )
+                    session.add(slide)
+                logger.debug(f"      🔁 Resynced slides for step: {step_data['title']}")
+
         return
-    
-    # Create story
+
+    # Create new story
     story = Story(
         title=course_data["title"],
         slug=course_data["slug"],
@@ -138,10 +186,10 @@ async def process_course(session, course_data):
         category_id=category.id if category else None
     )
     session.add(story)
-    await session.flush()  # Get story.id
-    
+    await session.flush()
+
     logger.debug(f"  ✅ Added course: {course_data['title']}")
-    
+
     # Create chapters
     for ch_idx, chapter_data in enumerate(course_data.get("chapters", [])):
         chapter = Chapter(
@@ -152,9 +200,9 @@ async def process_course(session, course_data):
         )
         session.add(chapter)
         await session.flush()
-        
+
         logger.debug(f"    📖 Chapter: {chapter_data['title']}")
-        
+
         # Create steps
         for st_idx, step_data in enumerate(chapter_data.get("steps", [])):
             step = Step(
@@ -167,7 +215,7 @@ async def process_course(session, course_data):
             session.add(step)
             await session.flush()
             logger.debug(f"      📝 Step: {step_data['title']}")
-            
+
             # Create slides
             for sl_idx, slide_data in enumerate(step_data.get("slides", [])):
                 from app.models import Slide

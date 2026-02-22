@@ -51,6 +51,41 @@
           }
         }
       ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "ia-bai-toan-toi-uu",
+          "type": "interaction",
+          "content": {
+            "interactionType": "E",
+            "lesson": {
+              "interactionType": "E",
+              "parameterSpec": {
+                "structure": { "min": 0, "max": 1, "step": 0.01, "initial": 0.5, "label": "Vị trí điểm chia" }
+              },
+              "systemSpec": {
+                "baseValues": {},
+                "conservedObject": { "type": "expression", "expression": "32/3", "variables": [] }
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  { "type": "structureNear",  "value": 0.5, "tolerance": 0.05, "message": "Điểm chia tại x=2 — đây chính là cực đại của f(x) = -x² + 4x!" },
+                  { "type": "structureBelow", "value": 0.2,                   "message": "Điểm chia còn xa cực trị — phần diện tích bên trái còn nhỏ." },
+                  { "type": "structureAbove", "value": 0.8,                   "message": "Điểm chia đã vượt qua cực đại — diện tích bên phải thu hẹp lại." }
+                ]
+              },
+              "representationSpec": {
+                "mode": "geometricSplit",
+                "geometryBase": { "type": "areaUnderCurve", "function": "-x*x + 4*x", "domain": [0, 4] },
+                "splitSpec": { "type": "domainSplit" },
+                "viewBox": { "xMin": -0.2, "xMax": 4.5, "yMin": 0, "yMax": 5.5 }
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }
