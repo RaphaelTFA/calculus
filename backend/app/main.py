@@ -105,17 +105,46 @@ async def seed_from_json():
                 categories_map[cat["slug"]] = category
                 logger.debug(f"  ✅ Category: {cat['name']}")
         
-        # 2. Load courses from JSON files
+        # 2. Load courses from folder-based structure
         courses_dir = DATA_DIR / "courses"
         if courses_dir.exists():
-            for course_file in sorted(courses_dir.glob("*.json")):
+            for course_folder in sorted(courses_dir.iterdir()):
+                if not course_folder.is_dir():
+                    continue
+                course_file = course_folder / "course.json"
+                if not course_file.exists():
+                    continue
+
                 with open(course_file, 'r', encoding='utf-8') as f:
                     course_data = json.load(f)
-                
+
+                # Load chapters from subfolders
+                chapters_dir = course_folder / "chapters"
+                course_data["chapters"] = []
+                if chapters_dir.exists():
+                    for chapter_folder in sorted(chapters_dir.iterdir()):
+                        if not chapter_folder.is_dir():
+                            continue
+                        chapter_file = chapter_folder / "chapter.json"
+                        if not chapter_file.exists():
+                            continue
+                        with open(chapter_file, 'r', encoding='utf-8') as f:
+                            chapter_data = json.load(f)
+                        steps_dir = chapter_folder / "steps"
+                        chapter_data["steps"] = []
+                        if steps_dir.exists():
+                            for step_file in sorted(steps_dir.glob("*.json")):
+                                with open(step_file, 'r', encoding='utf-8') as f:
+                                    step_data = json.load(f)
+                                chapter_data["steps"].append(step_data)
+                            chapter_data["steps"].sort(key=lambda x: x.get("order_index", 0))
+                        course_data["chapters"].append(chapter_data)
+                    course_data["chapters"].sort(key=lambda x: x.get("order_index", 0))
+
                 # Get category
-                category_slug = course_data.get("category", "giai-tich")
+                category_slug = course_data.get("category_slug", course_data.get("category", "giai-tich"))
                 category = categories_map.get(category_slug)
-                
+
                 # Check if story exists
                 existing_story_res = await db.execute(select(Story).where(Story.slug == course_data["slug"]))
                 existing_story = existing_story_res.scalar_one_or_none()
@@ -147,12 +176,13 @@ async def seed_from_json():
                     difficulty=course_data.get("difficulty", "beginner"),
                     is_published=course_data.get("is_published", True),
                     is_featured=course_data.get("is_featured", False),
+                    order_index=course_data.get("order_index", 0),
                     category_id=category.id if category else None
                 )
                 db.add(story)
                 await db.flush()
                 logger.debug(f"📚 Course: {course_data['title']}")
-                
+
                 # Create chapters
                 for chapter_data in course_data.get("chapters", []):
                     chapter = Chapter(
@@ -164,7 +194,7 @@ async def seed_from_json():
                     db.add(chapter)
                     await db.flush()
                     logger.debug(f"  📖 Chapter: {chapter_data['title']}")
-                    
+
                     # Create steps
                     for step_data in chapter_data.get("steps", []):
                         step = Step(
@@ -176,7 +206,7 @@ async def seed_from_json():
                         db.add(step)
                         await db.flush()
                         logger.debug(f"    📝 Step: {step_data['title']}")
-                        
+
                         # Create slides
                         for slide_data in step_data.get("slides", []):
                             slide = Slide(
