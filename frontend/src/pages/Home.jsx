@@ -241,7 +241,7 @@ export default function Home() {
               {/* Carousel Container */}
               <div className="relative overflow-hidden">
                 <motion.div 
-                  className="flex gap-4"
+                  className="flex"
                   animate={{ 
                     x: `-${currentSlide * 100}%`
                   }}
@@ -390,12 +390,14 @@ function CourseCard({ story }) {
         />
         
         {/* Course Icon */}
-        <div 
-          className="absolute right-8 top-8 text-[120px] opacity-5 font-bold select-none pointer-events-none"
-          style={{ color: themeColor }}
-        >
-          {story.icon || '∫'}
-        </div>
+         <img
+          className="absolute right-20 top-8 opacity-5 select-none pointer-events-none"
+          style={{
+            filter: `drop-shadow(0 0 0 ${themeColor})`,
+          }}
+          src={story.illustration}
+        />
+
 
         <CardContent className="relative z-10 p-8 space-y-6">
           {/* Header */}
@@ -452,9 +454,6 @@ function CourseCard({ story }) {
                   background-color: var(--progress-color) !important;
                 }
               `}</style>
-              <p className="text-sm text-gray-600 font-semibold">
-                {story.lessons_remaining || 0} lessons remaining
-              </p>
             </div>
           )}
 
