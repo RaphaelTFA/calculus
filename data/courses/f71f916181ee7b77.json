@@ -1,0 +1,1068 @@
+{
+  "slug": "dao-ham",
+  "title": "Đạo hàm",
+  "description": "Tìm hiểu đạo hàm và ứng dụng: tốc độ thay đổi, cực trị, khảo sát hàm số.",
+  "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Coordinate_Plane-TjmV5y.png?width=204",
+  "icon": "d/dx",
+  "color": "from-green-500 to-green-700",
+  "category": "giai-tich",
+  "difficulty": "beginner",
+  "is_published": true,
+  "is_featured": true,
+  "order_index": 2,
+  "chapters": [
+    {
+      "id": "dinh-nghia-dao-ham",
+      "title": "Định nghĩa đạo hàm",
+      "description": "Đạo hàm và tốc độ thay đổi",
+      "order_index": 0,
+      "steps": [
+        {
+          "id": "dao-ham-co-ban",
+          "title": "Đạo hàm cơ bản",
+          "description": "Đạo hàm các hàm cơ bản",
+          "xp_reward": 15,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "basic1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Bảng đạo hàm cơ bản",
+                    "paragraphs": [
+                      "Các công thức cần nhớ:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math14",
+                  "type": "math",
+                  "content": {
+                    "latex": "(x^n)' = nx^{n-1}"
+                  }
+                },
+                {
+                  "id": "math15",
+                  "type": "math",
+                  "content": {
+                    "latex": "(e^x)' = e^x"
+                  }
+                },
+                {
+                  "id": "math16",
+                  "type": "math",
+                  "content": {
+                    "latex": "(\\ln x)' = \\frac{1}{x}"
+                  }
+                },
+                {
+                  "id": "math17",
+                  "type": "math",
+                  "content": {
+                    "latex": "(\\sin x)' = \\cos x"
+                  }
+                },
+                {
+                  "id": "math18",
+                  "type": "math",
+                  "content": {
+                    "latex": "(\\cos x)' = -\\sin x"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz5",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $(x^5)' = ?$",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "$5x^4$"
+                      },
+                      {
+                        "value": "b",
+                        "label": "$x^4$"
+                      },
+                      {
+                        "value": "c",
+                        "label": "$5x^5$"
+                      }
+                    ],
+                    "correct": "a",
+                    "explanation": "Công thức: $(x^n)' = nx^{n-1}$, nên $(x^5)' = 5x^4$"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ia-dao-ham-co-ban",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "B",
+                    "lesson": {
+                      "meta": {
+                        "parameterLabel": "Số mũ n"
+                      },
+                      "parameter": {
+                        "min": 1,
+                        "max": 5,
+                        "initial": 2
+                      },
+                      "system": {
+                        "resolution": 200,
+                        "view": {
+                          "xMin": -2,
+                          "xMax": 2,
+                          "yMin": -6,
+                          "yMax": 6
+                        },
+                        "model": "Math.pow(Math.abs(x), Math.round(p)) * (x >= 0 ? 1 : (Math.round(p) % 2 === 0 ? 1 : -1))"
+                      },
+                      "reflections": [
+                        {
+                          "id": "power-low",
+                          "triggerSpec": {
+                            "field": "currentValue",
+                            "op": "<=",
+                            "value": 1.5
+                          },
+                          "text": "n = 1: f(x) = x, đạo hàm f'(x) = 1 — hằng số!"
+                        },
+                        {
+                          "id": "power-high",
+                          "triggerSpec": {
+                            "field": "currentValue",
+                            "op": ">=",
+                            "value": 4.5
+                          },
+                          "text": "n = 5: f(x) = x⁵, đạo hàm f'(x) = 5x⁴. Theo công thức (xⁿ)' = nxⁿ⁻¹!"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dao-ham-la-gi",
+          "title": "Đạo hàm là gì?",
+          "description": "Khái niệm đạo hàm",
+          "xp_reward": 10,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "der1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Giới thiệu Đạo hàm 📈",
+                    "paragraphs": [
+                      "Đạo hàm đo **tốc độ thay đổi** của một hàm số.",
+                      "Nếu y = f(x), đạo hàm cho biết y thay đổi nhanh như thế nào khi x thay đổi."
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "def2",
+                  "type": "text",
+                  "content": {
+                    "heading": "Định nghĩa",
+                    "paragraphs": [
+                      "Đạo hàm của f(x) tại điểm x:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math12",
+                  "type": "math",
+                  "content": {
+                    "latex": "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "quiz4",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Đạo hàm cho biết điều gì?",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "Giá trị của hàm"
+                      },
+                      {
+                        "value": "b",
+                        "label": "Tốc độ thay đổi"
+                      },
+                      {
+                        "value": "c",
+                        "label": "Điểm cực trị"
+                      }
+                    ],
+                    "correct": "b",
+                    "explanation": "Đạo hàm đo tốc độ thay đổi của hàm số!"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 3,
+              "blocks": [
+                {
+                  "id": "ia-dao-ham-la-gi",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "A",
+                    "lesson": {
+                      "interactionType": "A",
+                      "parameterSpec": {
+                        "resolutionLevels": [
+                          2,
+                          4,
+                          6,
+                          8,
+                          10,
+                          12,
+                          16,
+                          20,
+                          24,
+                          30,
+                          40,
+                          50,
+                          64
+                        ]
+                      },
+                      "systemSpec": {
+                        "function": "x*x",
+                        "derivative": "2*x",
+                        "domain": [
+                          -3,
+                          3
+                        ],
+                        "range": [
+                          -1,
+                          9
+                        ],
+                        "anchor": 1
+                      },
+                      "reflectionSpec": {
+                        "triggers": [
+                          {
+                            "conditionSpec": {
+                              "field": "resolution",
+                              "op": ">=",
+                              "value": 30
+                            },
+                            "message": "Khi h → 0, đường cát tuyến (xanh) tiến dần về tiếp tuyến (đỏ). Đó chính là ý nghĩa của đạo hàm!"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "y-nghia-hinh-hoc",
+          "title": "Ý nghĩa hình học",
+          "description": "Tiếp tuyến và đạo hàm",
+          "xp_reward": 10,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "geo1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Ý nghĩa hình học",
+                    "paragraphs": [
+                      "Đạo hàm f'(a) là **hệ số góc** của tiếp tuyến với đồ thị tại điểm x = a.",
+                      "Phương trình tiếp tuyến:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math13",
+                  "type": "math",
+                  "content": {
+                    "latex": "y - f(a) = f'(a)(x - a)"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "ia-y-nghia-hinh-hoc",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "A",
+                    "lesson": {
+                      "interactionType": "A",
+                      "parameterSpec": {
+                        "resolutionLevels": [
+                          2,
+                          4,
+                          6,
+                          8,
+                          12,
+                          16,
+                          24,
+                          32,
+                          48,
+                          64
+                        ]
+                      },
+                      "systemSpec": {
+                        "function": "Math.sin(x)",
+                        "derivative": "Math.cos(x)",
+                        "domain": [
+                          -3.14,
+                          3.14
+                        ],
+                        "range": [
+                          -1.5,
+                          1.5
+                        ],
+                        "anchor": 0.8
+                      },
+                      "reflectionSpec": {
+                        "triggers": [
+                          {
+                            "conditionSpec": {
+                              "field": "resolution",
+                              "op": ">=",
+                              "value": 32
+                            },
+                            "message": "Hệ số góc đường cát tuyến hội tụ về f'(0.8) = cos(0.8) ≈ 0.697. Đó là hệ số góc tiếp tuyến — ý nghĩa hình học của đạo hàm!"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quy-tac-tinh-dao-ham",
+      "title": "Quy tắc tính đạo hàm",
+      "description": "Các quy tắc quan trọng",
+      "order_index": 1,
+      "steps": [
+        {
+          "id": "dao-ham-ham-hop",
+          "title": "Đạo hàm hàm hợp",
+          "description": "Chain rule",
+          "xp_reward": 18,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "chain1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Quy tắc dây chuyền (Chain Rule)",
+                    "paragraphs": [
+                      "Nếu y = f(u) và u = g(x):"
+                    ]
+                  }
+                },
+                {
+                  "id": "math22",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}"
+                  }
+                },
+                {
+                  "id": "math23",
+                  "type": "math",
+                  "content": {
+                    "latex": "[f(g(x))]' = f'(g(x)) \\cdot g'(x)"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz7",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $(\\sin(2x))' = ?$",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "$\\cos(2x)$"
+                      },
+                      {
+                        "value": "b",
+                        "label": "$2\\cos(2x)$"
+                      },
+                      {
+                        "value": "c",
+                        "label": "$-2\\sin(2x)$"
+                      }
+                    ],
+                    "correct": "b",
+                    "explanation": "Chain rule: $(\\sin u)' = \\cos u \\cdot u'$. Với $u=2x$, ta có $\\cos(2x) \\cdot 2 = 2\\cos(2x)$"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ia-dao-ham-ham-hop",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "C",
+                    "lesson": {
+                      "interactionType": "C",
+                      "parameterSpec": {
+                        "time": {
+                          "start": 0,
+                          "end": 6.28318,
+                          "step": 0.025
+                        }
+                      },
+                      "systemSpec": {
+                        "initialState": {
+                          "x": 1,
+                          "y": 0
+                        },
+                        "evolutionRule": {
+                          "type": "expression",
+                          "expression": "[-2*sin(2*t), cos(t)]",
+                          "variables": [
+                            "t"
+                          ]
+                        }
+                      },
+                      "representationSpec": {
+                        "encoding": "motion",
+                        "viewBox": {
+                          "xMin": -1.5,
+                          "xMax": 1.5,
+                          "yMin": -1.5,
+                          "yMax": 1.5
+                        }
+                      },
+                      "reflectionSpec": {
+                        "triggers": [
+                          {
+                            "type": "timeReached",
+                            "value": 1.57,
+                            "message": "Quy tắc dây chuyền: dx/dt = −2·sin(2t), dy/dt = cos(t). Vận tốc của hàm hợp bằng tích các vận tốc thành phần!"
+                          },
+                          {
+                            "type": "timeReached",
+                            "value": 5.5,
+                            "message": "Đường Lissajous x=cos(2t), y=sin(t) — kết quả của hai hàm hợp nhau theo quy tắc dây chuyền."
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quy-tac-tich-thuong",
+          "title": "Quy tắc tích, thương",
+          "description": "Đạo hàm tích và thương",
+          "xp_reward": 15,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "prod1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Quy tắc tích (Product Rule)",
+                    "paragraphs": []
+                  }
+                },
+                {
+                  "id": "math20",
+                  "type": "math",
+                  "content": {
+                    "latex": "[f(x) \\cdot g(x)]' = f'(x)g(x) + f(x)g'(x)"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quot1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Quy tắc thương (Quotient Rule)",
+                    "paragraphs": []
+                  }
+                },
+                {
+                  "id": "math21",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\left[\\frac{f(x)}{g(x)}\\right]' = \\frac{f'(x)g(x) - f(x)g'(x)}{[g(x)]^2}"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ia-quy-tac-tich-thuong",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "E",
+                    "lesson": {
+                      "interactionType": "E",
+                      "parameterSpec": {
+                        "structure": {
+                          "min": 0,
+                          "max": 1,
+                          "step": 0.01,
+                          "initial": 0.5,
+                          "label": "Nhấn mạnh thành phần"
+                        }
+                      },
+                      "systemSpec": {
+                        "baseValues": {
+                          "u": 4,
+                          "v": 3,
+                          "du": 1,
+                          "dv": 1
+                        },
+                        "conservedObject": {
+                          "type": "expression",
+                          "expression": "u*dv + v*du",
+                          "variables": [
+                            "u",
+                            "v",
+                            "du",
+                            "dv"
+                          ]
+                        }
+                      },
+                      "reflectionSpec": {
+                        "triggers": [
+                          {
+                            "type": "structureNear",
+                            "value": 0.5,
+                            "tolerance": 0.08,
+                            "message": "Hai phần u·dv và v·du đang được nhấn mạnh ngang nhau — cả hai cùng tạo nên d(uv)."
+                          },
+                          {
+                            "type": "structureBelow",
+                            "value": 0.2,
+                            "message": "Phần u·dv nổi bật: v tăng thêm dv trong khi u cố định."
+                          },
+                          {
+                            "type": "structureAbove",
+                            "value": 0.8,
+                            "message": "Phần v·du nổi bật: u tăng thêm du trong khi v cố định."
+                          }
+                        ]
+                      },
+                      "representationSpec": {
+                        "mode": "geometricSplit",
+                        "geometryBase": {
+                          "type": "rectangle",
+                          "origin": [
+                            0,
+                            0
+                          ],
+                          "width": "u",
+                          "height": "v"
+                        },
+                        "splitSpec": {
+                          "type": "rectangleContribution"
+                        },
+                        "viewBox": {
+                          "xMin": -0.3,
+                          "xMax": 6.5,
+                          "yMin": -0.3,
+                          "yMax": 5.5
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quy-tac-tong-hieu",
+          "title": "Quy tắc tổng, hiệu",
+          "description": "Đạo hàm tổng và hiệu",
+          "xp_reward": 12,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "rule1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Quy tắc tổng và hiệu",
+                    "paragraphs": [
+                      "Đạo hàm của tổng/hiệu = Tổng/hiệu các đạo hàm:"
+                    ]
+                  }
+                },
+                {
+                  "id": "math19",
+                  "type": "math",
+                  "content": {
+                    "latex": "[f(x) \\pm g(x)]' = f'(x) \\pm g'(x)"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz6",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $(3x^2 + 2x - 5)' = ?$",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "$6x + 2$"
+                      },
+                      {
+                        "value": "b",
+                        "label": "$3x + 2$"
+                      },
+                      {
+                        "value": "c",
+                        "label": "$6x - 5$"
+                      }
+                    ],
+                    "correct": "a",
+                    "explanation": "$(3x^2)' = 6x$, $(2x)' = 2$, $(5)' = 0$. Tổng: $6x + 2$"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ia-quy-tac-tong-hieu",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "B",
+                    "lesson": {
+                      "meta": {
+                        "parameterLabel": "Hệ số a"
+                      },
+                      "parameter": {
+                        "min": -3,
+                        "max": 3,
+                        "initial": 1
+                      },
+                      "system": {
+                        "resolution": 200,
+                        "view": {
+                          "xMin": -3,
+                          "xMax": 3,
+                          "yMin": -8,
+                          "yMax": 8
+                        },
+                        "model": "p * x * x + 2 * x"
+                      },
+                      "reflections": [
+                        {
+                          "id": "sum-neg",
+                          "triggerSpec": {
+                            "field": "currentValue",
+                            "op": "<",
+                            "value": 0
+                          },
+                          "text": "a < 0: Parabol mở xuống. Đạo hàm (ax²+2x)' = 2ax+2. Quy tắc tổng: đạo hàm từng phần rồi cộng lại!"
+                        },
+                        {
+                          "id": "sum-pos",
+                          "triggerSpec": {
+                            "field": "currentValue",
+                            "op": ">",
+                            "value": 1.5
+                          },
+                          "text": "a > 1.5: Parabol mở lên mạnh. (f+g)' = f'+g' — đơn giản là cộng từng đạo hàm!"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ung-dung-dao-ham",
+      "title": "Ứng dụng đạo hàm",
+      "description": "Áp dụng đạo hàm vào bài toán",
+      "order_index": 2,
+      "steps": [
+        {
+          "id": "bai-toan-toi-uu",
+          "title": "Bài toán tối ưu",
+          "description": "Ứng dụng thực tế",
+          "xp_reward": 25,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "opt1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Bài toán tối ưu hóa",
+                    "paragraphs": [
+                      "Đạo hàm giúp tìm giá trị lớn nhất/nhỏ nhất:",
+                      "• Chi phí tối thiểu",
+                      "• Lợi nhuận tối đa",
+                      "• Diện tích lớn nhất",
+                      "• Thời gian ngắn nhất"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz8",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Muốn tìm giá trị nhỏ nhất của hàm số, ta cần tìm điểm nào?",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "Điểm cực đại"
+                      },
+                      {
+                        "value": "b",
+                        "label": "Điểm cực tiểu"
+                      },
+                      {
+                        "value": "c",
+                        "label": "Điểm uốn"
+                      }
+                    ],
+                    "correct": "b",
+                    "explanation": "Giá trị nhỏ nhất thường đạt được tại điểm cực tiểu!"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ia-bai-toan-toi-uu",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "E",
+                    "lesson": {
+                      "interactionType": "E",
+                      "parameterSpec": {
+                        "structure": {
+                          "min": 0,
+                          "max": 1,
+                          "step": 0.01,
+                          "initial": 0.5,
+                          "label": "Vị trí điểm chia"
+                        }
+                      },
+                      "systemSpec": {
+                        "baseValues": {},
+                        "conservedObject": {
+                          "type": "expression",
+                          "expression": "32/3",
+                          "variables": []
+                        }
+                      },
+                      "reflectionSpec": {
+                        "triggers": [
+                          {
+                            "type": "structureNear",
+                            "value": 0.5,
+                            "tolerance": 0.05,
+                            "message": "Điểm chia tại x=2 — đây chính là cực đại của f(x) = -x² + 4x!"
+                          },
+                          {
+                            "type": "structureBelow",
+                            "value": 0.2,
+                            "message": "Điểm chia còn xa cực trị — phần diện tích bên trái còn nhỏ."
+                          },
+                          {
+                            "type": "structureAbove",
+                            "value": 0.8,
+                            "message": "Điểm chia đã vượt qua cực đại — diện tích bên phải thu hẹp lại."
+                          }
+                        ]
+                      },
+                      "representationSpec": {
+                        "mode": "geometricSplit",
+                        "geometryBase": {
+                          "type": "areaUnderCurve",
+                          "function": "-x*x + 4*x",
+                          "domain": [
+                            0,
+                            4
+                          ]
+                        },
+                        "splitSpec": {
+                          "type": "domainSplit"
+                        },
+                        "viewBox": {
+                          "xMin": -0.2,
+                          "xMax": 4.5,
+                          "yMin": 0,
+                          "yMax": 5.5
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "khao-sat-ham-so",
+          "title": "Khảo sát hàm số",
+          "description": "Vẽ đồ thị hàm số",
+          "xp_reward": 20,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "survey1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Các bước khảo sát",
+                    "paragraphs": [
+                      "1. Tìm tập xác định",
+                      "2. Tính đạo hàm $f'(x)$, tìm cực trị",
+                      "3. Xét tính đồng biến, nghịch biến",
+                      "4. Tìm tiệm cận (nếu có)",
+                      "5. Vẽ đồ thị"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "ia-khao-sat-ham-so",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "A",
+                    "lesson": {
+                      "interactionType": "A",
+                      "parameterSpec": {
+                        "resolutionLevels": [
+                          2,
+                          4,
+                          6,
+                          8,
+                          12,
+                          16,
+                          24,
+                          32,
+                          48,
+                          64
+                        ]
+                      },
+                      "systemSpec": {
+                        "function": "x*x*x - 3*x",
+                        "derivative": "3*x*x - 3",
+                        "domain": [
+                          -2.5,
+                          2.5
+                        ],
+                        "range": [
+                          -3,
+                          3
+                        ],
+                        "anchor": 1
+                      },
+                      "reflectionSpec": {
+                        "triggers": [
+                          {
+                            "conditionSpec": {
+                              "field": "resolution",
+                              "op": ">=",
+                              "value": 24
+                            },
+                            "message": "f(x) = x³ − 3x có f'(x) = 3x² − 3. Tại neo x=1: f'(1) = 0 — đây là cực trị! Tiếp tuyến nằm ngang."
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tim-cuc-tri",
+          "title": "Tìm cực trị",
+          "description": "Cực đại, cực tiểu",
+          "xp_reward": 15,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "ext1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Điểm cực trị",
+                    "paragraphs": [
+                      "Điểm cực trị là điểm mà tại đó hàm số đạt giá trị lớn nhất hoặc nhỏ nhất cục bộ.",
+                      "**Điều kiện cần**: Tại điểm cực trị x₀, ta có $f'(x_0) = 0$"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "ext2",
+                  "type": "text",
+                  "content": {
+                    "heading": "Quy tắc tìm cực trị",
+                    "paragraphs": [
+                      "1. Tìm $f'(x) = 0$",
+                      "2. Xét dấu $f'(x)$ hoặc dùng đạo hàm cấp 2",
+                      "3. Nếu $f''(x_0) > 0$: cực tiểu",
+                      "4. Nếu $f''(x_0) < 0$: cực đại"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "ia-tim-cuc-tri",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "B",
+                    "lesson": {
+                      "meta": {
+                        "parameterLabel": "Tham số p"
+                      },
+                      "parameter": {
+                        "min": -2,
+                        "max": 6,
+                        "initial": -2
+                      },
+                      "system": {
+                        "resolution": 200,
+                        "view": {
+                          "xMin": -3,
+                          "xMax": 3,
+                          "yMin": -5,
+                          "yMax": 10
+                        },
+                        "model": "Math.pow(x, 4) - (p * Math.pow(x, 2))"
+                      },
+                      "reflections": [
+                        {
+                          "id": "one-min",
+                          "triggerSpec": {
+                            "field": "currentValue",
+                            "op": "<",
+                            "value": 0
+                          },
+                          "text": "p < 0: Hàm có một cực tiểu duy nhất tại x = 0."
+                        },
+                        {
+                          "id": "two-min",
+                          "triggerSpec": {
+                            "field": "currentValue",
+                            "op": ">",
+                            "value": 2
+                          },
+                          "text": "p > 2: Xuất hiện hai cực tiểu tại x = ±√(p/2)! Điểm x = 0 đổi vai thành cực đại cục bộ."
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
