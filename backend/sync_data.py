@@ -11,11 +11,14 @@ from sqlalchemy.orm import sessionmaker
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
 
 from app.models import Base, Category, Story, Chapter, Step
 from app.config import settings
 import logging
 
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 DATA_DIR = Path(__file__).parent.parent / "data"
@@ -57,12 +60,6 @@ async def sync_data():
         logger.debug("\n📚 Syncing courses...")
         courses_dir = DATA_DIR / "courses"
         if courses_dir.exists():
-            # Handle single JSON files
-            for course_file in courses_dir.glob("*.json"):
-                with open(course_file, 'r', encoding='utf-8') as f:
-                    course_data = json.load(f)
-                await process_course(session, course_data)
-            
             # Handle folder-based courses
             for course_folder in courses_dir.iterdir():
                 if course_folder.is_dir():

@@ -1,0 +1,13 @@
+{
+  "slug": "tich-phan",
+  "title": "Tích phân",
+  "description": "Tích phân bất định, xác định và ứng dụng tính diện tích, thể tích.",
+  "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Visual_Algebra_1-wiJeeI.png?width=204",
+  "icon": "∫",
+  "color": "from-purple-500 to-purple-700",
+  "category_slug": "giai-tich",
+  "difficulty": "intermediate",
+  "is_published": true,
+  "is_featured": false,
+  "order_index": 3
+}

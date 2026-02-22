@@ -1,0 +1,13 @@
+{
+  "slug": "gioi-han",
+  "title": "Giới hạn hàm số",
+  "description": "Khám phá khái niệm giới hạn - nền tảng của giải tích. Học cách tính giới hạn và áp dụng định lý.",
+  "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Arithmetic_Thinking-KaQBTB.png?width=204",
+  "icon": "lim",
+  "color": "from-blue-500 to-blue-700",
+  "category_slug": "giai-tich",
+  "difficulty": "beginner",
+  "is_published": true,
+  "is_featured": true,
+  "order_index": 1
+}

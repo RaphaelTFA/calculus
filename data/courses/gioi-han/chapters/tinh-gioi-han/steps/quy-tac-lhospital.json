@@ -1,0 +1,50 @@
+{
+  "id": "quy-tac-lhospital",
+  "title": "Quy tắc L'Hospital",
+  "description": "Xử lý dạng vô định",
+  "xp_reward": 20,
+  "order_index": 2,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "lh1",
+          "type": "text",
+          "content": {
+            "heading": "Quy tắc L'Hospital",
+            "paragraphs": [
+              "Khi gặp dạng vô định $\\frac{0}{0}$ hoặc $\\frac{\\infty}{\\infty}$, ta có:"
+            ]
+          }
+        },
+        {
+          "id": "math11",
+          "type": "math",
+          "content": {
+            "latex": "\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)}"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "quiz3",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\lim_{x \\to 0} \\frac{e^x - 1}{x}$ bằng L'Hospital",
+            "options": [
+              { "value": "a", "label": "0" },
+              { "value": "b", "label": "1" },
+              { "value": "c", "label": "e" }
+            ],
+            "correct": "b",
+            "explanation": "Đạo hàm tử: $(e^x)' = e^x$, mẫu: $(x)' = 1$. Giới hạn = $e^0/1 = 1$"
+          }
+        }
+      ]
+    }
+  ]
+}
