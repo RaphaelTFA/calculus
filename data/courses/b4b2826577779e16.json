@@ -5,7 +5,7 @@
   "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Visual_Algebra_1-wiJeeI.png?width=204",
   "icon": "∫",
   "color": "from-purple-500 to-purple-700",
-  "category": "giai-tich",
+  "category_slug": "giai-tich",
   "difficulty": "intermediate",
   "is_published": true,
   "is_featured": false,
@@ -18,31 +18,36 @@
       "order_index": 0,
       "steps": [
         {
-          "id": "nguyen-ham-la-gi",
-          "title": "Nguyên hàm là gì?",
-          "description": "Khái niệm nguyên hàm",
-          "xp_reward": 10,
-          "order_index": 0,
+          "id": "bai-tap-nguyen-ham",
+          "title": "Bài tập nguyên hàm",
+          "description": "Luyện tập",
+          "xp_reward": 20,
+          "order_index": 2,
           "slides": [
             {
               "order_index": 0,
               "blocks": [
                 {
-                  "id": "int1",
-                  "type": "text",
+                  "id": "quiz9",
+                  "type": "quiz",
                   "content": {
-                    "heading": "Nguyên hàm",
-                    "paragraphs": [
-                      "Nguyên hàm là **phép toán ngược** của đạo hàm.",
-                      "Nếu $F'(x) = f(x)$ thì F(x) là nguyên hàm của f(x)."
-                    ]
-                  }
-                },
-                {
-                  "id": "math24",
-                  "type": "math",
-                  "content": {
-                    "latex": "\\int f(x)dx = F(x) + C"
+                    "question": "Tính $\\int x^3 dx = ?$",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "$\\frac{x^4}{4} + C$"
+                      },
+                      {
+                        "value": "b",
+                        "label": "$3x^2 + C$"
+                      },
+                      {
+                        "value": "c",
+                        "label": "$x^4 + C$"
+                      }
+                    ],
+                    "correct": "a",
+                    "explanation": "Công thức: $\\int x^n dx = \\frac{x^{n+1}}{n+1} + C$, với n=3: $\\frac{x^4}{4} + C$"
                   }
                 }
               ]
@@ -107,36 +112,31 @@
           ]
         },
         {
-          "id": "bai-tap-nguyen-ham",
-          "title": "Bài tập nguyên hàm",
-          "description": "Luyện tập",
-          "xp_reward": 20,
-          "order_index": 2,
+          "id": "nguyen-ham-la-gi",
+          "title": "Nguyên hàm là gì?",
+          "description": "Khái niệm nguyên hàm",
+          "xp_reward": 10,
+          "order_index": 0,
           "slides": [
             {
               "order_index": 0,
               "blocks": [
                 {
-                  "id": "quiz9",
-                  "type": "quiz",
+                  "id": "int1",
+                  "type": "text",
                   "content": {
-                    "question": "Tính $\\int x^3 dx = ?$",
-                    "options": [
-                      {
-                        "value": "a",
-                        "label": "$\\frac{x^4}{4} + C$"
-                      },
-                      {
-                        "value": "b",
-                        "label": "$3x^2 + C$"
-                      },
-                      {
-                        "value": "c",
-                        "label": "$x^4 + C$"
-                      }
-                    ],
-                    "correct": "a",
-                    "explanation": "Công thức: $\\int x^n dx = \\frac{x^{n+1}}{n+1} + C$, với n=3: $\\frac{x^4}{4} + C$"
+                    "heading": "Nguyên hàm",
+                    "paragraphs": [
+                      "Nguyên hàm là **phép toán ngược** của đạo hàm.",
+                      "Nếu $F'(x) = f(x)$ thì F(x) là nguyên hàm của f(x)."
+                    ]
+                  }
+                },
+                {
+                  "id": "math24",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\int f(x)dx = F(x) + C"
                   }
                 }
               ]
@@ -151,6 +151,43 @@
       "description": "Các kỹ thuật tính tích phân",
       "order_index": 1,
       "steps": [
+        {
+          "id": "bai-tap-tong-hop",
+          "title": "Bài tập tổng hợp",
+          "description": "Luyện tập",
+          "xp_reward": 25,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "quiz10",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Phương pháp nào phù hợp cho $\\int xe^x dx$?",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "Đổi biến"
+                      },
+                      {
+                        "value": "b",
+                        "label": "Tích phân từng phần"
+                      },
+                      {
+                        "value": "c",
+                        "label": "Trực tiếp"
+                      }
+                    ],
+                    "correct": "b",
+                    "explanation": "Đặt $u=x, dv=e^x dx$. Dùng tích phân từng phần!"
+                  }
+                }
+              ]
+            }
+          ]
+        },
         {
           "id": "doi-bien-so",
           "title": "Đổi biến số",
@@ -216,43 +253,6 @@
                     "paragraphs": [
                       "Chọn u và dv sao cho $\\int v du$ đơn giản hơn $\\int u dv$"
                     ]
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "bai-tap-tong-hop",
-          "title": "Bài tập tổng hợp",
-          "description": "Luyện tập",
-          "xp_reward": 25,
-          "order_index": 2,
-          "slides": [
-            {
-              "order_index": 0,
-              "blocks": [
-                {
-                  "id": "quiz10",
-                  "type": "quiz",
-                  "content": {
-                    "question": "Phương pháp nào phù hợp cho $\\int xe^x dx$?",
-                    "options": [
-                      {
-                        "value": "a",
-                        "label": "Đổi biến"
-                      },
-                      {
-                        "value": "b",
-                        "label": "Tích phân từng phần"
-                      },
-                      {
-                        "value": "c",
-                        "label": "Trực tiếp"
-                      }
-                    ],
-                    "correct": "b",
-                    "explanation": "Đặt $u=x, dv=e^x dx$. Dùng tích phân từng phần!"
                   }
                 }
               ]

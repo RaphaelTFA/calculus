@@ -5,7 +5,7 @@
   "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Arithmetic_Thinking-KaQBTB.png?width=204",
   "icon": "lim",
   "color": "from-blue-500 to-blue-700",
-  "category": "giai-tich",
+  "category_slug": "giai-tich",
   "difficulty": "beginner",
   "is_published": true,
   "is_featured": true,
@@ -17,6 +17,123 @@
       "description": "Định nghĩa và ý nghĩa của giới hạn",
       "order_index": 0,
       "steps": [
+        {
+          "id": "bai-tap-co-ban",
+          "title": "Bài tập cơ bản",
+          "description": "Luyện tập tính giới hạn",
+          "xp_reward": 20,
+          "order_index": 2,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "ex2",
+                  "type": "text",
+                  "content": {
+                    "heading": "Ví dụ 1",
+                    "paragraphs": [
+                      "Tính: $\\lim_{x \\to 0} \\frac{\\sin x}{x}$"
+                    ]
+                  }
+                },
+                {
+                  "id": "math4",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1"
+                  }
+                },
+                {
+                  "id": "note1",
+                  "type": "text",
+                  "content": {
+                    "heading": "",
+                    "paragraphs": [
+                      "Đây là một giới hạn quan trọng cần nhớ!"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "quiz2",
+                  "type": "quiz",
+                  "content": {
+                    "question": "Tính $\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1}$ = ?",
+                    "options": [
+                      {
+                        "value": "a",
+                        "label": "1"
+                      },
+                      {
+                        "value": "b",
+                        "label": "2"
+                      },
+                      {
+                        "value": "c",
+                        "label": "0"
+                      }
+                    ],
+                    "correct": "b",
+                    "explanation": "Phân tích: $\\frac{x^2-1}{x-1} = \\frac{(x-1)(x+1)}{x-1} = x+1 \\to 2$"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dinh-nghia-epsilon-delta",
+          "title": "Định nghĩa ε-δ",
+          "description": "Định nghĩa chính xác của giới hạn",
+          "xp_reward": 15,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "eps1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Định nghĩa ε-δ",
+                    "paragraphs": [
+                      "Định nghĩa chính thức của giới hạn sử dụng ký hiệu ε (epsilon) và δ (delta).",
+                      "Đây là định nghĩa toán học nghiêm ngặt nhất."
+                    ]
+                  }
+                },
+                {
+                  "id": "math3",
+                  "type": "math",
+                  "content": {
+                    "latex": "\\forall \\varepsilon > 0, \\exists \\delta > 0: 0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon"
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "mean1",
+                  "type": "text",
+                  "content": {
+                    "heading": "Ý nghĩa",
+                    "paragraphs": [
+                      "Với mọi khoảng cách ε nhỏ tùy ý quanh L,",
+                      "Luôn tồn tại khoảng cách δ quanh a sao cho f(x) nằm trong khoảng ε."
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
         {
           "id": "gioi-han-la-gi",
           "title": "Giới hạn là gì?",
@@ -108,123 +225,6 @@
                     ],
                     "correct": "b",
                     "explanation": "Thay x = 2 vào: 3(2) - 1 = 6 - 1 = 5"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "dinh-nghia-epsilon-delta",
-          "title": "Định nghĩa ε-δ",
-          "description": "Định nghĩa chính xác của giới hạn",
-          "xp_reward": 15,
-          "order_index": 1,
-          "slides": [
-            {
-              "order_index": 0,
-              "blocks": [
-                {
-                  "id": "eps1",
-                  "type": "text",
-                  "content": {
-                    "heading": "Định nghĩa ε-δ",
-                    "paragraphs": [
-                      "Định nghĩa chính thức của giới hạn sử dụng ký hiệu ε (epsilon) và δ (delta).",
-                      "Đây là định nghĩa toán học nghiêm ngặt nhất."
-                    ]
-                  }
-                },
-                {
-                  "id": "math3",
-                  "type": "math",
-                  "content": {
-                    "latex": "\\forall \\varepsilon > 0, \\exists \\delta > 0: 0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon"
-                  }
-                }
-              ]
-            },
-            {
-              "order_index": 1,
-              "blocks": [
-                {
-                  "id": "mean1",
-                  "type": "text",
-                  "content": {
-                    "heading": "Ý nghĩa",
-                    "paragraphs": [
-                      "Với mọi khoảng cách ε nhỏ tùy ý quanh L,",
-                      "Luôn tồn tại khoảng cách δ quanh a sao cho f(x) nằm trong khoảng ε."
-                    ]
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "bai-tap-co-ban",
-          "title": "Bài tập cơ bản",
-          "description": "Luyện tập tính giới hạn",
-          "xp_reward": 20,
-          "order_index": 2,
-          "slides": [
-            {
-              "order_index": 0,
-              "blocks": [
-                {
-                  "id": "ex2",
-                  "type": "text",
-                  "content": {
-                    "heading": "Ví dụ 1",
-                    "paragraphs": [
-                      "Tính: $\\lim_{x \\to 0} \\frac{\\sin x}{x}$"
-                    ]
-                  }
-                },
-                {
-                  "id": "math4",
-                  "type": "math",
-                  "content": {
-                    "latex": "\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1"
-                  }
-                },
-                {
-                  "id": "note1",
-                  "type": "text",
-                  "content": {
-                    "heading": "",
-                    "paragraphs": [
-                      "Đây là một giới hạn quan trọng cần nhớ!"
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "order_index": 1,
-              "blocks": [
-                {
-                  "id": "quiz2",
-                  "type": "quiz",
-                  "content": {
-                    "question": "Tính $\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1}$ = ?",
-                    "options": [
-                      {
-                        "value": "a",
-                        "label": "1"
-                      },
-                      {
-                        "value": "b",
-                        "label": "2"
-                      },
-                      {
-                        "value": "c",
-                        "label": "0"
-                      }
-                    ],
-                    "correct": "b",
-                    "explanation": "Phân tích: $\\frac{x^2-1}{x-1} = \\frac{(x-1)(x+1)}{x-1} = x+1 \\to 2$"
                   }
                 }
               ]

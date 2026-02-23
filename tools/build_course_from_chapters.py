@@ -42,12 +42,43 @@ def collect_chapters(chapters_root):
 
 
 def encrypt_name(name: str, salt: str | None = None) -> tuple[str, str]:
-    # add a small random salt by default to vary the filename
+    # Deterministic hash of the name to avoid creating duplicate files.
+    # We intentionally avoid random salts here so the same `name` always
+    # maps to the same filename. To allow lookup from filename -> name,
+    # callers should maintain an index mapping (see `_index.json`).
     if salt is None:
-        salt = hashlib.sha256(os.urandom(16)).hexdigest()[:8]
+        salt = ""
     combined = f"{name}|{salt}"
     h = hashlib.sha256(combined.encode('utf-8')).hexdigest()
     return h[:16], salt
+
+
+def update_index(index_path: str, filename: str, slug: str) -> None:
+    """Maintain a small JSON index mapping filename -> slug to avoid duplicates
+    and to allow reverse lookup. The index lives in the target directory and is
+    used by the server startup to know which slug corresponds to which file.
+    """
+    index = {}
+    if os.path.isfile(index_path):
+        try:
+            with open(index_path, 'r', encoding='utf-8') as f:
+                index = json.load(f)
+        except Exception:
+            index = {}
+
+    index[os.path.basename(filename)] = slug
+    with open(index_path, 'w', encoding='utf-8') as f:
+        json.dump(index, f, ensure_ascii=False, indent=2)
+
+
+def lookup_index(index_path: str) -> dict:
+    if os.path.isfile(index_path):
+        try:
+            with open(index_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
 
 
 def build_course_from_folder(source_folder: str, target_dir: str, encrypt: bool = True) -> str:
@@ -70,6 +101,18 @@ def build_course_from_folder(source_folder: str, target_dir: str, encrypt: bool 
         meta['chapters'] = collect_chapters(chapters_root)
 
     slug = meta.get('slug') or meta.get('title') or 'course'
+    index_path = os.path.join(target_dir, '_index.json')
+    os.makedirs(target_dir, exist_ok=True)
+
+    # Load index to check for existing mapping to avoid duplicates
+    index = lookup_index(index_path)
+    # If slug already exists in index, return existing file
+    for fname, s in index.items():
+        if s == slug:
+            existing = os.path.join(target_dir, fname)
+            if os.path.isfile(existing):
+                return existing, ''
+
     if encrypt:
         filename_base, salt = encrypt_name(slug)
     else:
@@ -78,8 +121,23 @@ def build_course_from_folder(source_folder: str, target_dir: str, encrypt: bool 
     filename = f"{filename_base}.json"
     out_path = os.path.join(target_dir, filename)
 
+    # If file already exists but not in index, attempt to avoid overwrite by
+    # checking content equality; if equal, just register in index and return.
+    if os.path.isfile(out_path):
+        try:
+            with open(out_path, 'r', encoding='utf-8') as f:
+                existing = json.load(f)
+            if existing == meta:
+                update_index(index_path, out_path, slug)
+                return out_path, salt
+        except Exception:
+            pass
+
     with open(out_path, 'w', encoding='utf-8') as wf:
         json.dump(meta, wf, ensure_ascii=False, indent=2)
+
+    # update index so next run will reuse the same file for this slug
+    update_index(index_path, out_path, slug)
 
     # return path and salt used (salt empty if no encryption)
     return out_path, salt
