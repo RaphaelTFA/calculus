@@ -114,7 +114,8 @@ async def ensure_course_jsons():
             return
         for src in sources:
             try:
-                meta = load_json(str(src / 'course.json'))
+                with open(src / 'course.json', 'r', encoding='utf-8') as f:
+                    meta = json.load(f)
                 slug = meta.get('slug') or meta.get('title')
             except Exception:
                 slug = None
