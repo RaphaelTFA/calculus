@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import json
+import runpy
+import asyncio
 from app.config import settings
 from app.database import init_db
 from app.routers import auth_router, stories_router, steps_router, progress_router, categories_router, auth
@@ -25,6 +27,7 @@ DATA_DIR = Path(__file__).parent.parent.parent / "data"
 async def lifespan(app: FastAPI):
     # Startup
     await init_db()
+    await ensure_course_jsons()
     await seed_from_json()
     await seed_achievements()
     yield
@@ -56,9 +59,72 @@ app.include_router(auth.router, prefix="/api/v1")
 async def root():
     return {"message": "Calculus API", "version": "1.0.0"}
 
+
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+async def ensure_course_jsons():
+    """Run builder on any source folder not yet indexed.
+
+    Courses are considered present if their slug appears as a value in
+    `data/courses/_index.json`. Sources are looked for in both the top-level
+    `data/` directory and under `data/courses/` (since some projects nest them).
+    """
+    from pathlib import Path
+    data_dir = Path(__file__).parent.parent.parent / 'data'
+    raw_courses_dir = data_dir / 'raw_courses'
+    courses_dir = data_dir / 'courses'
+    index_path = courses_dir / '_index.json'
+    existing_slugs = set()
+    if index_path.exists():
+        try:
+            existing_slugs = set(json.loads(index_path.read_text(encoding='utf-8')).values())
+        except Exception:
+            existing_slugs = set()
+
+    sources = []
+    # check top‑level data folders
+    for entry in sorted(data_dir.iterdir()):
+        if entry.is_dir() and (entry / 'course.json').is_file():
+            sources.append(entry)
+    # also look in data/courses subfolders (some sources live there)
+    if courses_dir.exists():
+        for entry in sorted(courses_dir.iterdir()):
+            if entry.is_dir() and (entry / 'course.json').is_file():
+                sources.append(entry)
+    # additionally consider raw_courses directory which holds unprocessed material
+    raw_root = data_dir / 'raw_courses'
+    if raw_root.exists():
+        for entry in sorted(raw_root.iterdir()):
+            if entry.is_dir() and (entry / 'course.json').is_file():
+                sources.append(entry)
+
+    if not sources:
+        logger.debug("No course source folders found to build")
+        return
+
+    def run_build():
+        # import runner lazily to avoid circular import issues
+        globs = runpy.run_path(str(Path(__file__).parent.parent.parent / 'tools' / 'build_course_from_chapters.py'))
+        build_fn = globs.get('build_course_from_folder')
+        if not build_fn:
+            logger.debug("build_course_from_folder not available")
+            return
+        for src in sources:
+            try:
+                meta = load_json(str(src / 'course.json'))
+                slug = meta.get('slug') or meta.get('title')
+            except Exception:
+                slug = None
+            if slug and slug in existing_slugs:
+                logger.debug(f"Skipping {src}, already indexed")
+                continue
+            out, salt = build_fn(str(src), str(courses_dir), encrypt=True)
+            logger.info(f"Built course file: {out}")
+    
+    await asyncio.to_thread(run_build)
 
 
 async def seed_from_json():
