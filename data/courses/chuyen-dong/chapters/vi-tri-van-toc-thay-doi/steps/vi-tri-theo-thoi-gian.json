@@ -1,0 +1,404 @@
+{
+  "id": "vi-tri-theo-thoi-gian",
+  "title": "Vị Trí Theo Thời Gian",
+  "description": "Đọc và hiểu đồ thị hàm vị trí — bản ghi chuyển động theo thời gian.",
+  "xp_reward": 10,
+  "order_index": 0,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-vi-tri-theo-thoi-gian",
+          "type": "interaction",
+          "content": {
+            "interactionType": "C",
+            "lesson": {
+              "interactionType": "C",
+              "parameterSpec": {
+                "time": {
+                  "start": 0,
+                  "end": 5,
+                  "step": 0.05
+                }
+              },
+              "systemSpec": {
+                "initialState": {
+                  "x": 0,
+                  "y": 0
+                },
+                "evolutionRule": {
+                  "type": "expression",
+                  "expression": "[1, 2.5 - t]",
+                  "variables": [
+                    "t",
+                    "x",
+                    "y"
+                  ]
+                }
+              },
+              "representationSpec": {
+                "encoding": "positionTime",
+                "viewBox": {
+                  "xMin": 0,
+                  "xMax": 5,
+                  "yMin": -0.4,
+                  "yMax": 3.5
+                },
+                "xLabel": "Thời gian (giây)",
+                "yLabel": "Vị trí (m)"
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "type": "timeReached",
+                    "value": 4.0,
+                    "message": "Đồ thị dốc xuống — vật đang đi theo chiều âm, trở về vị trí ban đầu."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 2.5,
+                    "message": "Đồ thị nằm ngang — vật đứng yên trong thoáng chốc trước khi đổi chiều."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 1.0,
+                    "message": "Đồ thị dốc lên — vật đang di chuyển nhanh theo chiều dương."
+                  }
+                ]
+              },
+              "prompt": "Quan sát cả hai bảng khi hoạt hình chạy. Khi nào vật di chuyển nhanh nhất? Khi nào vật đứng yên? Đặc điểm nào của đồ thị tương ứng với mỗi thời điểm đó?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-ham-vi-tri",
+          "type": "text",
+          "content": {
+            "heading": "Hàm vị trí",
+            "paragraphs": [
+              "Ký hiệu <b>f(t)</b> biểu thị vị trí của vật tại thời điểm t. Với mỗi t trong miền xác định, f(t) trả về đúng một giá trị vị trí. Tập hợp tất cả các điểm (t, f(t)) tạo thành đồ thị của f — bản ghi đầy đủ của chuyển động.",
+              "Đồ thị <b>không phải là hình ảnh của con đường</b> vật đi qua trong không gian. Trục tung biểu thị vị trí đo được trên một trục tham chiếu — không phải hướng di chuyển trong không gian thực."
+            ]
+          }
+        },
+        {
+          "id": "math-ham-vi-tri",
+          "type": "math",
+          "content": {
+            "latex": "f: [0,\\,5] \\to \\mathbb{R}, \\qquad f(t) = \\text{vị trí tại thời điểm } t"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-doc-do-thi",
+          "type": "text",
+          "content": {
+            "heading": "Đọc đồ thị hàm vị trí",
+            "paragraphs": [
+              "Khi f <b>tăng</b> trên một khoảng, vật di chuyển theo chiều dương. Khi f <b>giảm</b>, vật di chuyển theo chiều âm. Khi f <b>nằm ngang</b>, vật đứng yên tại thời điểm đó.",
+              "Để đọc f(a): tìm điểm trên đường cong ngay phía trên a trên trục hoành — chiều cao của điểm đó chính là f(a). Mỗi điểm (t, f(t)) là một tuyên bố: <i>tại thời điểm này, vật ở đây.</i>"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-1-doc-do-thi",
+          "type": "quiz",
+          "content": {
+            "question": "Đồ thị của $f(t)$ tăng dốc từ $t = 0$ đến $t = 1$, rồi nằm ngang từ $t = 1$ đến $t = 3$. Kết luận nào đúng?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Vật di chuyển lên trên, sau đó dừng giữa không khí."
+              },
+              {
+                "value": "b",
+                "label": "Vật di chuyển nhanh theo chiều dương, sau đó đứng yên."
+              },
+              {
+                "value": "c",
+                "label": "Vật đổi chiều tại $t = 1$."
+              },
+              {
+                "value": "d",
+                "label": "Vật di chuyển đều trong suốt $[0, 3]$."
+              }
+            ],
+            "correct": "b",
+            "explanation": "Đồ thị tăng → f(t) tăng → vật đi theo chiều dương. Đồ thị nằm ngang → f(t) không đổi → vật đứng yên. Đáp án A nhầm đồ thị với quỹ đạo trong không gian."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-2-gia-tri-diem",
+          "type": "quiz",
+          "content": {
+            "question": "Hàm vị trí cho $f(0) = 2$, $f(3) = 5$, $f(6) = 2$. Giá trị $f(6) = 2$ có nghĩa là gì?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Vật đứng yên trong 6 giây."
+              },
+              {
+                "value": "b",
+                "label": "Tại $t = 6$ giây, vật ở vị trí 2 mét."
+              },
+              {
+                "value": "c",
+                "label": "Vật đã đi được tổng cộng 2 mét."
+              },
+              {
+                "value": "d",
+                "label": "Vật đang di chuyển với tốc độ 2 m/s tại $t = 6$."
+              }
+            ],
+            "correct": "b",
+            "explanation": "$f(t)$ cho biết vị trí tại thời điểm $t$ — không phải quãng đường hay tốc độ. $f(6) = 2$ nghĩa là tại giây thứ 6, vật đang ở vị trí 2 mét."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-3-nham-lan-quy-dao",
+          "type": "quiz",
+          "content": {
+            "question": "Đồ thị hàm vị trí tăng từ $t = 0$ đến $t = 4$, rồi giảm từ $t = 4$ đến $t = 8$. Một học sinh kết luận: \"Vật đi lên rồi đi xuống.\" Điều gì sai?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Không có gì sai — đây là cách đọc đúng."
+              },
+              {
+                "value": "b",
+                "label": "Đồ thị chỉ cho thấy một khoảng thời gian, không xác định được chiều."
+              },
+              {
+                "value": "c",
+                "label": "Trục tung biểu thị vị trí đo được, không phải chiều cao — vật đổi chiều trên trục thẳng, không phải lên xuống trong không gian."
+              },
+              {
+                "value": "d",
+                "label": "Học sinh nên dùng trục hoành để xác định chiều chuyển động."
+              }
+            ],
+            "correct": "c",
+            "explanation": "Đồ thị hàm vị trí không phải quỹ đạo vật lý. Trục tung là đại lượng đo lường — vật chỉ di chuyển trên trục tham chiếu một chiều."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-4-dung-yen",
+          "type": "quiz",
+          "content": {
+            "question": "Đồ thị của $f(t)$ nằm ngang trên đoạn $[2, 4]$. Điều này có nghĩa là gì?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Vật đang gia tốc đều."
+              },
+              {
+                "value": "b",
+                "label": "Vật đã rời khỏi trục tham chiếu."
+              },
+              {
+                "value": "c",
+                "label": "Vật đứng yên — vị trí không thay đổi trong khoảng đó."
+              },
+              {
+                "value": "d",
+                "label": "Đồ thị có lỗi; mọi hàm vị trí đều phải thay đổi."
+              }
+            ],
+            "correct": "c",
+            "explanation": "Đồ thị nằm ngang → $f(t)$ là hằng số trên $[2, 4]$ → vị trí không đổi → vật đứng yên. Hàm vị trí hoàn toàn có thể là hằng số cục bộ."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-5-chieu-chuyen-dong",
+          "type": "quiz",
+          "content": {
+            "question": "Đồ thị của $f(t)$ giảm từ $t = 1$ đến $t = 3$, rồi tăng từ $t = 3$ đến $t = 5$. Điều gì mô tả đúng chuyển động?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Vật chậm lại rồi nhanh lên, luôn đi theo chiều dương."
+              },
+              {
+                "value": "b",
+                "label": "Vật đi theo chiều âm, đạt vị trí nhỏ nhất tại $t = 3$, rồi đảo chiều theo chiều dương."
+              },
+              {
+                "value": "c",
+                "label": "Vật đi lên, dừng lại, rồi đi xuống."
+              },
+              {
+                "value": "d",
+                "label": "Vật dao động giữa hai tốc độ cố định."
+              }
+            ],
+            "correct": "b",
+            "explanation": "$f(t)$ giảm → chiều âm. $f(t)$ tăng → chiều dương. Cực tiểu tại $t = 3$ là điểm vật đổi chiều. Đáp án C nhầm đồ thị với chuyển động trong không gian."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-6-gia-tri-bang-nhau",
+          "type": "quiz",
+          "content": {
+            "question": "$f(2) = 3$ và $f(5) = 3$. Kết luận nào hợp lệ?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Vật đứng yên trong suốt $[2, 5]$."
+              },
+              {
+                "value": "b",
+                "label": "Vật đã đi được tổng cộng 0 mét trong $[2, 5]$."
+              },
+              {
+                "value": "c",
+                "label": "Vị trí tại $t = 2$ và $t = 5$ bằng nhau; vật có thể đã di chuyển ở giữa."
+              },
+              {
+                "value": "d",
+                "label": "Hàm $f$ là hằng số trên toàn bộ miền xác định."
+              }
+            ],
+            "correct": "c",
+            "explanation": "Hai giá trị bằng nhau tại hai thời điểm khác nhau không có nghĩa $f$ hằng số ở giữa. Đồ thị có thể đã tăng rồi giảm trong khoảng $[2, 5]$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-7-nhiet-do",
+          "type": "quiz",
+          "content": {
+            "question": "Một trạm khí tượng ghi nhiệt độ $T(t)$ theo giờ. Đồ thị của $T(t)$ nằm ngang từ $t = 2$ đến $t = 4$. Điều này có nghĩa là gì?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Nhiệt độ bằng 0 trong khoảng đó."
+              },
+              {
+                "value": "b",
+                "label": "Nhiệt kế bị hỏng."
+              },
+              {
+                "value": "c",
+                "label": "Thời gian không trôi từ $t = 2$ đến $t = 4$."
+              },
+              {
+                "value": "d",
+                "label": "Nhiệt độ không thay đổi trong khoảng đó — là hằng số."
+              }
+            ],
+            "correct": "d",
+            "explanation": "Quy tắc đọc đồ thị áp dụng cho mọi hàm số: đồ thị nằm ngang → giá trị đầu ra không đổi. Ở đây, nhiệt độ duy trì ổn định trong $[2, 4]$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-8-mo-ta-do-thi",
+          "type": "quiz",
+          "content": {
+            "question": "Một vật xuất phát từ vị trí 0, di chuyển theo chiều dương đến $t = 3$, rồi đảo chiều về vị trí 0 lúc $t = 6$. Mô tả nào đúng cho đồ thị $f(t)$?",
+            "options": [
+              {
+                "value": "a",
+                "label": "$f$ tăng từ $(0,\\, 0)$, đạt cực đại, rồi giảm về $f(6) = 0$."
+              },
+              {
+                "value": "b",
+                "label": "$f$ giảm từ $(0,\\, 0)$, đạt cực tiểu, rồi tăng về $f(6) = 0$."
+              },
+              {
+                "value": "c",
+                "label": "$f$ bằng 0 với mọi $t$ trong $[0, 6]$."
+              },
+              {
+                "value": "d",
+                "label": "$f$ tăng liên tục từ $(0,\\, 0)$ mà không dừng lại tại $t = 6$."
+              }
+            ],
+            "correct": "a",
+            "explanation": "Chiều dương → $f$ tăng. Đảo chiều tại $t = 3$ → $f$ đạt cực đại. Trở về vị trí 0 → $f(6) = 0$. Đây là parabol hướng xuống trên $[0, 6]$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-9-ban-ghi-hay-quy-dao",
+          "type": "quiz",
+          "content": {
+            "question": "Học sinh A: \"Đồ thị này cho thấy con đường vật đi trong không gian.\" Học sinh B: \"Đồ thị này ghi lại vị trí của vật thay đổi theo thời gian.\" Ai đúng?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Học sinh A — đồ thị trực tiếp cho thấy quỹ đạo của vật."
+              },
+              {
+                "value": "b",
+                "label": "Học sinh B — đồ thị ghi lại các giá trị vị trí theo thời gian; vật chỉ di chuyển trên trục tham chiếu."
+              },
+              {
+                "value": "c",
+                "label": "Cả hai đều đúng — vị trí và quỹ đạo là một."
+              },
+              {
+                "value": "d",
+                "label": "Cả hai đều sai — đồ thị hàm vị trí không mô tả được chuyển động."
+              }
+            ],
+            "correct": "b",
+            "explanation": "Đồ thị hàm vị trí là bản ghi, không phải quỹ đạo. Trục hoành là thời gian; trục tung là vị trí đo được. Vật không di chuyển theo hình dạng của đồ thị."
+          }
+        }
+      ]
+    }
+  ]
+}

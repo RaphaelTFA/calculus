@@ -88,7 +88,7 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
   const config = lessonProp || DEFAULT_LESSON
 
   const [currentValue, setCurrentValue] = useState(config.parameter.initial)
-  const [triggeredReflections, setTriggeredReflections] = useState(new Set())
+  const triggeredRef = useRef(new Set())
   const [cards, setCards] = useState([])
 
   const canvasRef = useRef(null)
@@ -119,40 +119,39 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
     renderCanvas(canvas, recomputeSystem(config, currentValue))
   }, [currentValue])
 
-  // Reflection triggers
+  // Reflection triggers — use ref to avoid race conditions with duplicate cards
   useEffect(() => {
     const newCards = []
-    const nextTriggered = new Set(triggeredReflections)
-    let updated = false
+    const state = { currentValue }
 
     config.reflections.forEach(ref => {
-      if (!triggeredReflections.has(ref.id)) {
-        const state = { currentValue }
-        let triggered = false
-        if (typeof ref.trigger === 'function') {
-          triggered = ref.trigger(state)
-        } else if (ref.triggerSpec) {
-          const { field, op, value } = ref.triggerSpec
-          const v = state[field]
-          triggered = op === '>=' ? v >= value
-                    : op === '>'  ? v >  value
-                    : op === '<=' ? v <= value
-                    : op === '<'  ? v <  value
-                    : false
-        }
-        if (triggered) {
-          nextTriggered.add(ref.id)
-          newCards.push({ id: ref.id, text: ref.text, visible: false })
-          updated = true
-        }
+      if (triggeredRef.current.has(ref.id)) return
+      let triggered = false
+      if (typeof ref.trigger === 'function') {
+        triggered = ref.trigger(state)
+      } else if (typeof ref.trigger === 'string') {
+        try {
+          triggered = new Function('state', `"use strict"; return (${ref.trigger});`)(state)
+        } catch { triggered = false }
+      } else if (ref.triggerSpec) {
+        const { field, op, value } = ref.triggerSpec
+        const v = state[field]
+        triggered = op === '>=' ? v >= value
+          : op === '>' ? v > value
+            : op === '<=' ? v <= value
+              : op === '<' ? v < value
+                : false
+      }
+      if (triggered) {
+        triggeredRef.current.add(ref.id)
+        newCards.push({ id: ref.id, text: ref.text, visible: false })
       }
     })
 
-    if (updated) {
-      setTriggeredReflections(nextTriggered)
+    if (newCards.length > 0) {
       setCards(prev => [...newCards.reverse(), ...prev])
     }
-  }, [currentValue, triggeredReflections])
+  }, [currentValue])
 
   // Card fade-in animation
   useEffect(() => {

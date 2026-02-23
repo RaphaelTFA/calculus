@@ -1,56 +1,23 @@
 {
-  "id": "dao-ham-co-ban",
-  "title": "Đạo hàm cơ bản",
-  "description": "Đạo hàm các hàm cơ bản",
-  "xp_reward": 15,
-  "order_index": 2,
+  "id": "vi-tri-theo-thoi-gian",
+  "title": "Vị Trí Theo Thời Gian",
+  "description": "Mô tả chuyển động của một vật bằng hàm vị trí và đồ thị của nó.",
+  "xp_reward": 10,
+  "order_index": 0,
   "slides": [
     {
       "order_index": 0,
       "blocks": [
         {
-          "id": "basic1",
+          "id": "text-tinh-huong",
           "type": "text",
           "content": {
-            "heading": "Bảng đạo hàm cơ bản",
+            "heading": "Vật đang ở đâu?",
             "paragraphs": [
-              "Các công thức cần nhớ:"
+              "Hãy hình dung một vật đang di chuyển dọc theo một đường thẳng. Tại mỗi thời điểm, vật đó đang ở một vị trí xác định. Câu hỏi đặt ra là: làm thế nào để ghi lại toàn bộ quá trình chuyển động đó một cách đầy đủ và chính xác?",
+              "Câu trả lời không phải là vẽ lại con đường vật đi qua trong không gian. Thay vào đó, chúng ta ghi lại <b>vị trí của vật tại mỗi thời điểm</b> — như một bảng số liệu liên tục, hay chính xác hơn, như một <b>hàm số</b>.",
+              "Trong tương tác dưới đây, bạn sẽ kiểm soát thời gian và quan sát cả hai cách biểu diễn chuyển động cùng lúc. Hãy chú ý đến mối liên hệ giữa hình dạng của đồ thị và chuyển động thực sự của vật."
             ]
-          }
-        },
-        {
-          "id": "math14",
-          "type": "math",
-          "content": {
-            "latex": "(x^n)' = nx^{n-1}"
-          }
-        },
-        {
-          "id": "math15",
-          "type": "math",
-          "content": {
-            "latex": "(e^x)' = e^x"
-          }
-        },
-        {
-          "id": "math16",
-          "type": "math",
-          "content": {
-            "latex": "(\\ln x)' = \\frac{1}{x}"
-          }
-        },
-        {
-          "id": "math17",
-          "type": "math",
-          "content": {
-            "latex": "(\\sin x)' = \\cos x"
-          }
-        },
-        {
-          "id": "math18",
-          "type": "math",
-          "content": {
-            "latex": "(\\cos x)' = -\\sin x"
           }
         }
       ]
@@ -59,26 +26,64 @@
       "order_index": 1,
       "blocks": [
         {
-          "id": "quiz5",
-          "type": "quiz",
+          "id": "ia-vi-tri-theo-thoi-gian",
+          "type": "interaction",
           "content": {
-            "question": "Tính $(x^5)' = ?$",
-            "options": [
-              {
-                "value": "a",
-                "label": "$5x^4$"
+            "interactionType": "C",
+            "lesson": {
+              "interactionType": "C",
+              "parameterSpec": {
+                "time": {
+                  "start": 0,
+                  "end": 5,
+                  "step": 0.05
+                }
               },
-              {
-                "value": "b",
-                "label": "$x^4$"
+              "systemSpec": {
+                "initialState": {
+                  "x": 0,
+                  "y": 0
+                },
+                "evolutionRule": {
+                  "type": "expression",
+                  "expression": "[1, 2.5 - t]",
+                  "variables": [
+                    "t"
+                  ]
+                }
               },
-              {
-                "value": "c",
-                "label": "$5x^5$"
-              }
-            ],
-            "correct": "a",
-            "explanation": "Công thức: $(x^n)' = nx^{n-1}$, nên $(x^5)' = 5x^4$"
+              "representationSpec": {
+                "encoding": "positionTime",
+                "viewBox": {
+                  "xMin": 0,
+                  "xMax": 5,
+                  "yMin": -0.4,
+                  "yMax": 3.5
+                },
+                "xLabel": "Thời gian (giây)",
+                "yLabel": "Vị trí (m)"
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "type": "timeReached",
+                    "value": 1.0,
+                    "message": "Đồ thị đang dốc lên — vật đang di chuyển theo chiều dương và đang tăng tốc."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 2.5,
+                    "message": "Đồ thị nằm ngang tại đây — vật đứng yên trong thoáng chốc trước khi đổi chiều."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 4.0,
+                    "message": "Đồ thị đang dốc xuống — vật đang di chuyển theo chiều âm, trở về phía xuất phát."
+                  }
+                ]
+              },
+              "prompt": "Kéo thanh trượt để di chuyển theo thời gian. Quan sát đồ thị phía trên và điểm đánh dấu vị trí. Độ dốc của đồ thị có liên hệ gì với tốc độ dịch chuyển của vật? Hãy tìm thời điểm vật di chuyển chậm nhất."
+            }
           }
         }
       ]
@@ -87,31 +92,99 @@
       "order_index": 2,
       "blocks": [
         {
-          "id": "ia-dao-ham-co-ban",
-          "type": "interaction",
+          "id": "text-ham-vi-tri",
+          "type": "text",
           "content": {
-            "interactionType": "B",
-            "lesson": {
-              "meta": { "parameterLabel": "Số mũ n" },
-              "parameter": { "min": 1, "max": 5, "initial": 2 },
-              "system": {
-                "resolution": 200,
-                "view": { "xMin": -2, "xMax": 2, "yMin": -6, "yMax": 6 },
-                "model": "Math.pow(Math.abs(x), Math.round(p)) * (x >= 0 ? 1 : (Math.round(p) % 2 === 0 ? 1 : -1))"
+            "heading": "Hàm vị trí",
+            "paragraphs": [
+              "Những gì bạn vừa quan sát có thể được mô tả chính xác bằng ngôn ngữ toán học. Ký hiệu <b>f(t)</b> biểu thị vị trí của vật tại thời điểm t. Với mỗi giá trị t trong miền xác định, f(t) trả về đúng một giá trị vị trí duy nhất.",
+              "Tập hợp tất cả các điểm (t, f(t)) tạo thành đồ thị của f. Đây là điều quan trọng cần nhớ: đồ thị của hàm vị trí <b>không phải là hình ảnh của con đường vật di chuyển trong không gian</b>. Trục tung biểu thị giá trị đo được — vị trí trên một trục tham chiếu — không phải hướng di chuyển trong không gian vật lý.",
+              "Sự nhầm lẫn phổ biến nhất là nhìn vào một đồ thị đi lên rồi nói rằng 'vật đã di chuyển lên phía trên'. Điều này chỉ đúng nếu trục tung là trục chiều cao trong không gian thực."
+            ]
+          }
+        },
+        {
+          "id": "math-dinh-nghia",
+          "type": "math",
+          "content": {
+            "latex": "f: [0, 5] \\to \\mathbb{R} \\qquad f(t) = \\text{vị trí tại thời điểm } t"
+          }
+        },
+        {
+          "id": "text-doc-do-thi",
+          "type": "text",
+          "content": {
+            "heading": "Đọc hình dạng đồ thị",
+            "paragraphs": [
+              "Hình dạng của đồ thị mang thông tin chuyển động trực tiếp: khi đồ thị <b>đi lên</b> trên một khoảng thời gian, giá trị f(t) đang tăng — vật di chuyển theo chiều dương. Khi đồ thị <b>đi xuống</b>, f(t) giảm — vật di chuyển theo chiều âm. Khi đồ thị <b>nằm ngang</b>, f(t) không thay đổi — vật đứng yên tại thời điểm đó.",
+              "Ngoài ra, đồ thị càng <b>dốc</b> thì vật di chuyển càng nhanh. Trong bài học này, chúng ta chưa định nghĩa chính xác 'nhanh' có nghĩa là gì — đó sẽ là chủ đề của các bài học tiếp theo. Nhưng bạn đã cảm nhận được mối liên hệ này qua tương tác."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "text-vi-du",
+          "type": "text",
+          "content": {
+            "heading": "Ví dụ: Đọc giá trị từ đồ thị",
+            "paragraphs": [
+              "Giả sử đồ thị của một hàm vị trí f đi qua các điểm sau: f(0) = 0, f(2) = 4, f(4) = 0. Từ đây, ta có thể đọc được ba sự kiện cụ thể về chuyển động của vật."
+            ]
+          }
+        },
+        {
+          "id": "math-gia-tri-cu-the",
+          "type": "math",
+          "content": {
+            "latex": "f(0) = 0 \\qquad f(2) = 4 \\qquad f(4) = 0"
+          }
+        },
+        {
+          "id": "text-phan-tich",
+          "type": "text",
+          "content": {
+            "heading": "Phân tích",
+            "paragraphs": [
+              "Mỗi điểm trên đồ thị là một bản ghi đầy đủ: điểm (2, 4) có nghĩa là <i>tại thời điểm t = 2 giây, vật đang ở vị trí 4 mét tính từ gốc tham chiếu</i>.",
+              "Chú ý: f(0) = f(4) = 0 cho thấy vật đã trở về vị trí ban đầu sau 4 giây. Điều này <b>không có nghĩa là vật đứng yên</b> trong suốt quãng thời gian đó — vật đã di chuyển đến vị trí f(2) = 4 rồi quay trở về. Đồ thị chính là bằng chứng: nó không phẳng trên khoảng [0, 4].",
+              "Đây là sự phân biệt quan trọng giữa <b>vị trí cuối cùng</b> và <b>toàn bộ quá trình di chuyển</b> — hai khái niệm sẽ được phân tích kỹ hơn trong bài học tiếp theo."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-nham-lan-quy-dao",
+          "type": "quiz",
+          "content": {
+            "question": "Đồ thị của hàm vị trí $f(t)$ đi lên trong khoảng $t \\in [1, 3]$ rồi đi xuống trong khoảng $t \\in [3, 5]$. Kết luận nào sau đây là <b>đúng</b>?",
+            "options": [
+              {
+                "value": "a",
+                "label": "Vật di chuyển lên phía trên rồi đi xuống phía dưới trong không gian."
               },
-              "reflections": [
-                {
-                  "id": "power-low",
-                  "triggerSpec": { "field": "currentValue", "op": "<=", "value": 1.5 },
-                  "text": "n = 1: f(x) = x, đạo hàm f'(x) = 1 — hằng số!"
-                },
-                {
-                  "id": "power-high",
-                  "triggerSpec": { "field": "currentValue", "op": ">=", "value": 4.5 },
-                  "text": "n = 5: f(x) = x⁵, đạo hàm f'(x) = 5x⁴. Theo công thức (xⁿ)' = nxⁿ⁻¹!"
-                }
-              ]
-            }
+              {
+                "value": "b",
+                "label": "Vật di chuyển theo chiều dương rồi đổi hướng theo chiều âm dọc theo trục tham chiếu."
+              },
+              {
+                "value": "c",
+                "label": "Vật đứng yên trong suốt khoảng thời gian $[1, 5]$."
+              },
+              {
+                "value": "d",
+                "label": "Đồ thị không đủ thông tin để mô tả chuyển động của vật."
+              }
+            ],
+            "correct": "b",
+            "explanation": "Đáp án đúng là B. Trục tung của đồ thị hàm vị trí biểu thị giá trị vị trí đo được, không phải hướng di chuyển trong không gian vật lý. Khi đồ thị đi lên, f(t) tăng — vật di chuyển theo chiều dương. Khi đồ thị đi xuống, f(t) giảm — vật đổi hướng theo chiều âm. Đáp án A là nhầm lẫn phổ biến nhất: đồng nhất đồ thị hàm số với quỹ đạo vật lý. Đáp án C sai vì đồ thị không nằm ngang — vật đang di chuyển. Đáp án D sai vì đồ thị hàm vị trí hoàn toàn đủ để mô tả chuyển động theo trục thẳng."
           }
         }
       ]

@@ -1,0 +1,363 @@
+{
+    "id": "van-toc-co-dau",
+    "title": "Vận Tốc Có Dấu",
+    "description": "Vận tốc mang dấu dương hoặc âm — dấu mã hoá hướng chuyển động.",
+    "xp_reward": 10,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-van-toc-dau",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "C",
+                        "lesson": {
+                            "interactionType": "C",
+                            "parameterSpec": {
+                                "time": {
+                                    "start": 0,
+                                    "end": 6,
+                                    "step": 0.05
+                                }
+                            },
+                            "systemSpec": {
+                                "initialState": {
+                                    "x": 0,
+                                    "y": -5
+                                },
+                                "evolutionRule": {
+                                    "type": "expression",
+                                    "expression": "[1, 2*(3 - t)]",
+                                    "variables": [
+                                        "t",
+                                        "x",
+                                        "y"
+                                    ]
+                                }
+                            },
+                            "representationSpec": {
+                                "encoding": "positionTime",
+                                "viewBox": {
+                                    "xMin": 0,
+                                    "xMax": 6,
+                                    "yMin": -6,
+                                    "yMax": 5
+                                }
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "type": "timeReached",
+                                        "value": 5.0,
+                                        "message": "Đồ thị giảm → vận tốc âm. Vật đi theo chiều âm."
+                                    },
+                                    {
+                                        "type": "timeReached",
+                                        "value": 3.0,
+                                        "message": "Đồ thị nằm ngang — vận tốc = 0. Vật dừng thoáng chốc trước khi đổi chiều."
+                                    },
+                                    {
+                                        "type": "timeReached",
+                                        "value": 1.0,
+                                        "message": "Đồ thị tăng → vận tốc dương. Vật đang đi theo chiều dương."
+                                    }
+                                ]
+                            },
+                            "prompt": "Quan sát chỉ báo chiều. Khi nào nó đọc dương? Khi nào âm? Đặc điểm nào của đồ thị tương ứng với mỗi dấu?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-van-toc-dau",
+                    "type": "text",
+                    "content": {
+                        "heading": "Vận tốc mang dấu",
+                        "paragraphs": [
+                            "<b>Vận tốc</b> là đại lượng có dấu. Dương khi vật đi theo chiều dương (vị trí tăng), âm khi vật đi theo chiều âm (vị trí giảm).",
+                            "<b>Tốc độ</b> là giá trị tuyệt đối của vận tốc. Vật có vận tốc $-5$ m/s đang di chuyển với tốc độ 5 m/s theo chiều âm. Dấu không phải lỗi — nó mang thông tin hướng."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-dau-tren-do-thi",
+                    "type": "text",
+                    "content": {
+                        "heading": "Dấu trên đồ thị",
+                        "paragraphs": [
+                            "Nơi $f$ <b>tăng</b>: vận tốc dương. Nơi $f$ <b>giảm</b>: vận tốc âm. Tại đỉnh (chuyển từ tăng sang giảm): vận tốc bằng 0 — vật đứng yên thoáng chốc.",
+                            "Độ dịch chuyển $\\Delta f = f(b) - f(a)$ cũng có dấu. $\\Delta f > 0$: ròng theo chiều dương. $\\Delta f < 0$: ròng theo chiều âm."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l5-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Đồ thị $f(t)$ đang giảm tại $t = 4$. Dấu của vận tốc?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Dương"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Bằng 0"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Âm"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định được"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Đồ thị giảm → vị trí giảm → chiều âm → vận tốc âm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l5-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vận tốc của vật là $-6$ m/s trong 3 giây. Độ dịch chuyển?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "18 m"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-18$ m"
+                            },
+                            {
+                                "value": "c",
+                                "label": "6 m"
+                            },
+                            {
+                                "value": "d",
+                                "label": "0 m"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\Delta f = (-6)(3) = -18$ m. Vật di chuyển 18 m theo chiều âm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l5-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật có độ dịch chuyển dương trên $[0, 5]$. Điều gì phải đúng?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vật không bao giờ đi theo chiều âm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vận tốc dương tại mọi thời điểm."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vật kết thúc ở vị trí dương hơn lúc bắt đầu, dù có thể đã đổi chiều giữa chừng."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tốc độ không đổi."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\Delta f > 0$ chỉ nói vị trí cuối > vị trí đầu. Vật vẫn có thể đã đổi chiều."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l5-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vận tốc = $-3$ m/s. Tốc độ = ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$-3$ m/s"
+                            },
+                            {
+                                "value": "b",
+                                "label": "3 m/s"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0 m/s"
+                            },
+                            {
+                                "value": "d",
+                                "label": "9 m/s"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tốc độ = $|\\text{vận tốc}| = |-3| = 3$ m/s."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l5-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vận tốc đổi dấu tại đâu trên đồ thị?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tại cực đại hoặc cực tiểu cục bộ của $f$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tại giao điểm của $f$ với trục hoành."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Cả A và B."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không bao giờ — dấu vận tốc không đổi trên đường cong trơn."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Vận tốc = 0 và đổi dấu tại cực đại/cực tiểu cục bộ (đỉnh/đáy) của $f$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l5-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(2) = 5$ và $f(7) = 5$. Độ dịch chuyển dương, âm, hay bằng 0?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Dương"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Âm"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Bằng 0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\Delta f = 5 - 5 = 0$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l5-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật có vận tốc âm suốt $[1, 4]$. Kết luận gì về $\\Delta f$ trên $[1, 4]$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$\\Delta f > 0$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\Delta f = 0$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\Delta f < 0$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Vận tốc âm liên tục → vị trí giảm liên tục → $\\Delta f < 0$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l5-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Số dư tài khoản giảm từ 500 xuống 300 trong một tháng. \"Vận tốc\" số dư là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Dương — tài khoản có tiền."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Âm — số dư đang giảm."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Bằng 0 — số dư tồn tại."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định — tiền không có hướng."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Khung thay đổi có dấu áp dụng cho mọi đại lượng. Giảm = âm."
+                    }
+                }
+            ]
+        }
+    ]
+}

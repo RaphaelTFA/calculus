@@ -1,0 +1,344 @@
+{
+    "id": "thu-nho-khoang-cach",
+    "title": "Thu Nhỏ Khoảng — Cái Nhìn Đầu Tiên",
+    "description": "Khi Δt → 0, độ dốc cát tuyến hội tụ — trực giác tiền giới hạn.",
+    "xp_reward": 15,
+    "order_index": 0,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-hoi-tu",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "A",
+                        "lesson": {
+                            "interactionType": "A",
+                            "parameterSpec": {
+                                "resolutionLevels": [
+                                    1,
+                                    2,
+                                    5,
+                                    10,
+                                    20,
+                                    50,
+                                    100
+                                ]
+                            },
+                            "systemSpec": {
+                                "function": "x*x",
+                                "derivative": "2*x",
+                                "domain": [
+                                    0,
+                                    3
+                                ],
+                                "range": [
+                                    -0.5,
+                                    9.5
+                                ],
+                                "anchor": 1
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "condition": "state.resolution >= 100",
+                                        "message": "Độ dốc ≈ 2.00 — sai số gần bằng 0. Giá trị đang ổn định."
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-hoi-tu",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quy luật hội tụ",
+                        "paragraphs": [
+                            "Khi $\\Delta t$ giảm, độ dốc cát tuyến $\\Delta f / \\Delta t$ thay đổi — nhưng không hỗn loạn. Với $f(t) = t^2$ tại $a = 1$: $\\Delta t = 1 \\to$ độ dốc = 3; $\\Delta t = 0.1 \\to$ 2.1; $\\Delta t = 0.01 \\to$ 2.01.",
+                            "Các giá trị tiến đến 2. Hiện tượng này — một đại lượng ổn định khi đại lượng khác tiến về 0 — sẽ được đặt tên chính xác ở Module tiếp theo."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-y-nghia",
+                    "type": "text",
+                    "content": {
+                        "heading": "Ý nghĩa cho chuyển động",
+                        "paragraphs": [
+                            "Độ dốc hội tụ biểu thị cát tuyến đang tiến đến <b>tiếp tuyến</b> tại $t = 1$ — đường thẳng duy nhất chạm đường cong tại điểm đó mà không cắt qua.",
+                            "Điều này gợi ý rằng ngay tại một thời điểm duy nhất, chuyển động vẫn có \"vận tốc\" xác định. Module 2 sẽ trang bị cho ta công cụ để chính xác hoá giá trị này."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l7-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\Delta t = 0.5$ cho độ dốc ≈ 2.5, $\\Delta t = 0.1$ cho ≈ 2.1. Quy luật gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Độ dốc tăng không giới hạn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Độ dốc dao động."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Độ dốc giảm dần về giá trị ổn định gần 2."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Độ dốc trở nên không xác định."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Các giá trị: 3, 2.5, 2.1, 2.01, 2.001... — rõ ràng hội tụ về 2."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l7-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi $\\Delta t \\to 0$, cát tuyến tiến đến:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Trục hoành."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Trục tung."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Trung bình của mọi độ dốc cát tuyến."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tiếp tuyến tại điểm neo."
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "Cát tuyến xoay quanh điểm neo và tiến tới tiếp tuyến khi $\\Delta t \\to 0$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l7-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Dãy độ dốc: 3, 2.5, 2.1, 2.01, 2.001. Giá trị nào chúng tiến tới?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "3"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2.5"
+                            },
+                            {
+                                "value": "d",
+                                "label": "2"
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "Mỗi số đều gần 2 hơn số trước — hội tụ rõ ràng về 2."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l7-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao không thể tính $\\Delta f / \\Delta t$ khi $\\Delta t = 0$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì $\\Delta f$ sẽ trở nên âm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì công thức yêu cầu $b > a$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì chia cho 0 không xác định — khoảng có chiều dài 0 không chứa chuyển động."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì không đọc được đồ thị tại một điểm."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\Delta t = 0 \\Rightarrow$ chia cho 0, biểu thức không xác định."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l7-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi điểm cuối cát tuyến tiến gần đến $a = 1$, cát tuyến:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Trở nên dài hơn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Trở nên nằm ngang."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Xoay về vị trí giới hạn — tiếp tuyến."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Biến mất khỏi đồ thị."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Điểm phải trượt dần về điểm neo; cát tuyến xoay về vị trí tiếp tuyến."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l7-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Độ dốc ổn định tại 2 khi $\\Delta t \\to 0$. Điều này gợi ý gì về vật lý?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vật đứng yên tại $t = 1$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tốc độ trung bình trên khoảng lớn là 2 m/s."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vật có vận tốc tức thời xác định tại $t = 1$ — xấp xỉ 2 m/s."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Hàm vị trí bằng 2 tại $t = 1$."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Sự ổn định = dấu hiệu rằng \"vận tốc tại một thời điểm\" là khái niệm có nghĩa."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l7-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu mọi điểm neo trên đường cong trơn đều có độ dốc hội tụ, điều gì có thể suy ra?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Mọi đường cong trơn có độ dốc hằng số."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Mọi đường cong trơn có độ dốc tiếp tuyến xác định tại mỗi điểm — một hàm mô tả tốc độ thay đổi tức thời."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Độ dốc luôn là 2 cho mọi hàm."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Khái niệm này chỉ áp dụng cho parabol."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Đây là trực giác cho khái niệm đạo hàm — hàm cho biết tốc độ thay đổi tại mỗi điểm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l7-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hiện tượng \"đại lượng tiến đến giá trị ổn định khi khoảng thu nhỏ\" sẽ được gọi là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vận tốc trung bình."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Độ dịch chuyển."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Diện tích dưới đường cong."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giới hạn — được giới thiệu chính thức ở Module 2."
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "Bài học này xây dựng trực giác. Module 2 sẽ đặt tên và chính xác hoá hiện tượng này."
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,387 @@
+{
+    "id": "van-toc-trung-binh-la-do-doc",
+    "title": "Vận Tốc Trung Bình Là Độ Dốc",
+    "description": "Vận tốc trung bình = Δf/Δt = độ dốc cát tuyến trên đồ thị vị trí–thời gian.",
+    "xp_reward": 15,
+    "order_index": 2,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-cat-tuyen",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Độ cong"
+                            },
+                            "parameter": {
+                                "min": 0.2,
+                                "max": 2,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": 0,
+                                    "xMax": 5.5,
+                                    "yMin": -1,
+                                    "yMax": 14
+                                },
+                                "model": "-0.5 * p * x * x + 5 * x"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "flat",
+                                    "trigger": "state.currentValue < 0.4",
+                                    "text": "Đường gần thẳng → cát tuyến gần trùng đường cong. Vận tốc trung bình ≈ hằng số."
+                                },
+                                {
+                                    "id": "mid",
+                                    "trigger": "state.currentValue > 0.8 && state.currentValue < 1.2",
+                                    "text": "Đường cong vừa phải — cát tuyến trên các khoảng khác nhau cho độ dốc khác nhau = vận tốc trung bình khác nhau."
+                                },
+                                {
+                                    "id": "steep",
+                                    "trigger": "state.currentValue > 1.7",
+                                    "text": "Đường cong rất cong — cát tuyến dốc lên ở đầu, dốc xuống ở cuối. Dấu vận tốc trung bình đổi!"
+                                }
+                            ],
+                            "prompt": "Thay đổi độ cong. Khi nào cát tuyến dốc lên? Dốc xuống? Vận tốc trung bình (Δf/Δt) dương hay âm?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-vtb-dinh-nghia",
+                    "type": "text",
+                    "content": {
+                        "heading": "Định nghĩa vận tốc trung bình",
+                        "paragraphs": [
+                            "Vận tốc trung bình trên $[a, b]$: $\\frac{\\Delta f}{\\Delta t} = \\frac{f(b) - f(a)}{b - a}$. Đây là <b>độ dốc cát tuyến</b> qua hai điểm $(a, f(a))$ và $(b, f(b))$ trên đồ thị.",
+                            "Vận tốc trung bình có dấu: dương nếu vật di chuyển ròng theo chiều dương, âm nếu ngược lại."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-vtb",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\bar{v} = \\frac{\\Delta f}{\\Delta t} = \\frac{f(b) - f(a)}{b - a}"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-do-doc-y-nghia",
+                    "type": "text",
+                    "content": {
+                        "heading": "Độ dốc mang ý nghĩa vật lý",
+                        "paragraphs": [
+                            "Cát tuyến không phải phép dựng hình vô nghĩa. Độ dốc của nó chính là vận tốc trung bình — tỷ số giữa thay đổi vị trí ròng và thời gian đã trôi.",
+                            "Vận tốc trung bình ≠ tốc độ trung bình. Vận tốc dùng $\\Delta f$ (có dấu); tốc độ dùng tổng quãng đường (không dấu)."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l6-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(1) = 4$, $f(4) = 10$. Vận tốc trung bình trên $[1, 4]$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$14/5$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "2"
+                            },
+                            {
+                                "value": "c",
+                                "label": "6"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-2$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\frac{10 - 4}{4 - 1} = \\frac{6}{3} = 2$ m/s."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l6-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(2) = 8$, $f(6) = 4$. Vận tốc trung bình trên $[2, 6]$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "3"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-1$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "1"
+                            },
+                            {
+                                "value": "d",
+                                "label": "12"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\frac{4 - 8}{6 - 2} = \\frac{-4}{4} = -1$ m/s."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l6-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Đối tượng hình học nào biểu diễn vận tốc trung bình trên đồ thị vị trí–thời gian?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tiếp tuyến tại một điểm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Diện tích dưới đường cong."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Cát tuyến nối hai điểm trên đồ thị."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giá trị trục tung tại điểm giữa."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Vận tốc trung bình = độ dốc cát tuyến qua $(a, f(a))$ và $(b, f(b))$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l6-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vận tốc trung bình trên $[0, 5]$ là $-2$ m/s. Dấu cho biết gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tốc độ vật là 2 m/s."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vật đứng yên."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vật di chuyển ròng theo chiều âm trên $[0, 5]$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vật đổi chiều đúng một lần."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Dấu âm = $\\Delta f < 0$ = vị trí cuối thấp hơn vị trí đầu = ròng theo chiều âm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l6-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật đi 6 m về phía trước rồi 2 m về phía sau trong 4 giây. Vận tốc trung bình = ? Tốc độ trung bình = ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Cả hai = 1 m/s."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vận tốc TB = 2 m/s, tốc độ TB = 1 m/s."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vận tốc TB = 1 m/s, tốc độ TB = 2 m/s."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Cả hai = 2 m/s."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Vận tốc: $\\Delta f = 4$ m, $4/4 = 1$ m/s. Tốc độ: quãng đường = 8 m, $8/4 = 2$ m/s."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l6-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\frac{\\Delta f}{\\Delta t}$ với $\\Delta f = f(b) - f(a)$, $\\Delta t = b - a$ tính:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vận tốc tức thời tại $t = a$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tổng quãng đường / tổng thời gian."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vận tốc trung bình trên $[a, b]$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Diện tích dưới $f$ từ a đến b."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\Delta f / \\Delta t$ là độ dốc cát tuyến = vận tốc trung bình."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l6-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(2) = 5$, $f(7) = 5$. Vận tốc trung bình trên $[2, 7]$? Điều này cho biết gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "VTB = 5; vật nhanh."
+                            },
+                            {
+                                "value": "b",
+                                "label": "VTB = 0; vật về đúng vị trí ban đầu nhưng có thể đã di chuyển."
+                            },
+                            {
+                                "value": "c",
+                                "label": "VTB = 0; vật đứng yên suốt."
+                            },
+                            {
+                                "value": "d",
+                                "label": "VTB = 1; vật đi đều."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\frac{5-5}{7-2} = 0$. Vật kết thúc tại cùng vị trí nhưng có thể đã đi-về."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l6-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Cát tuyến dốc xuống từ trái sang phải trên đồ thị vị trí–thời gian. Điều này nghĩa là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vật đi đều."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vận tốc trung bình trên khoảng đó là âm."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vật đứng yên."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đồ thị bị lỗi."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Dốc xuống = độ dốc âm = vận tốc trung bình âm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l6-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Sinh viên tính $\\Delta f / \\Delta t = 0$ cho một khoảng. Vật có thể đã di chuyển không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — VTB = 0 nghĩa là vật đứng yên."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — vật có thể đã đi rồi quay về cùng vị trí, cho dịch chuyển ròng = 0."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — nếu tốc độ = 0 thì quãng đường = 0."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Có, nhưng chỉ khi khoảng rất dài."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\Delta f = 0$ chỉ nói vị trí ròng không đổi. Vật có thể đã đi xa rồi quay về."
+                    }
+                }
+            ]
+        }
+    ]
+}

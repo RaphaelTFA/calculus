@@ -1,0 +1,402 @@
+{
+    "id": "quang-duong-va-do-dich-chuyen",
+    "title": "Quãng Đường và Độ Dịch Chuyển",
+    "description": "Phân biệt tổng quãng đường đi được và độ dịch chuyển ròng Δf = f(b) − f(a).",
+    "xp_reward": 10,
+    "order_index": 2,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-quang-duong",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "C",
+                        "lesson": {
+                            "interactionType": "C",
+                            "parameterSpec": {
+                                "time": {
+                                    "start": 0,
+                                    "end": 6,
+                                    "step": 0.05
+                                }
+                            },
+                            "systemSpec": {
+                                "initialState": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "evolutionRule": {
+                                    "type": "expression",
+                                    "expression": "[1, 3 - t]",
+                                    "variables": [
+                                        "t",
+                                        "x",
+                                        "y"
+                                    ]
+                                }
+                            },
+                            "representationSpec": {
+                                "encoding": "positionTime",
+                                "viewBox": {
+                                    "xMin": 0,
+                                    "xMax": 6,
+                                    "yMin": -1,
+                                    "yMax": 5.5
+                                }
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "type": "timeReached",
+                                        "value": 5.5,
+                                        "message": "Vật đã quay về gần vị trí ban đầu — nhưng tổng quãng đường đi được lớn hơn 0 rất nhiều."
+                                    },
+                                    {
+                                        "type": "timeReached",
+                                        "value": 3.0,
+                                        "message": "Vật đạt đỉnh rồi bắt đầu quay lại — bộ đếm quãng đường vẫn tiếp tục tăng."
+                                    },
+                                    {
+                                        "type": "timeReached",
+                                        "value": 1.0,
+                                        "message": "Vật đang di chuyển theo chiều dương — quãng đường và độ dịch chuyển tạm thời bằng nhau."
+                                    }
+                                ]
+                            },
+                            "prompt": "Quan sát điểm đánh dấu trên trục số. Tại t = 6, vật ở đâu? Tổng quãng đường đi được là bao nhiêu? Hai giá trị đó có giống nhau không?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-do-dich-chuyen",
+                    "type": "text",
+                    "content": {
+                        "heading": "Độ dịch chuyển: thay đổi ròng",
+                        "paragraphs": [
+                            "<b>Độ dịch chuyển</b> là thay đổi ròng vị trí: $\\Delta f = f(b) - f(a)$. Độ dịch chuyển có thể bằng 0 khi vật quay về điểm xuất phát.",
+                            "Ví dụ: $\\Delta f = f(6) - f(0) = 0 - 0 = 0$. Vật quay về vị trí ban đầu nhưng đã di chuyển thực sự."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-delta-f",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\Delta f = f(b) - f(a)"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-quang-duong",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quãng đường: tổng chiều dài đường đi",
+                        "paragraphs": [
+                            "<b>Quãng đường</b> đếm mọi đoạn đường, bất kể hướng. Quãng đường luôn ≥ 0 và không bao giờ giảm khi thời gian trôi.",
+                            "Khi vật đi 4.5 m rồi quay lại 4.5 m: độ dịch chuyển = 0, quãng đường = 9 m. Đây là hai phép đo khác nhau của cùng một hành trình."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l3-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại $t = 6$, điểm đánh dấu quay về vị trí 0. Bộ đếm quãng đường hiển thị 9 m. Kết luận gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vật đi 0 mét vì quay về điểm xuất phát."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Độ dịch chuyển là 9 m, quãng đường là 0 m."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Độ dịch chuyển là 0 m, quãng đường là 9 m."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Cả hai đều là 9 m."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Quay về xuất phát → $\\Delta f = 0$. Nhưng tổng chiều dài đường đi = 9 m (đi ra + quay lại)."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l3-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(0) = 2$ m, $f(5) = 6$ m. Độ dịch chuyển bằng bao nhiêu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "8 m"
+                            },
+                            {
+                                "value": "b",
+                                "label": "4 m"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2 m"
+                            },
+                            {
+                                "value": "d",
+                                "label": "6 m"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\Delta f = f(5) - f(0) = 6 - 2 = 4$ m."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l3-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(0) = 5$ m, $f(4) = 1$ m. Độ dịch chuyển?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "6 m"
+                            },
+                            {
+                                "value": "b",
+                                "label": "4 m"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-4$ m"
+                            },
+                            {
+                                "value": "d",
+                                "label": "1 m"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\Delta f = 1 - 5 = -4$ m. Âm nghĩa là vật di chuyển ròng theo chiều âm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l3-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật đi từ vị trí 0 đến 7 m, rồi quay lại vị trí 3 m. Quãng đường và độ dịch chuyển?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Quãng đường = 3 m, độ dịch chuyển = 7 m."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Quãng đường = 7 m, độ dịch chuyển = 3 m."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Quãng đường = 11 m, độ dịch chuyển = 3 m."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Quãng đường = 3 m, độ dịch chuyển = 3 m."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "7 m đi ra + 4 m quay lại = 11 m quãng đường. Vị trí ròng: $3 - 0 = 3$ m."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l3-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật quay về đúng điểm xuất phát sau 10 giây. Điều gì đúng?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Quãng đường = 0 và độ dịch chuyển = 0."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Độ dịch chuyển = 0; quãng đường có thể là bất kỳ giá trị dương nào."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Quãng đường = 0; độ dịch chuyển có thể là bất kỳ giá trị nào."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Cả hai đều dương."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Quay về xuất phát → $\\Delta f = 0$. Nhưng vật có thể đã đi rất xa rồi quay lại → quãng đường > 0."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l3-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Biểu thức $\\Delta f = f(b) - f(a)$ tính gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tổng quãng đường đi được từ a đến b."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Thay đổi ròng vị trí từ thời điểm a đến b."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vị trí trung bình trên $[a, b]$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tốc độ tại thời điểm b."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\Delta f = f(b) - f(a)$ cho biết vị trí ròng thay đổi bao nhiêu — có thể dương, âm, hoặc 0."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l3-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật đi theo đường ngoằn ngoèo rồi quay về gần điểm xuất phát. Đại lượng nào lớn hơn?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Độ dịch chuyển luôn lớn hơn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Chúng luôn bằng nhau."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Quãng đường lớn hơn — nó đếm mọi mét đường đi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định được."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Quãng đường đếm toàn bộ chiều dài đường đi. Độ dịch chuyển chỉ đo thay đổi ròng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l3-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Một người đi 3 dãy nhà về phía bắc, rồi 3 dãy nhà về phía nam. Nhận xét đúng?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đi 0 dãy nhà, độ dịch chuyển 0."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Đi 6 dãy nhà, độ dịch chuyển 6 dãy nhà về phía bắc."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đi 6 dãy nhà tổng cộng, độ dịch chuyển = 0."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đi 3 dãy nhà, độ dịch chuyển 3 dãy nhà."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Tổng đường đi: 3 + 3 = 6. Vị trí ròng: quay về xuất phát → $\\Delta = 0$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l3-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Độ dịch chuyển có thể bằng quãng đường không? Khi nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không bao giờ — chúng luôn khác nhau."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Chỉ khi vật đi thẳng đều."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có — khi vật chỉ đi theo một chiều không đổi, $\\Delta f$ = tổng quãng đường."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Có — nhưng chỉ khi vị trí cuối bằng 0."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Khi không đổi chiều, mọi đoạn đường đi đều tích lũy theo cùng hướng → quãng đường = |Δf|."
+                    }
+                }
+            ]
+        }
+    ]
+}

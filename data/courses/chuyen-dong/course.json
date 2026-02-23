@@ -1,0 +1,13 @@
+{
+    "slug": "chuyen-dong",
+    "title": "Chuyển động, Tốc độ, Vận tốc, Thay đổi",
+    "description": "Xây dựng trực giác về thay đổi: vị trí, tốc độ, vận tốc, và tốc độ thay đổi — nền tảng cho giới hạn và đạo hàm.",
+    "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Coordinate_Plane-TjmV5y.png?width=204",
+    "icon": "Δ",
+    "color": "from-blue-500 to-indigo-700",
+    "category_slug": "giai-tich",
+    "difficulty": "beginner",
+    "is_published": true,
+    "is_featured": true,
+    "order_index": 0
+}

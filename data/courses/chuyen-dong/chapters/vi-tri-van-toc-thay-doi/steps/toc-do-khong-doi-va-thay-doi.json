@@ -1,0 +1,380 @@
+{
+    "id": "toc-do-khong-doi-va-thay-doi",
+    "title": "Tốc Độ Không Đổi và Thay Đổi",
+    "description": "Phân biệt chuyển động tốc độ không đổi (đồ thị tuyến tính) và thay đổi (đồ thị cong).",
+    "xp_reward": 10,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-toc-do",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Tốc độ (m/s)"
+                            },
+                            "parameter": {
+                                "min": 0.5,
+                                "max": 4,
+                                "initial": 2
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": 0,
+                                    "xMax": 5,
+                                    "yMin": -1,
+                                    "yMax": 12
+                                },
+                                "model": "p * x"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "slow",
+                                    "trigger": "state.currentValue < 1",
+                                    "text": "Đường thẳng thoải — tốc độ thấp. Vị trí thay đổi chậm theo thời gian."
+                                },
+                                {
+                                    "id": "medium",
+                                    "trigger": "state.currentValue > 1.8 && state.currentValue < 2.5",
+                                    "text": "Đường thẳng — tốc độ không đổi. Mỗi giây, vật đi thêm cùng một quãng đường."
+                                },
+                                {
+                                    "id": "fast",
+                                    "trigger": "state.currentValue > 3.5",
+                                    "text": "Đường thẳng dốc — tốc độ cao. Vị trí thay đổi nhanh nhưng vẫn đều."
+                                }
+                            ],
+                            "prompt": "Kéo thanh trượt để thay đổi tốc độ. Đường thẳng thay đổi thế nào? Điều gì không đổi về hình dạng?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-toc-do-kd",
+                    "type": "text",
+                    "content": {
+                        "heading": "Tốc độ không đổi: đồ thị thẳng",
+                        "paragraphs": [
+                            "Khi vật đi với <b>tốc độ không đổi</b>, vị trí $f(t)$ là hàm tuyến tính: $f(t) = v \\cdot t$. Đồ thị là đường thẳng. Độ dốc đường thẳng <b>chính là tốc độ</b>.",
+                            "Mỗi giây, vật đi thêm cùng một quãng đường. Không có tăng tốc, không có giảm tốc."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-toc-do-td",
+                    "type": "text",
+                    "content": {
+                        "heading": "Tốc độ thay đổi: đồ thị cong",
+                        "paragraphs": [
+                            "Khi tốc độ <b>thay đổi</b>, đồ thị $f(t)$ là <b>đường cong</b>. Nơi đường cong dốc hơn, vật đi nhanh hơn. Nơi đường cong thoải hơn, vật chậm lại.",
+                            "Đường cong ẩn chứa thông tin mà đường thẳng không có: tốc độ thay đổi liên tục tại mỗi thời điểm."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l2-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Đồ thị $f(t)$ là đường thẳng. Kết luận gì về tốc độ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tốc độ bằng 0."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tốc độ không đổi."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Tốc độ tăng dần."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không đủ thông tin."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Đường thẳng = độ dốc không đổi = tốc độ không đổi."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l2-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Đồ thị $f(t)$ cong lên. Tốc độ đang:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Giảm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không đổi."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Tăng — đường cong ngày càng dốc hơn."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Bằng 0."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Đường cong dốc dần = vật chuyển động nhanh dần = tốc độ tăng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l2-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vật A: $f(t) = 3t$. Vật B: $f(t) = 5t$. Vật nào nhanh hơn?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "A — hệ số nhỏ hơn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "B — hệ số 5 > 3 nên dốc hơn."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Bằng nhau vì cả hai đều thẳng."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tốc độ = độ dốc đường thẳng. B dốc hơn → B nhanh hơn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l2-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi kéo thanh trượt tốc độ lên cao, đồ thị thay đổi thế nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đường thẳng xoay, trở nên dốc hơn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Đường thẳng dịch sang phải."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đường thẳng trở thành đường cong."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đường thẳng không đổi."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Tốc độ lớn hơn → độ dốc lớn hơn → đường thẳng quay dốc lên quanh gốc tọa độ."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l2-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu đồ thị nằm ngang ($f(t) =$ hằng số), tốc độ là bao nhiêu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vô cùng lớn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "1 m/s."
+                            },
+                            {
+                                "value": "c",
+                                "label": "0 m/s — vật đứng yên."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Âm."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Nằm ngang = độ dốc = 0 = vật đứng yên."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l2-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Đồ thị nào mô tả vật chạy nhanh rồi dừng lại?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đường thẳng dốc lên."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Đường cong từ dốc trở nên nằm ngang."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đường thẳng nằm ngang."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đường thẳng dốc xuống."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Dốc → nằm ngang = nhanh → chậm dần → dừng. Đường cong phản ánh tốc độ thay đổi."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l2-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao đường thẳng không thể mô tả vật tăng tốc?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì đường thẳng có độ dốc không đổi = tốc độ không đổi."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì đường thẳng luôn đi xuống."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì đường thẳng nằm ngang."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đường thẳng có thể mô tả tăng tốc."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Đường thẳng = độ dốc hằng = tốc độ không đổi. Muốn tăng tốc phải cong."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l2-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Xe đi 100 km trong 2 giờ đầu rồi 100 km trong 1 giờ sau. Đồ thị vị trí–thời gian:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đường thẳng liên tục."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Hai đoạn thẳng — đoạn sau dốc hơn (nhanh hơn)."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nằm ngang rồi dốc lên."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Một đường cong trơn."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Đoạn 1: 50 km/h (thoải). Đoạn 2: 100 km/h (dốc). Hai tốc độ khác nhau → hai đoạn thẳng khác độ dốc."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l2-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong thực tế, vật thường có đồ thị vị trí–thời gian dạng nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Luôn là đường thẳng."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Luôn là đường cong."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Thường là đường cong — tốc độ hiếm khi hoàn toàn không đổi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Luôn nằm ngang."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Tăng tốc, phanh, lên dốc... đều tạo đường cong. Đường thẳng là mô hình lý tưởng."
+                    }
+                }
+            ]
+        }
+    ]
+}

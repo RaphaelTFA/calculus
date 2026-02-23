@@ -147,15 +147,15 @@ export default function Step() {
   const handleCompleteAndNavigate = async () => {
     try {
       const result = await api.post(`/steps/${id}/complete`, { score: 100 })
-      
+
       // Update user XP and streak in store immediately
       if (result) {
         updateUserStats(result)
       }
-      
+
       // Also fetch fresh user data from server to ensure sync
       await fetchUser()
-      
+
       const currentIdx = allSteps.findIndex(s => s.id === parseInt(id))
       if (currentIdx < allSteps.length - 1) {
         const next = allSteps[currentIdx + 1]
@@ -333,8 +333,8 @@ export default function Step() {
       <footer className={cn(
         'h-[10vh] shrink-0 flex items-center justify-center transition-colors duration-300',
         quizIsCorrect ? 'bg-emerald-500' :
-        quizIsIncorrect ? 'bg-stone-400' :
-        'bg-white'
+          quizIsIncorrect ? 'bg-stone-400' :
+            'bg-white'
       )}>
         {quizIsAnswered ? (
           // Answered state - show feedback
@@ -379,8 +379,8 @@ export default function Step() {
               onClick={handleFooterAction}
               className={cn(
                 'h-10 px-6 text-sm font-bold rounded-xl',
-                quizIsCorrect 
-                  ? 'bg-white text-emerald-600 hover:bg-white/90' 
+                quizIsCorrect
+                  ? 'bg-white text-emerald-600 hover:bg-white/90'
                   : 'bg-white text-stone-600 hover:bg-white/90'
               )}
             >
@@ -418,7 +418,7 @@ export default function Step() {
           >
             {/* Blur backdrop */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            
+
             {/* Modal content */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -441,14 +441,14 @@ export default function Step() {
                   <XIcon className="w-5 h-5" />
                 </button>
               </div>
-              
+
               {/* Body */}
               <div className="px-6 py-5 max-h-[60vh] overflow-y-auto">
                 <div className="text-stone-700 leading-relaxed">
                   <MathText text={currentExplanation} />
                 </div>
               </div>
-              
+
               {/* Footer */}
               <div className="px-6 py-4 bg-stone-50 border-t border-stone-100">
                 <Button
@@ -475,10 +475,10 @@ function BlockRenderer({ block, quizAnswer, quizSubmitted, quizResult, onQuizAns
   const type = block.type || block.block_type
 
   switch (type) {
-    case 'text':       return <TextBlock block={block} />
-    case 'math':       return <MathBlock block={block} />
-    case 'image':      return <ImageBlock block={block} />
-    case 'quiz':       return (
+    case 'text': return <TextBlock block={block} />
+    case 'math': return <MathBlock block={block} />
+    case 'image': return <ImageBlock block={block} />
+    case 'quiz': return (
       <QuizBlock
         block={block}
         answer={quizAnswer}
@@ -489,14 +489,14 @@ function BlockRenderer({ block, quizAnswer, quizSubmitted, quizResult, onQuizAns
         onRetry={onQuizRetry}
       />
     )
-    case 'code':       return <CodeBlock block={block} />
-    case 'callout':    return <CalloutBlock block={block} />
-    case 'reveal':     return <RevealBlock block={block} />
-    case 'video':      return <VideoBlock block={block} />
+    case 'code': return <CodeBlock block={block} />
+    case 'callout': return <CalloutBlock block={block} />
+    case 'reveal': return <RevealBlock block={block} />
+    case 'video': return <VideoBlock block={block} />
     case 'fill_blank': return <FillBlankBlock block={block} />
-    case 'ordering':   return <OrderingBlock block={block} />
+    case 'ordering': return <OrderingBlock block={block} />
     case 'interactive_graph': return <InteractiveGraphBlock block={block} />
-    case 'interaction':       return <InteractionBlock block={block} />
+    case 'interaction': return <InteractionBlock block={block} />
     default:
       return <div className="text-stone-400 text-sm italic">Unsupported block type: {type}</div>
   }
@@ -510,7 +510,7 @@ function BlockRenderer({ block, quizAnswer, quizSubmitted, quizResult, onQuizAns
 function InteractionBlock({ block }) {
   const content = block.content || block.block_data || {}
   return (
-    <div className="my-4 rounded-xl overflow-hidden border border-violet-200" style={{ height: 420 }}>
+    <div className="my-4 rounded-xl overflow-hidden border border-violet-200" style={{ height: 520 }}>
       <InteractionSlide
         interactionType={content.interactionType}
         lesson={content.lesson}
@@ -687,8 +687,8 @@ function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRet
         <MathText text={question} />
       </p>
 
-      {/* Options - Horizontal layout with square boxes */}
-      <div className="flex flex-wrap justify-center gap-3">
+      {/* Options - 2-column grid with rectangular boxes */}
+      <div className="grid grid-cols-2 gap-3 px-1">
         {options.map((opt, idx) => {
           const optValue = opt.value ?? opt.id ?? idx
           const optLabel = opt.label || opt.text || (typeof opt === 'string' ? opt : String(opt))
@@ -704,7 +704,7 @@ function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRet
               animate={showWrongMark ? { x: [0, -4, 4, -3, 3, 0] } : {}}
               transition={{ duration: 0.3 }}
               className={cn(
-                'relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-3 transition-all duration-200 flex flex-col items-center justify-center p-2',
+                'relative w-full min-h-[90px] rounded-2xl border-3 transition-all duration-200 flex flex-col items-start justify-center px-5 py-4',
                 showCorrectMark
                   ? 'bg-emerald-50 border-emerald-400 text-emerald-800 shadow-lg shadow-emerald-100'
                   : showWrongMark
@@ -734,17 +734,17 @@ function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRet
 
               {/* Option label */}
               <span className={cn(
-                'text-xs font-bold mb-1 transition-colors',
+                'text-xs font-bold mb-1.5 transition-colors',
                 showCorrectMark ? 'text-emerald-500' :
-                showWrongMark   ? 'text-red-500' :
-                isSelected      ? 'text-blue-500' :
-                                  'text-stone-400'
+                  showWrongMark ? 'text-red-500' :
+                    isSelected ? 'text-blue-500' :
+                      'text-stone-400'
               )}>
                 {String.fromCharCode(65 + idx)}
               </span>
 
               {/* Option content */}
-              <span className="text-sm sm:text-base font-semibold leading-tight text-center">
+              <span className="text-sm sm:text-base font-semibold leading-snug text-left">
                 <MathText text={typeof optLabel === 'string' ? optLabel : String(optLabel)} />
               </span>
 
@@ -770,11 +770,11 @@ function QuizBlock({ block, answer, submitted, result, onAnswer, onSubmit, onRet
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const calloutConfig = {
-  info:    { icon: Info,           bg: 'bg-blue-50',    border: 'border-blue-200', iconColor: 'text-blue-500',    title: 'Info' },
-  tip:     { icon: Lightbulb,     bg: 'bg-amber-50',   border: 'border-amber-200', iconColor: 'text-amber-500',  title: 'Tip' },
-  warning: { icon: AlertTriangle, bg: 'bg-orange-50',  border: 'border-orange-200', iconColor: 'text-orange-500', title: 'Warning' },
-  theorem: { icon: GraduationCap, bg: 'bg-violet-50',  border: 'border-violet-200', iconColor: 'text-violet-500', title: 'Theorem' },
-  note:    { icon: Info,          bg: 'bg-stone-50',   border: 'border-stone-200', iconColor: 'text-stone-500',   title: 'Note' },
+  info: { icon: Info, bg: 'bg-blue-50', border: 'border-blue-200', iconColor: 'text-blue-500', title: 'Info' },
+  tip: { icon: Lightbulb, bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-500', title: 'Tip' },
+  warning: { icon: AlertTriangle, bg: 'bg-orange-50', border: 'border-orange-200', iconColor: 'text-orange-500', title: 'Warning' },
+  theorem: { icon: GraduationCap, bg: 'bg-violet-50', border: 'border-violet-200', iconColor: 'text-violet-500', title: 'Theorem' },
+  note: { icon: Info, bg: 'bg-stone-50', border: 'border-stone-200', iconColor: 'text-stone-500', title: 'Note' },
 }
 
 function CalloutBlock({ block }) {
@@ -955,8 +955,8 @@ function FillBlankBlock({ block }) {
                 className={cn(
                   'inline-block w-28 px-2 py-0.5 border-b-2 text-center text-sm font-medium bg-transparent outline-none transition',
                   isCorrect ? 'border-emerald-500 text-emerald-700' :
-                  isWrong ? 'border-red-400 text-red-600' :
-                  'border-stone-300 focus:border-blue-400 text-stone-800'
+                    isWrong ? 'border-red-400 text-red-600' :
+                      'border-stone-300 focus:border-blue-400 text-stone-800'
                 )}
               />
             )
@@ -1027,8 +1027,8 @@ function OrderingBlock({ block }) {
               className={cn(
                 'flex items-center gap-2 px-3 py-2.5 rounded-lg border bg-white cursor-grab active:cursor-grabbing transition-colors',
                 checked && isCorrect ? 'border-emerald-200 bg-emerald-50' :
-                checked && !isCorrect ? 'border-red-200 bg-red-50' :
-                'border-stone-200 hover:border-stone-300'
+                  checked && !isCorrect ? 'border-red-200 bg-red-50' :
+                    'border-stone-200 hover:border-stone-300'
               )}
             >
               <GripVertical className="w-4 h-4 text-stone-300 shrink-0" />

@@ -1,0 +1,355 @@
+{
+    "id": "toc-do-thay-doi-ngoai-chuyen-dong",
+    "title": "Tốc Độ Thay Đổi Ngoài Chuyển Động",
+    "description": "Δy/Δx là cấu trúc toán học phổ quát đo tốc độ thay đổi — không chỉ trong vật lý.",
+    "xp_reward": 15,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-tong-quat",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Điểm cuối b"
+                            },
+                            "parameter": {
+                                "min": 0.5,
+                                "max": 4,
+                                "initial": 2
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": 0,
+                                    "xMax": 4.5,
+                                    "yMin": -1,
+                                    "yMax": 17
+                                },
+                                "model": "x * x"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "small",
+                                    "trigger": "state.currentValue < 1.2",
+                                    "text": "Δy/Δx nhỏ — đường cong gần bằng phẳng ở đây. Trong chuyển động: vật chậm. Kinh doanh: chi phí thay đổi ít."
+                                },
+                                {
+                                    "id": "medium",
+                                    "trigger": "state.currentValue > 1.8 && state.currentValue < 2.5",
+                                    "text": "Δy/Δx ≈ 2–3. Cùng công thức cho mọi ngữ cảnh: vận tốc, tốc độ tăng nhiệt, chi phí biên."
+                                },
+                                {
+                                    "id": "large",
+                                    "trigger": "state.currentValue > 3.5",
+                                    "text": "Δy/Δx lớn — đường cong dốc. Cấu trúc (thay đổi đầu ra)/(thay đổi đầu vào) luôn giống nhau."
+                                }
+                            ],
+                            "prompt": "Kéo b để thay đổi khoảng. Tỷ số Δy/Δx thay đổi thế nào? Nó đo gì nếu y là khoảng cách? Nếu y là nhiệt độ? Nếu y là chi phí?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-cau-truc-pho-quat",
+                    "type": "text",
+                    "content": {
+                        "heading": "Δy/Δx: cấu trúc phổ quát",
+                        "paragraphs": [
+                            "Tỷ số $\\frac{\\Delta y}{\\Delta x} = \\frac{y_2 - y_1}{x_2 - x_1}$ đo lượng y thay đổi bao nhiêu trên mỗi đơn vị thay đổi của x. Cấu trúc này giống hệt nhau trong mọi ngữ cảnh:",
+                            "Chuyển động: $\\Delta f / \\Delta t$ = vận tốc trung bình (m/s). Nhiệt độ: $\\Delta T / \\Delta t$ (°C/h). Chi phí: $\\Delta C / \\Delta q$ ($/đơn vị). Công thức không thuộc về vật lý — nó thuộc về mọi mối quan hệ giữa hai đại lượng thay đổi."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-dy-dx",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\frac{\\Delta y}{\\Delta x} = \\frac{y_2 - y_1}{x_2 - x_1}"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-cau-noi-m2",
+                    "type": "text",
+                    "content": {
+                        "heading": "Module 2 sẽ làm gì với cấu trúc này?",
+                        "paragraphs": [
+                            "Trong Module 1, ta đã tính $\\Delta y / \\Delta x$ trên các khoảng. Ở Bài 7, ta thấy khi khoảng thu nhỏ, tỷ số này ổn định.",
+                            "Module 2 sẽ trang bị công cụ để chính xác hoá giá trị ổn định đó — tốc độ thay đổi tại <b>một điểm duy nhất</b>, không phải trên khoảng. Đó là giới hạn, và sau đó là đạo hàm."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l8-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Dân số thành phố tăng từ 50,000 lên 54,000 trong 2 năm. $\\Delta P / \\Delta t$ = ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "4,000"
+                            },
+                            {
+                                "value": "b",
+                                "label": "52,000"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2,000 người/năm"
+                            },
+                            {
+                                "value": "d",
+                                "label": "108,000"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\frac{54{,}000 - 50{,}000}{2} = 2{,}000$ người/năm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l8-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Biểu thức nào tính đúng tốc độ thay đổi của đại lượng $y$ theo $x$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$y_1 \\cdot x_2$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$y_2 + x_1$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\frac{y_2 - y_1}{x_2 - x_1}$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$\\frac{x_2 - x_1}{y_2 - y_1}$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Đây là cấu trúc phổ quát: (thay đổi đầu ra) ÷ (thay đổi đầu vào)."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l8-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nhiệt độ giảm từ 20°C xuống 12°C trong 4 giờ. $\\Delta T / \\Delta t$ và đơn vị?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "2°C"
+                            },
+                            {
+                                "value": "b",
+                                "label": "8°C/h"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-2$°C/h"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-8$°C"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\frac{12 - 20}{4} = \\frac{-8}{4} = -2$°C/h. Dấu âm chỉ nhiệt độ giảm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l8-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong chuyển động, $\\Delta f / \\Delta t = 3$ m/s. Trong kinh doanh, $\\Delta C / \\Delta q = 3$ $/đơn vị nghĩa là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Công ty lãi 3 đô la."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Sản lượng là 3 đơn vị."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Mỗi đơn vị sản xuất thêm tốn trung bình 3 đô la trên khoảng đã cho."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chi phí cố định tại 3 đô la."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Cùng công thức, khác ý nghĩa vật lý: tỷ số đo thay đổi trên mỗi đơn vị."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l8-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao $\\Delta y / \\Delta x$ là cấu trúc \"phổ quát\"?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì chỉ dùng được cho hàm tuyến tính."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì được phát minh cho vật lý."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì nó đo thay đổi của bất kỳ hai đại lượng liên quan nào bằng cùng công thức tỷ số."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì giá trị của nó luôn dương."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Cấu trúc (thay đổi đầu ra)/(thay đổi đầu vào) áp dụng cho mọi mối quan hệ hàm số."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l8-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\Delta C / \\Delta q = -5$ $/đơn vị. Dấu âm nghĩa là gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Chi phí là âm — không thể xảy ra."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Sản lượng $q$ đang giảm."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chi phí trên mỗi đơn vị đang giảm khi sản lượng tăng."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Công thức được áp dụng ngược."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Dấu âm = đại lượng đầu ra giảm khi đại lượng đầu vào tăng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l8-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Cây cao từ 10 cm lên 28 cm trong 6 tuần. Tốc độ thay đổi chiều cao trung bình?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "38 cm/tuần"
+                            },
+                            {
+                                "value": "b",
+                                "label": "28 cm/tuần"
+                            },
+                            {
+                                "value": "c",
+                                "label": "3 cm/tuần"
+                            },
+                            {
+                                "value": "d",
+                                "label": "18 cm"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\frac{28 - 10}{6} = \\frac{18}{6} = 3$ cm/tuần."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l8-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Module 1 đã tính tốc độ thay đổi trung bình $\\Delta y / \\Delta x$ trên khoảng. Module 2 sẽ xử lý:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Thêm nhiều ngữ cảnh vật lý vào công thức."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tính trên khoảng lớn hơn."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Thay $\\Delta y / \\Delta x$ bằng phép cộng."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tìm giá trị mà $\\Delta y / \\Delta x$ tiến đến khi khoảng thu nhỏ về 0 — tốc độ thay đổi tại một thời điểm."
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "Module 2 chính xác hoá hiện tượng hội tụ: từ trung bình trên khoảng → tức thời tại điểm."
+                    }
+                }
+            ]
+        }
+    ]
+}

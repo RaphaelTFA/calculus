@@ -108,14 +108,20 @@ function renderCanvas(systemState, interaction, ctx, canvas) {
 
 function evalCondition(trigger, state) {
   if (typeof trigger.condition === 'function') return trigger.condition(state)
+  if (typeof trigger.condition === 'string') {
+    // String expression from JSON — evaluate with state in scope
+    try {
+      return new Function('state', `"use strict"; return (${trigger.condition});`)(state)
+    } catch { return false }
+  }
   if (trigger.conditionSpec) {
     const { field, op, value } = trigger.conditionSpec
     const v = state[field]
-    if (op === '>=' ) return v >= value
-    if (op === '>'  ) return v >  value
-    if (op === '<=' ) return v <= value
-    if (op === '<'  ) return v <  value
-    if (op === '==' ) return v === value
+    if (op === '>=') return v >= value
+    if (op === '>') return v > value
+    if (op === '<=') return v <= value
+    if (op === '<') return v < value
+    if (op === '==') return v === value
   }
   return false
 }
@@ -150,7 +156,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   // We treat resolution as a continuous value between min and max levels
   const minRes = levels[0]
   const maxRes = levels[levels.length - 1]
-  
+
   const state = { resolution }
 
   const computationResult = useMemo(() => {
@@ -158,54 +164,54 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   }, [resolution, interaction])
 
 
-    // Use a ref to track the "pending" resolution to avoid React batching lag during drag
-    const pendingResolutionRef = useRef(LESSON.parameterSpec.resolutionLevels[0])
-    
-    // Canvas rendering - Optimized with animation frame for smooth updates
-    useEffect(() => {
-        const canvas = canvasRef.current
-        if (!canvas) return
-        const ctx = canvas.getContext("2d")
-        let animationFrameId
-        
-        const renderLoop = () => {
-            const dpr = window.devicePixelRatio || 1
-            const rect = canvas.getBoundingClientRect()
-            
-            // Only set dimensions if they changed to avoid clearing canvas unnecessarily
-            if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
-                 canvas.width = rect.width * dpr
-                 canvas.height = rect.height * dpr
-                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-            }
-            
-            renderCanvas(computationResult.systemState, interaction, ctx, canvas)
-        }
+  // Use a ref to track the "pending" resolution to avoid React batching lag during drag
+  const pendingResolutionRef = useRef(LESSON.parameterSpec.resolutionLevels[0])
 
-        renderLoop()
+  // Canvas rendering - Optimized with animation frame for smooth updates
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    let animationFrameId
 
-    }, [computationResult, interaction])
+    const renderLoop = () => {
+      const dpr = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+
+      // Only set dimensions if they changed to avoid clearing canvas unnecessarily
+      if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
+        canvas.width = rect.width * dpr
+        canvas.height = rect.height * dpr
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      }
+
+      renderCanvas(computationResult.systemState, interaction, ctx, canvas)
+    }
+
+    renderLoop()
+
+  }, [computationResult, interaction])
 
   // SMOOTH DRAG LOGIC
   // We use a ref to track drag state and requestAnimationFrame to throttle React state updates.
   const isDraggingRef = useRef(false)
-  
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
     const updateFromEvent = (clientX, sourceWidth, sourceLeft) => {
-        const x = clientX - sourceLeft
-        let ratio = Math.max(0, Math.min(1, x / sourceWidth))
-        
-        // Continuous resolution mapping
-        const newRes = minRes + ratio * (maxRes - minRes)
-        
-        // Update if significantly different (e.g. > 0.1 change) to avoid micro-updates
-        if (Math.abs(newRes - pendingResolutionRef.current) > 0.01) {
-            pendingResolutionRef.current = newRes
-            setResolution(newRes)
-        }
+      const x = clientX - sourceLeft
+      let ratio = Math.max(0, Math.min(1, x / sourceWidth))
+
+      // Continuous resolution mapping
+      const newRes = minRes + ratio * (maxRes - minRes)
+
+      // Update if significantly different (e.g. > 0.1 change) to avoid micro-updates
+      if (Math.abs(newRes - pendingResolutionRef.current) > 0.01) {
+        pendingResolutionRef.current = newRes
+        setResolution(newRes)
+      }
     }
 
     const handleCanvasMove = (e) => {
@@ -270,26 +276,26 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
                 type="range"
                 min={minRes}
                 max={maxRes}
-                step="0.1" 
-                value={resolution} 
+                step="0.1"
+                value={resolution}
                 onInput={(e) => {
-                    // Using onInput for immediate feedback
-                    const newRes = parseFloat(e.target.value)
-                    if (newRes !== pendingResolutionRef.current) {
-                        pendingResolutionRef.current = newRes
-                        setResolution(newRes)
-                    }
+                  // Using onInput for immediate feedback
+                  const newRes = parseFloat(e.target.value)
+                  if (newRes !== pendingResolutionRef.current) {
+                    pendingResolutionRef.current = newRes
+                    setResolution(newRes)
+                  }
                 }}
-                style={{ 
-                    width: '100%', 
-                    cursor: 'pointer', 
-                    accentColor: '#3498db',
-                    height: 6
+                style={{
+                  width: '100%',
+                  cursor: 'pointer',
+                  accentColor: '#3498db',
+                  height: 6
                 }}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280' }}>
-                  <span>Coarse</span>
-                  <span>Fine</span>
+                <span>Coarse</span>
+                <span>Fine</span>
               </div>
             </div>
           </div>

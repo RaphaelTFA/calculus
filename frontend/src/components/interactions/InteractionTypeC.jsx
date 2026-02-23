@@ -57,6 +57,19 @@ function createEvaluator(model) {
 
 // ─── PURE LOGIC ──────────────────────────────────────────────────────────────
 
+function computeFullTrace(interaction) {
+  const evaluator = createEvaluator(interaction.systemSpec.evolutionRule)
+  const { start, end, step } = interaction.parameterSpec.time
+  let position = { ...interaction.systemSpec.initialState }
+  const trace = []
+  for (let tau = start; tau <= end; tau += step) {
+    const [vx, vy] = evaluator({ t: tau, x: position.x, y: position.y })
+    position = { x: position.x + vx * step, y: position.y + vy * step }
+    trace.push({ x: position.x, y: position.y })
+  }
+  return trace
+}
+
 function recompute(interaction, state) {
   const evaluator = createEvaluator(interaction.systemSpec.evolutionRule)
   const { start, step } = interaction.parameterSpec.time
@@ -102,9 +115,22 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
       ctx.stroke()
     }
 
-    if (obj.type === "trace") {
-      ctx.strokeStyle = "rgba(37,99,235,0.25)"
+    if (obj.type === "fullCurve") {
+      ctx.strokeStyle = "rgba(180,180,180,0.5)"
       ctx.lineWidth = 1.5
+      ctx.setLineDash([4, 4])
+      ctx.beginPath()
+      obj.data.forEach((pt, i) => {
+        const px = mapX(pt.x); const py = mapY(pt.y)
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
+      })
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
+
+    if (obj.type === "trace") {
+      ctx.strokeStyle = "rgba(37,99,235,0.85)"
+      ctx.lineWidth = 2.5
       ctx.beginPath()
       obj.data.forEach((pt, i) => {
         const px = mapX(pt.x); const py = mapY(pt.y)
@@ -124,7 +150,10 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
 
 function evaluateReflections(interaction, state) {
   if (!interaction.reflectionSpec) return null
-  for (const trigger of interaction.reflectionSpec.triggers) {
+  // Sort by value descending so the HIGHEST reached trigger wins
+  const triggers = [...interaction.reflectionSpec.triggers]
+    .sort((a, b) => b.value - a.value)
+  for (const trigger of triggers) {
     if (trigger.type === "timeReached" && state.t >= trigger.value) {
       return trigger.message
     }
@@ -158,6 +187,7 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
     const timeSpec = LESSON.parameterSpec.time
 
     let currentState = { t: timeSpec.start }
+    const fullTrace = computeFullTrace(LESSON)
 
     function resize() {
       if (!canvas.parentElement) return
@@ -168,7 +198,10 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
       const result = recompute(LESSON, currentState)
-      renderCanvas(result.systemState, LESSON.representationSpec, ctx, canvas)
+      const sysWithFull = {
+        geometry: [{ type: "fullCurve", data: fullTrace }, ...result.systemState.geometry]
+      }
+      renderCanvas(sysWithFull, LESSON.representationSpec, ctx, canvas)
     }
 
     window.addEventListener("resize", resize)
@@ -181,7 +214,10 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
       const message = evaluateReflections(LESSON, currentState)
       if (message !== null) setReflection(message)
 
-      renderCanvas(result.systemState, LESSON.representationSpec, ctx, canvas)
+      const sysWithFull = {
+        geometry: [{ type: "fullCurve", data: fullTrace }, ...result.systemState.geometry]
+      }
+      renderCanvas(sysWithFull, LESSON.representationSpec, ctx, canvas)
 
       currentState = { t: currentState.t + timeSpec.step }
       requestRef.current = requestAnimationFrame(step)
