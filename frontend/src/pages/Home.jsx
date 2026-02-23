@@ -114,37 +114,36 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* 2-Column Responsive Layout */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 lg:gap-8">
-        
-        {/* Left Sidebar - Enhanced with more features */}
-        <aside className="order-2 lg:order-1 space-y-4">
-          {/* User Stats Overview */}
-          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+        {/* Left Sidebar - Colorful & Minimal */}
+        <aside className="order-2 lg:order-1 space-y-6">
+          {/* User Stats Overview - Colorful Card */}
+          <Card className="border-2 border-fuchsia-400/40 bg-gradient-to-br from-fuchsia-100 via-pink-100 to-yellow-100 shadow-xl animate-pulse-slow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                Your Progress
+              <CardTitle className="text-lg flex items-center gap-2 text-fuchsia-700">
+                <TrendingUp className="w-5 h-5 text-fuchsia-500 animate-bounce" />
+                Tiến trình của bạn
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <StatItem icon={Flame} label="Streak" value={`${user?.current_streak || 0}d`} color="text-orange-600" bgColor="bg-orange-100" />
-                <StatItem icon={Zap} label="XP" value={user?.xp || 0} color="text-yellow-600" bgColor="bg-yellow-100" />
-                <StatItem icon={Trophy} label="Rank" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100" />
-                <StatItem icon={BookOpen} label="Lessons" value={dashboardData?.lessons_completed || 0} color="text-blue-600" bgColor="bg-blue-100" />
+                <StatItem icon={Flame} label="Chuỗi ngày" value={`${user?.current_streak || 0}d`} color="text-orange-600" bgColor="bg-orange-100/80" />
+                <StatItem icon={Zap} label="XP" value={user?.xp || 0} color="text-yellow-600" bgColor="bg-yellow-100/80" />
+                <StatItem icon={Trophy} label="Hạng" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100/80" />
+                <StatItem icon={BookOpen} label="Bài học" value={dashboardData?.lessons_completed || 0} color="text-blue-600" bgColor="bg-blue-100/80" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Daily Goal */}
+          {/* Daily Goal - More Colorful */}
           {dashboardData?.daily_goal && (
-            <Card>
+            <Card className="border-2 border-cyan-300/40 bg-gradient-to-r from-cyan-100 via-sky-100 to-green-100 shadow-md">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Daily Goal
+                  <CardTitle className="text-base flex items-center gap-2 text-cyan-700">
+                    <Calendar className="w-4 h-4 text-cyan-500 animate-spin-slow" />
+                    Mục tiêu hôm nay
                   </CardTitle>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs bg-cyan-200 text-cyan-800">
                     {dashboardData.daily_goal.completed}/{dashboardData.daily_goal.target}
                   </Badge>
                 </div>
@@ -152,28 +151,25 @@ export default function Home() {
               <CardContent className="space-y-2">
                 <Progress 
                   value={(dashboardData.daily_goal.completed / dashboardData.daily_goal.target) * 100} 
-                  className="h-2" 
+                  className="h-2 bg-cyan-200" 
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-cyan-700">
                   {dashboardData.daily_goal.remaining > 0 
-                    ? `${dashboardData.daily_goal.remaining} more lesson${dashboardData.daily_goal.remaining !== 1 ? 's' : ''} to reach your daily goal!`
-                    : 'Daily goal completed! 🎉'
+                    ? `${dashboardData.daily_goal.remaining} bài nữa để hoàn thành mục tiêu!`
+                    : 'Đã hoàn thành mục tiêu ngày! 🎉'
                   }
                 </p>
               </CardContent>
             </Card>
           )}
-          
-          {/* Learning Streak Card */}
-          <StreakCard streak={user?.current_streak || 0} />
-          
-          {/* Achievements Preview */}
+
+          {/* Achievements Preview - Only show if available */}
           {dashboardData?.recent_achievements && dashboardData.recent_achievements.length > 0 && (
-            <Card>
+            <Card className="border-2 border-amber-300/40 bg-gradient-to-r from-yellow-100 via-amber-100 to-orange-100 shadow-md">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Award className="w-4 h-4" />
-                  Recent Achievements
+                <CardTitle className="text-base flex items-center gap-2 text-amber-700">
+                  <Award className="w-4 h-4 text-amber-500 animate-pulse" />
+                  Thành tựu gần đây
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -189,8 +185,8 @@ export default function Home() {
               </CardContent>
             </Card>
           )}
-          
-          {/* XP / League Progress */}
+
+          {/* XP / League Progress - Colorful */}
           {dashboardData?.league && (
             <LeagueCard 
               xp={user?.xp || 0} 
