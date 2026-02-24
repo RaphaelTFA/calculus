@@ -44,10 +44,11 @@
                                 "triggers": [
                                     {
                                         "condition": "state.resolution >= 50",
-                                        "message": "Δf/Δx → 4 khi khoảng thu nhỏ. Thế trực tiếp cho (x²−4)/(x−2) tại x=2 cũng cho 0/0, nhưng rút gọn cho x+2 = 4."
+                                        "message": "Δf/Δx → 4 — rút gọn (x²−4)/(x−2) = x+2 cũng cho 4 tại x=2. Đại số xác nhận giới hạn."
                                     }
                                 ]
-                            }
+                            },
+                            "prompt": "Tăng số điểm lấy mẫu. Δf/Δx tiến về giá trị nào khi khoảng thu nhỏ quanh x = 2?"
                         }
                     }
                 }
