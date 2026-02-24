@@ -46,22 +46,27 @@ function useLearningPaths() {
 export default function Explore() {
   const learningPaths = useLearningPaths()
   return (
-    // Changed: Removed px-10, added pl-6. Added font-cofo.
-    <div className="bg-white min-h-screen w-full pl-4 py-12 font-cofo select-none">
+     <div className="bg-white min-h-screen w-full pl-4 py-12 select-none" style={{ fontFamily: 'Nunito, Arial, sans-serif' }}>
       
       {/* Title Section: Aligned left */}
-      <div className="mb-[60px]">
-        <h1 className="text-[24px] font-[700] tracking-tight mb-1 text-[#111]">
-          Learning Paths
+      <div className="mb-16 max-w-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+          Studying Modules
         </h1>
-        <p className="text-[16px] text-[#666] font-[400]">
-          Step-by-step paths to mastery
+
+        <p className="mt-3 text-lg text-neutral-500 max-w-xl leading-relaxed">
+          SbS modules designed to take you from fundamentals to mastery.
         </p>
       </div>
 
       <div className="space-y-16">
-        {learningPaths.map((path) => (
-          <PathSection key={path.id} path={path} />
+        {learningPaths.map((path, index) => (
+          <>
+            <PathSection key={path.id} path={path} />
+            {index !== learningPaths.length - 1 && (
+              <div className="w-full h-[1px] bg-gray-300" />
+            )}
+          </>
         ))}
       </div>
     </div>
@@ -70,7 +75,7 @@ export default function Explore() {
 
 function PathSection({ path }) {
   return (
-    <section className="bg-white w-full">
+     <section className="bg-white w-full" style={{ fontFamily: 'Nunito, Arial, sans-serif' }}>
       
       {/* 1. HEADER BLOCK - Shifted more to the right */}
       {/* Adjust 'pl-24' to move it more or less */}
@@ -85,20 +90,25 @@ function PathSection({ path }) {
       </div>
 
       {/* 2. GRAY TRAY - Pinned further to the left */}
-      {/* 'rounded-l-3xl' ensures the left side is rounded while it spans to the right */}
-      <div className="bg-[#F8F8F8] rounded-l-[24px] py-10 pl-8 flex gap-6 overflow-x-auto scrollbar-hide">
-        {path.courses.map((course) => (
-          <CourseCard key={course.slug} course={course} />
+      {/* 'rounded-3xl' ensures the left side is rounded while it spans to the right */}
+      <div className="bg-[#F8F8F8] rounded-[24px] py-10 pl-10 flex items-center overflow-x-auto scrollbar-hide">
+        {path.courses.map((course, index) => (
+          <div key={course.slug} className="flex items-center">
+            <CourseCard course={course} />
+            {index !== path.courses.length - 1 && (
+              <div className="w-8 h-[3px] bg-gray-300 shrink-0 -translate-y-4" />
+            )}
+          </div>
         ))}
       </div>
-
+      {/* 3. SPACING - The 'mb-16' on the section ensures consistent spacing between sections */}
     </section>
   )
 }
 
 function CourseCard({ course }) {
   return (
-    <Link to={`/course/${course.slug}`} className="flex-shrink-0 w-[176px] flex flex-col gap-6 no-underline group">
+     <Link to={`/course/${course.slug}`} className="flex-shrink-0 w-[176px] flex flex-col gap-6 no-underline group" style={{ fontFamily: 'Nunito, Arial, sans-serif' }}>
       <motion.div
         whileHover={{ y: -2 }}
         className="relative w-[176px] h-[176px] bg-white border-2 border-[#E5E5E5] rounded-[24px] shadow-[0_4px_0_0_#E5E5E5] group-hover:shadow-[0_6px_0_0_#E5E5E5] flex items-center justify-center transition-all duration-200"
