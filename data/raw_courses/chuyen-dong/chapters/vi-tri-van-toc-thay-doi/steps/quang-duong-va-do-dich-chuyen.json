@@ -7,7 +7,7 @@
     "slides": [
         {
             "order_index": 0,
-            "blocks": [
+            "blocks": [ 
                 {
                     "id": "ia-quang-duong",
                     "type": "interaction",

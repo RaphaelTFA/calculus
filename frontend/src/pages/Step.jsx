@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   X as XIcon, Check, Sparkles, RotateCcw, HelpCircle,
@@ -97,10 +97,10 @@ export default function Step() {
     if (currentSlideIndex < slides.length - 1) setCurrentSlideIndex(i => i + 1)
   }, [currentSlideIndex, slides.length])
 
-  // Is the current slide an interaction-only slide?
+  // Is the current slide an interaction slide? (true when at least one block is interaction)
   const isInteractionSlide = useMemo(() => {
     const blocks = currentSlide?.blocks || []
-    return blocks.length === 1 && (blocks[0].type || blocks[0].block_type) === 'interaction'
+    return blocks.some(b => (b.type || b.block_type) === 'interaction')
   }, [currentSlide])
 
   // Does the current slide have an unanswered quiz?
@@ -247,7 +247,9 @@ export default function Step() {
 
   // ── MAIN RENDER ──
   return (
-    <div className="h-[100dvh] flex flex-col bg-stone-100 overflow-hidden">
+    <div className={cn(
+      'h-[100dvh] flex flex-col overflow-hidden', 'bg-white'
+    )}>
       {/* ── Header ── 1/10 of screen */}
       <header className="h-[10vh] shrink-0 flex items-center justify-center relative bg-white">
         {/* Exit button — top left */}
@@ -272,27 +274,90 @@ export default function Step() {
         </div>
       </header>
 
-      {/* ── Body ── 8/10 of screen */}
-      <main className="h-[80vh] shrink-0 overflow-hidden">
+      {/* ── Body ── fills remaining space; blocks constrained to center column */}
+      <main className='flex-1 shrink-0 overflow-hidden'>
         {isInteractionSlide ? (
           // Full-bleed interaction slide — no scroll container, no max-width
           <AnimatePresence mode="wait">
-            <motion.div
+              <motion.div
               key={currentSlideIndex}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="w-full h-full"
+              className="w-full h-full flex items-center justify-center px-4 py-6"
             >
               {(() => {
-                const block = currentSlide.blocks[0]
-                const content = block.content || block.block_data || {}
+                // ScaleToFit wrapper ensures interaction content scales to parent
+                const ScaleToFit = ({ children, naturalWidth = 420, naturalHeight = 300 }) => {
+                  const containerRef = useRef(null)
+                  const [scale, setScale] = useState(1)
+
+                  useLayoutEffect(() => {
+                    if (!containerRef.current) return
+                    const measure = () => {
+                      const rect = containerRef.current.getBoundingClientRect()
+                      const pw = Math.max(rect.width - 32, 50) // account for padding
+                      const ph = Math.max(rect.height - 32, 50)
+                      const s = Math.max(0.2, Math.min(pw / naturalWidth, ph / naturalHeight))
+                      setScale(s)
+                    }
+                    measure()
+                    const obs = new ResizeObserver(measure)
+                    obs.observe(containerRef.current)
+                    return () => obs.disconnect()
+                  }, [naturalWidth, naturalHeight])
+
+                  return (
+                    <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: naturalWidth, height: naturalHeight, transform: `scale(${scale})`, transformOrigin: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {children}
+                      </div>
+                    </div>
+                  )
+                }
+
+                const blocks = currentSlide?.blocks || []
+
                 return (
-                  <InteractionSlide
-                    interactionType={content.interactionType}
-                    lesson={content.lesson}
-                  />
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem 0', boxSizing: 'border-box' }}>
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: '1rem' }}>
+                      <div className="w-full overflow-y-auto" style={{ maxHeight: '100%' }}>
+                        <div className="max-w-3xl mx-auto px-6">
+                          {blocks.map((b, idx) => {
+                            const isInteraction = (b.type || b.block_type) === 'interaction'
+                            if (isInteraction) {
+                              const content = b.content || b.block_data || {}
+                              return (
+                                <div key={b.id || idx} className="mb-6 flex items-center justify-center">
+                                  <ScaleToFit>
+                                    <InteractionSlide
+                                      interactionType={content.interactionType}
+                                      lesson={content.lesson}
+                                    />
+                                  </ScaleToFit>
+                                </div>
+                              )
+                            }
+
+                            return (
+                              <div key={b.id || idx} className="mb-4">
+                                <BlockRenderer
+                                  block={b}
+                                  quizAnswer={quizAnswers[b.id]}
+                                  quizSubmitted={quizSubmitted[b.id]}
+                                  quizResult={quizResults[b.id]}
+                                  onQuizAnswer={(ans) => handleQuizAnswer(b.id, ans)}
+                                  onQuizSubmit={(correct, explanation) => handleQuizSubmit(b.id, correct, explanation)}
+                                  onQuizRetry={() => handleQuizRetry(b.id)}
+                                />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )
               })()}
             </motion.div>

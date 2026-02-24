@@ -96,29 +96,75 @@ function recompute(interaction, state) {
 }
 
 function renderCanvas(systemState, representationSpec, ctx, canvas) {
-  ctx.fillStyle = "#ffffff"
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  // Ensure canvas backing store matches CSS size (handles clipping and HiDPI)
+  const rect = canvas.getBoundingClientRect()
+  const dpr = window.devicePixelRatio || 1
+  const cssW = Math.max(1, rect.width)
+  const cssH = Math.max(1, rect.height)
+  const pxW = Math.round(cssW * dpr)
+  const pxH = Math.round(cssH * dpr)
+  if (canvas.width !== pxW || canvas.height !== pxH) {
+    canvas.width = pxW
+    canvas.height = pxH
+  }
+  // Scale drawing so 1 unit = 1 CSS pixel
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+  // White background (use CSS size coordinates)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, cssW, cssH)
 
   const vb = representationSpec.viewBox
-  const w = canvas.clientWidth; const h = canvas.clientHeight
+  const w = cssW; const h = cssH
 
-  const mapX = x => (x - vb.xMin) / (vb.xMax - vb.xMin) * w
-  const mapY = y => h - (y - vb.yMin) / (vb.yMax - vb.yMin) * h
+  // Add a small padding so axes and arrowheads are not clipped
+  const pad = Math.max(12, Math.round(Math.min(w, h) / 20))
+  const innerW = Math.max(1, w - 2 * pad)
+  const innerH = Math.max(1, h - 2 * pad)
 
+  const mapX = x => pad + (x - vb.xMin) / (vb.xMax - vb.xMin) * innerW
+  const mapY = y => pad + innerH - (y - vb.yMin) / (vb.yMax - vb.yMin) * innerH
+
+  // Draw each geometry object with a clean, textbook style
   systemState.geometry.forEach(obj => {
-    if (obj.type === "axes") {
-      ctx.strokeStyle = "#e5e7eb"
-      ctx.lineWidth = 1
+    // Bold black axes with arrowheads
+    if (obj.type === 'axes') {
+      ctx.save()
+      ctx.strokeStyle = '#000000'
+      ctx.lineWidth = Math.max(1.5, Math.min(3, Math.round(w / 300)))
       ctx.beginPath()
-      ctx.moveTo(0, mapY(0)); ctx.lineTo(w, mapY(0))
-      ctx.moveTo(mapX(0), 0); ctx.lineTo(mapX(0), h)
+      // x-axis
+      const y0 = mapY(0)
+      ctx.moveTo(pad, y0); ctx.lineTo(w - pad, y0)
+      // y-axis
+      const x0 = mapX(0)
+      ctx.moveTo(x0, pad); ctx.lineTo(x0, h - pad)
       ctx.stroke()
+
+      // arrowheads (small, proportional)
+      const ah = Math.max(6, Math.round(Math.min(innerW, innerH) / 80))
+      // x-axis arrow (right)
+      ctx.beginPath()
+      ctx.moveTo(w - pad - ah, y0 - ah / 2)
+      ctx.lineTo(w - pad, y0)
+      ctx.lineTo(w - pad - ah, y0 + ah / 2)
+      ctx.fillStyle = '#000'
+      ctx.fill()
+      // y-axis arrow (top)
+      ctx.beginPath()
+      ctx.moveTo(x0 - ah / 2, pad + ah)
+      ctx.lineTo(x0, pad)
+      ctx.lineTo(x0 + ah / 2, pad + ah)
+      ctx.fill()
+      ctx.restore()
     }
 
-    if (obj.type === "fullCurve") {
-      ctx.strokeStyle = "rgba(180,180,180,0.5)"
-      ctx.lineWidth = 1.5
-      ctx.setLineDash([4, 4])
+    // Secondary reference: thin orange line (low weight)
+    if (obj.type === 'fullCurve') {
+      ctx.save()
+      ctx.strokeStyle = '#fb923c' // orange-400
+      ctx.lineWidth = 1
+      ctx.setLineDash([6, 6])
       ctx.beginPath()
       obj.data.forEach((pt, i) => {
         const px = mapX(pt.x); const py = mapY(pt.y)
@@ -126,24 +172,49 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
       })
       ctx.stroke()
       ctx.setLineDash([])
+      ctx.restore()
     }
 
-    if (obj.type === "trace") {
-      ctx.strokeStyle = "rgba(37,99,235,0.85)"
+    // Main trace: strong blue
+    if (obj.type === 'trace') {
+      ctx.save()
+      ctx.strokeStyle = '#1e40af' // strong indigo-blue
       ctx.lineWidth = 2.5
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
       ctx.beginPath()
       obj.data.forEach((pt, i) => {
         const px = mapX(pt.x); const py = mapY(pt.y)
         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
       })
       ctx.stroke()
+      ctx.restore()
     }
 
-    if (obj.type === "point") {
-      ctx.fillStyle = "#2563eb"
+    // Highlight points with solid circular markers and dashed projections
+    if (obj.type === 'point') {
+      const px = mapX(obj.x); const py = mapY(obj.y)
+      // dashed projection to axes
+      ctx.save()
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)'
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 4])
       ctx.beginPath()
-      ctx.arc(mapX(obj.x), mapY(obj.y), 6, 0, Math.PI * 2)
+      // vertical to x-axis
+      ctx.moveTo(px, py); ctx.lineTo(px, mapY(0))
+      // horizontal to y-axis
+      ctx.moveTo(px, py); ctx.lineTo(mapX(0), py)
+      ctx.stroke()
+      ctx.setLineDash([])
+      // filled circular marker with white ring
+      ctx.beginPath()
+      ctx.fillStyle = '#1e40af'
+      ctx.arc(px, py, 5, 0, Math.PI * 2)
       ctx.fill()
+      ctx.lineWidth = 2
+      ctx.strokeStyle = '#ffffff'
+      ctx.stroke()
+      ctx.restore()
     }
   })
 }
@@ -170,92 +241,217 @@ function validateTypeC(interaction) {
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
 
+
 export default function InteractionTypeC({ lesson: lessonProp }) {
   const LESSON = lessonProp || DEFAULT_LESSON
-
   const canvasRef = useRef(null)
-  const reflectionRef = useRef(null)
   const requestRef = useRef(null)
+  const [t, setT] = useState(LESSON.parameterSpec.time.start)
+  const [playing, setPlaying] = useState(false)
   const [reflection, setReflection] = useState("")
 
+  // Shrink all sizes by ~20% and make slide-friendly
+  // For best appearance, Step.jsx should use a white or transparent background for interaction slides.
+  const styles = {
+    root: {
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      fontFamily: 'system-ui',
+      background: 'transparent',
+      gap: 8
+    },
+    canvas: {
+      width: '100%',
+      maxWidth: 420,
+      aspectRatio: '7/5',
+      background: '#fff',
+      border: '1px solid #e5e7eb',
+      borderRadius: 6,
+      display: 'block',
+      marginBottom: 8,
+      height: 'auto'
+    },
+    controls: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    },
+    playBtn: {
+      width: 32,
+      height: 32,
+      border: 'none',
+      borderRadius: '50%',
+      background: '#2563eb',
+      color: '#fff',
+      fontSize: 16,
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      outline: 'none'
+    },
+    timelineBar: {
+      flex: 1,
+      height: 6,
+      background: '#e5e7eb',
+      borderRadius: 3,
+      position: 'relative',
+      cursor: 'pointer',
+      margin: '0 8px'
+    },
+    progress: {
+      height: '100%',
+      background: '#2563eb',
+      borderRadius: 3,
+      position: 'absolute',
+      left: 0,
+      top: 0
+    },
+    scrubber: {
+      position: 'absolute',
+      top: -4,
+      width: 12,
+      height: 12,
+      borderRadius: '50%',
+      background: '#2563eb',
+      border: '2px solid #fff',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+      cursor: 'pointer',
+      transform: 'translateX(-6px)'
+    },
+    tLabel: {
+      minWidth: 44,
+      textAlign: 'right',
+      color: '#555',
+      fontSize: 12
+    },
+    reflection: {
+      width: '100%',
+      minHeight: 24,
+      fontSize: 13,
+      color: '#111827',
+      textAlign: 'center',
+      marginTop: 4
+    }
+  }
+
+  // Animation loop
   useEffect(() => {
     try { validateTypeC(LESSON) } catch (e) { console.error(e); return }
-
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext("2d")
     const timeSpec = LESSON.parameterSpec.time
-
-    let currentState = { t: timeSpec.start }
+    let running = playing
+    let currentT = t
     const fullTrace = computeFullTrace(LESSON)
 
-    function resize() {
-      if (!canvas.parentElement) return
-      const rect = canvas.parentElement.getBoundingClientRect()
-      const dpr = window.devicePixelRatio || 1
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-
-      const result = recompute(LESSON, currentState)
+    function drawFrame(timeVal) {
+      const result = recompute(LESSON, { t: timeVal })
       const sysWithFull = {
         geometry: [{ type: "fullCurve", data: fullTrace }, ...result.systemState.geometry]
       }
       renderCanvas(sysWithFull, LESSON.representationSpec, ctx, canvas)
+      const message = evaluateReflections(LESSON, { t: timeVal })
+      setReflection(message || "")
     }
 
-    window.addEventListener("resize", resize)
-    resize()
-
     function step() {
-      if (currentState.t > timeSpec.end) return
-
-      const result = recompute(LESSON, currentState)
-      const message = evaluateReflections(LESSON, currentState)
-      if (message !== null) setReflection(message)
-
-      const sysWithFull = {
-        geometry: [{ type: "fullCurve", data: fullTrace }, ...result.systemState.geometry]
+      if (!running) return
+      if (currentT >= timeSpec.end) {
+        setPlaying(false)
+        return
       }
-      renderCanvas(sysWithFull, LESSON.representationSpec, ctx, canvas)
-
-      currentState = { t: currentState.t + timeSpec.step }
+      currentT += timeSpec.step
+      setT(currentT)
+      drawFrame(currentT)
       requestRef.current = requestAnimationFrame(step)
     }
 
-    requestRef.current = requestAnimationFrame(step)
-
+    drawFrame(t)
+    if (playing) {
+      running = true
+      requestRef.current = requestAnimationFrame(step)
+    }
     return () => {
-      window.removeEventListener("resize", resize)
       if (requestRef.current) cancelAnimationFrame(requestRef.current)
     }
-  }, [])
+    // eslint-disable-next-line
+  }, [playing, t])
+
+  // Timeline scrub handler
+  function handleTimelineClick(e) {
+    const bar = e.currentTarget
+    const rect = bar.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const percent = Math.max(0, Math.min(1, x / rect.width))
+    const timeSpec = LESSON.parameterSpec.time
+    const tVal = timeSpec.start + percent * (timeSpec.end - timeSpec.start)
+    setT(tVal)
+  }
+
+  // Scrubber drag
+  function handleScrubberDrag(e) {
+    if (e.type === 'mousedown' || e.type === 'touchstart') {
+      const move = evt => {
+        let clientX = evt.touches ? evt.touches[0].clientX : evt.clientX
+        const bar = document.getElementById('timeline-bar')
+        const rect = bar.getBoundingClientRect()
+        const x = clientX - rect.left
+        const percent = Math.max(0, Math.min(1, x / rect.width))
+        const timeSpec = LESSON.parameterSpec.time
+        const tVal = timeSpec.start + percent * (timeSpec.end - timeSpec.start)
+        setT(tVal)
+      }
+      const up = () => {
+        window.removeEventListener('mousemove', move)
+        window.removeEventListener('mouseup', up)
+        window.removeEventListener('touchmove', move)
+        window.removeEventListener('touchend', up)
+      }
+      window.addEventListener('mousemove', move)
+      window.addEventListener('mouseup', up)
+      window.addEventListener('touchmove', move)
+      window.addEventListener('touchend', up)
+    }
+  }
+
+  // Progress percent
+  const timeSpec = LESSON.parameterSpec.time
+  const percent = Math.max(0, Math.min(1, (t - timeSpec.start) / (timeSpec.end - timeSpec.start)))
+  const progressWidth = `${percent * 100}%`
+  const scrubberLeft = `calc(${percent * 100}% - 6px)`
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', background: '#ffffff' }}>
-      <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>
-        <div style={{
-          width: '100%', maxWidth: 1100, height: '100%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 40, padding: 20
-        }}>
-          {/* Canvas */}
-          <div style={{ flex: '0 0 600px', height: '80%' }}>
-            <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
-          </div>
-
-          {/* Reflection */}
-          <div ref={reflectionRef} style={{
-            flex: 1, maxWidth: 320,
-            fontSize: 16, lineHeight: 1.5, color: '#111827',
-            display: 'flex', alignItems: 'center'
-          }}>
-            {reflection}
-          </div>
+    <div style={styles.root}>
+      <canvas ref={canvasRef} style={styles.canvas}></canvas>
+      <div style={styles.controls}>
+        <button style={styles.playBtn} onClick={() => setPlaying(p => !p)}>
+          {playing ? (
+            <span>&#10073;&#10073;</span>
+          ) : (
+            <span>&#9654;</span>
+          )}
+        </button>
+        <div
+          id="timeline-bar"
+          style={styles.timelineBar}
+          onClick={handleTimelineClick}
+        >
+          <div style={{ ...styles.progress, width: progressWidth }} />
+          <div
+            style={{ ...styles.scrubber, left: scrubberLeft }}
+            onMouseDown={handleScrubberDrag}
+            onTouchStart={handleScrubberDrag}
+          />
         </div>
+        <span style={styles.tLabel}>t = {t.toFixed(2)}</span>
       </div>
+      <div style={styles.reflection}>{reflection}</div>
     </div>
   )
 }

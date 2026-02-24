@@ -25,10 +25,10 @@ import InteractionTypeC from './InteractionTypeC'
 import InteractionTypeE from './InteractionTypeE'
 
 const TYPE_MAP = {
-  A: InteractionTypeA,
-  B: InteractionTypeB,
-  C: InteractionTypeC,
-  E: InteractionTypeE,
+  'A': InteractionTypeA,
+  'B': InteractionTypeB,
+  'C': InteractionTypeC,
+  'E': InteractionTypeE,
 }
 
 /**
@@ -39,6 +39,7 @@ const TYPE_MAP = {
  *   lesson           optional lesson config object to override defaults
  */
 export default function InteractionSlide({ interactionType, lesson }) {
+  console.log('Rendering InteractionSlide with type', interactionType, 'and lesson config', lesson)
   const Component = TYPE_MAP[interactionType]
 
   if (!Component) {
@@ -51,7 +52,7 @@ export default function InteractionSlide({ interactionType, lesson }) {
         Unknown interaction type: <strong style={{ marginLeft: 4 }}>{interactionType}</strong>
       </div>
     )
-  }
+  } 
 
   return <Component lesson={lesson} />
 }
