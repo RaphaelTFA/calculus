@@ -1873,6 +1873,17 @@
               "order_index": 0,
               "blocks": [
                 {
+                  "id": "text-do-dich-chuyen-test",
+                  "type": "text",
+                  "content": {
+                    "heading": "Đây chỉ dùng để test interaction — sẽ bị xóa sau khi hoàn thiện.",
+                    "paragraphs": [
+                      "<b>Độ dịch chuyển</b> là thay đổi ròng vị trí: $\\Delta f = f(b) - f(a)$. Độ dịch chuyển có thể bằng 0 khi vật quay về điểm xuất phát.",
+                      "Ví dụ: $\\Delta f = f(6) - f(0) = 0 - 0 = 0$. Vật quay về vị trí ban đầu nhưng đã di chuyển thực sự."
+                    ]
+                  }
+                },
+                {
                   "id": "ia-quang-duong",
                   "type": "interaction",
                   "content": {

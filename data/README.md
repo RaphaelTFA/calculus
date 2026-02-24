@@ -73,6 +73,56 @@ data/
 
 ## 🧱 Block Types
 
+## 🔁 Interactive Blocks
+
+Hệ thống hỗ trợ các block tương tác toán học dạng `interactive` dùng các module React/JSX trong `data/interaction_data`. Tham khảo chi tiết về engine và các hợp đồng `recompute`/`render` ở [data/interaction_data/instructions.md](data/interaction_data/instructions.md).
+
+Cấu trúc block ví dụ (slides.blocks -> một block kiểu interactive):
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "interaction_type": "A|B|C|E",
+    "module": "interactive_type_a.jsx",
+    "props": { /* props dành cho component, ví dụ range, labels */ },
+    "initial_state": { /* primitive state, ví dụ { resolution: 100 } */ },
+    "instructions": "Ngắn gọn hướng dẫn cho học viên"
+  }
+}
+```
+
+Hướng dẫn theo loại:
+- **Type A — Resolution Interaction**: điều khiển mật độ mẫu. Gán `interaction_type: "A"` và `initial_state: { "resolution": <number> }`. Module mẫu: [data/interaction_data/interactive_type_a.jsx](data/interaction_data/interactive_type_a.jsx).
+- **Type B — Parameter Control**: thay đổi tham số hàm (semantic parameter). Gán `interaction_type: "B"` và `initial_state: { "parameterValue": <number> }`. Module mẫu: [data/interaction_data/interactive_type_b.jsx](data/interaction_data/interactive_type_b.jsx).
+- **Type C — Temporal Playback**: điều khiển thời gian/replay. Gán `interaction_type: "C"` và `initial_state: { "t": <number> }`. Module mẫu: [data/interaction_data/interactive_type_c.jsx](data/interaction_data/interactive_type_c.jsx).
+- **Type E — Structural Decomposition**: điều khiển tham số phân tích/partition. Gán `interaction_type: "E"` và `initial_state: { "structure": <0..1> }`. Module mẫu: [data/interaction_data/interactive_type_e.jsx](data/interaction_data/interactive_type_e.jsx).
+
+Ghi chú thực thi và thiết kế:
+- `recompute(interaction, state)` phải trả `{ newState, systemState }` và luôn là hàm thuần (xem `recompute` contract trong [data/interaction_data/instructions.md](data/interaction_data/instructions.md)).
+- `render()` chỉ dùng `systemState` và không đổi `state` hay `interaction` JSON.
+- Các `props` trong `content.props` chỉ dành cho giao diện và không được thay thế cho `primitive state` — mọi thay đổi semantic phải diễn ra qua `initial_state`/`recompute`.
+
+Ví dụ ngắn (Type B):
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "interaction_type": "B",
+    "module": "interactive_type_b.jsx",
+    "props": { "label": "Điều chỉnh a", "min": -5, "max": 5, "step": 0.1 },
+    "initial_state": { "parameterValue": 1.0 },
+    "instructions": "Kéo thanh để thay đổi tham số hàm"
+  }
+}
+```
+
+Thêm module tương tác mới:
+- Đặt file component trong `data/interaction_data/`.
+- Đảm bảo `recompute` và `render` tuân thủ hợp đồng trong [data/interaction_data/instructions.md](data/interaction_data/instructions.md).
+
+
 ### Text Block
 ```json
 {
