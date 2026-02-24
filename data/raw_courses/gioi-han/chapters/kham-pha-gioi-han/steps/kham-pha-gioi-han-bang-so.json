@@ -31,12 +31,12 @@
                                 "function": "x * x",
                                 "derivative": "2 * x",
                                 "domain": [
-                                    -2,
-                                    4
+                                    -3,
+                                    3
                                 ],
                                 "range": [
-                                    -1,
-                                    17
+                                    -0.5,
+                                    10
                                 ],
                                 "anchor": 1
                             },
@@ -48,7 +48,8 @@
                                     }
                                 ]
                             },
-                            "prompt": "Kéo thanh trượt để tăng số điểm lấy mẫu. Quan sát đường cát tuyến (xanh) tiến gần đường tiếp tuyến (đỏ). Sai số có giảm về 0?"
+                            "prompt": "Kéo thanh trượt để tăng số điểm lấy mẫu. Quan sát đường cát tuyến (xanh) tiến gần đường tiếp tuyến (đỏ). Sai số có giảm về 0?",
+                            "sliderLabel": "Độ chính xác"
                         }
                     }
                 }

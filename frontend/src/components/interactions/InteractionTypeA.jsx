@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -44,9 +44,9 @@ function recompute(interaction, state) {
     graph.push({ x, y: f(x) })
   }
 
-  const h = (domain[1] - domain[0]) / resolution
+  const h = 1 / resolution
   const y0 = f(anchor)
-  // Forward difference — converges visibly (central diff is exact for quadratics)
+  // Forward difference — converges as h→0
   const approxSlope = (f(anchor + h) - y0) / h
   const trueSlope = df(anchor)
   const error = Math.abs(approxSlope - trueSlope)
@@ -65,9 +65,26 @@ function recompute(interaction, state) {
 
 function renderCanvas(systemState, interaction, ctx, canvas) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  const { domain, range } = interaction.systemSpec
+  const { domain: rawDomain, range: rawRange } = interaction.systemSpec
   const w = canvas.clientWidth
   const h = canvas.clientHeight
+
+  // ── Dynamic camera padding ──────────────────────────────────────────
+  const padX = (rawDomain[1] - rawDomain[0]) * 0.15
+  const padY = (rawRange[1] - rawRange[0]) * 0.20
+  const domain = [rawDomain[0] - padX, rawDomain[1] + padX]
+  const range = [rawRange[0] - padY, rawRange[1] + padY]
+
+  // ── Anchor-centered bias: shift viewport so anchor sits near center ─
+  const anchorX = systemState.anchor
+  const anchorY = systemState.y0
+  const domainMid = (domain[0] + domain[1]) / 2
+  const rangeMid = (range[0] + range[1]) / 2
+  // Bias 40% toward anchor (subtle, avoids jarring jump)
+  const biasX = (anchorX - domainMid) * 0.4
+  const biasY = (anchorY - rangeMid) * 0.4
+  domain[0] += biasX; domain[1] += biasX
+  range[0] += biasY; range[1] += biasY
 
   const mapX = x => (x - domain[0]) / (domain[1] - domain[0]) * w
   const mapY = y => h - (y - range[0]) / (range[1] - range[0]) * h
@@ -104,16 +121,12 @@ function renderCanvas(systemState, interaction, ctx, canvas) {
 
   // Tangent line — red, extended across full canvas
   const trueSlope = systemState.trueSlope
-  const anchorX = systemState.anchor
-  const anchorY = systemState.y0
   ctx.strokeStyle = '#ef4444'
   ctx.lineWidth = 1.5
   ctx.setLineDash([6, 4])
   ctx.beginPath()
-  const tx1 = domain[0]
-  const tx2 = domain[1]
-  ctx.moveTo(mapX(tx1), mapY(anchorY + trueSlope * (tx1 - anchorX)))
-  ctx.lineTo(mapX(tx2), mapY(anchorY + trueSlope * (tx2 - anchorX)))
+  ctx.moveTo(mapX(domain[0]), mapY(anchorY + trueSlope * (domain[0] - anchorX)))
+  ctx.lineTo(mapX(domain[1]), mapY(anchorY + trueSlope * (domain[1] - anchorX)))
   ctx.stroke()
   ctx.setLineDash([])
 
@@ -123,10 +136,8 @@ function renderCanvas(systemState, interaction, ctx, canvas) {
   ctx.strokeStyle = '#3b82f6'
   ctx.lineWidth = 2
   ctx.beginPath()
-  const sx1 = domain[0]
-  const sx2 = domain[1]
-  ctx.moveTo(mapX(sx1), mapY(p1.y + secSlope * (sx1 - p1.x)))
-  ctx.lineTo(mapX(sx2), mapY(p1.y + secSlope * (sx2 - p1.x)))
+  ctx.moveTo(mapX(domain[0]), mapY(p1.y + secSlope * (domain[0] - p1.x)))
+  ctx.lineTo(mapX(domain[1]), mapY(p1.y + secSlope * (domain[1] - p1.x)))
   ctx.stroke()
 
   // Sample points on the secant — blue dots
@@ -206,23 +217,33 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   }, [resolution, interaction])
 
   const pendingResolutionRef = useRef(LESSON.parameterSpec.resolutionLevels[0])
+  const containerRef = useRef(null)
 
-  // Canvas rendering
-  useEffect(() => {
+  // Draw helper — always reads current canvas CSS size, sets buffer to match
+  const draw = useCallback((result, inter) => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext("2d")
-
+    const ctx = canvas.getContext('2d')
     const dpr = window.devicePixelRatio || 1
     const rect = canvas.getBoundingClientRect()
-    if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    }
-
-    renderCanvas(computationResult.systemState, interaction, ctx, canvas)
+    if (!rect.width || !rect.height) return
+    canvas.width = rect.width * dpr
+    canvas.height = rect.height * dpr
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    renderCanvas((result || computationResult).systemState, inter || interaction, ctx, canvas)
   }, [computationResult, interaction])
+
+  // Re-draw when data changes
+  useEffect(() => { draw() }, [draw])
+
+  // Re-draw when container is resized (fixes zoom/stretch after first paint)
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const ro = new ResizeObserver(() => { draw() })
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [draw])
 
   const reflection = evaluateReflection(interaction, state)
   const sys = computationResult.systemState
@@ -252,14 +273,17 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
 
       {/* Main content: canvas (left) + info panel (right) */}
       <div style={{
-        flex: 1, display: 'flex', gap: 12, padding: 12,
+        flex: 1, display: 'flex', gap: 8, padding: '6px 8px',
         minHeight: 0, overflow: 'hidden'
       }}>
         {/* Canvas area */}
-        <div style={{
-          flex: '1 1 0%', minWidth: 0,
-          display: 'flex', flexDirection: 'column', gap: 0
-        }}>
+        <div
+          ref={containerRef}
+          style={{
+            flex: '1 1 0%', minWidth: 0,
+            display: 'flex', flexDirection: 'column', gap: 0
+          }}
+        >
           <canvas
             ref={canvasRef}
             style={{
@@ -294,8 +318,8 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
 
         {/* Right info panel */}
         <div style={{
-          flex: '0 0 240px', display: 'flex', flexDirection: 'column',
-          gap: 10, overflow: 'hidden', justifyContent: 'center'
+          flex: '0 0 200px', display: 'flex', flexDirection: 'column',
+          gap: 8, overflow: 'hidden', justifyContent: 'center'
         }}>
           {/* Live readout */}
           <div style={{
@@ -344,7 +368,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
               alignItems: 'center', marginBottom: 6
             }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>
-                Số điểm lấy mẫu
+                {LESSON.sliderLabel || 'Số điểm vẽ đồ thị'}
               </span>
               <span style={{
                 fontFamily: 'monospace', fontSize: 13,

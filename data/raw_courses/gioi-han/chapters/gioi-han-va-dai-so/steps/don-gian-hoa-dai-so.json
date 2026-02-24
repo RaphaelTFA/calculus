@@ -31,11 +31,11 @@
                                 "function": "x * x",
                                 "derivative": "2 * x",
                                 "domain": [
-                                    0,
+                                    -2,
                                     5
                                 ],
                                 "range": [
-                                    -1,
+                                    -0.5,
                                     26
                                 ],
                                 "anchor": 2
@@ -48,7 +48,8 @@
                                     }
                                 ]
                             },
-                            "prompt": "Tăng số điểm lấy mẫu. Δf/Δx tiến về giá trị nào khi khoảng thu nhỏ quanh x = 2?"
+                            "prompt": "Tăng số điểm lấy mẫu. Δf/Δx tiến về giá trị nào khi khoảng thu nhỏ quanh x = 2?",
+                            "sliderLabel": "Độ chính xác"
                         }
                     }
                 }

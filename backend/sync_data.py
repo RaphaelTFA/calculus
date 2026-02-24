@@ -32,6 +32,16 @@ async def sync_data():
         await conn.run_sync(Base.metadata.create_all)
     
     async with async_session() as session:
+        # 0. Clean all existing course data so deleted folders are removed from DB
+        from sqlalchemy import text
+        logger.debug("🧹 Cleaning existing course data...")
+        await session.execute(text("DELETE FROM slides"))
+        await session.execute(text("DELETE FROM steps"))
+        await session.execute(text("DELETE FROM chapters"))
+        await session.execute(text("DELETE FROM stories"))
+        await session.commit()
+        logger.debug("  ✅ Old data cleared")
+
         # 1. Sync categories
         logger.debug("📁 Syncing categories...")
         categories_file = DATA_DIR / "categories.json"
@@ -40,7 +50,6 @@ async def sync_data():
                 categories_data = json.load(f)
             
             for cat in categories_data.get("categories", []):
-                from sqlalchemy import text
                 existing = await session.execute(
                     text("SELECT id FROM categories WHERE slug = :slug"),
                     {"slug": cat["slug"]}
@@ -56,9 +65,9 @@ async def sync_data():
         
         await session.commit()
         
-        # 2. Sync courses
+        # 2. Sync courses from raw_courses folder
         logger.debug("\n📚 Syncing courses...")
-        courses_dir = DATA_DIR / "courses"
+        courses_dir = DATA_DIR / "raw_courses"
         if courses_dir.exists():
             # Handle folder-based courses
             for course_folder in courses_dir.iterdir():
