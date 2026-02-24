@@ -1,0 +1,378 @@
+{
+    "id": "tinh-lien-tuc",
+    "title": "Tính Liên Tục",
+    "description": "Liên tục = giới hạn và giá trị hàm đồng ý — không lỗ, không nhảy, không bất ngờ.",
+    "xp_reward": 15,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-lien-tuc",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Giá trị f(2)"
+                            },
+                            "parameter": {
+                                "min": 0,
+                                "max": 8,
+                                "initial": 6
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": -0.5,
+                                    "xMax": 4.5,
+                                    "yMin": -1,
+                                    "yMax": 18
+                                },
+                                "model": "(abs(x - 2) < 0.12) ? p : (x * x)"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "continuous",
+                                    "trigger": "state.currentValue > 3.8 && state.currentValue < 4.2",
+                                    "text": "f(2) = 4 = lim f(x). Điểm nằm trên đường cong → hàm liên tục tại x = 2!"
+                                },
+                                {
+                                    "id": "discontinuous",
+                                    "trigger": "state.currentValue > 5.5",
+                                    "text": "f(2) ≠ lim f(x) = 4. Điểm rời khỏi đường cong → bất liên tục tháo được."
+                                },
+                                {
+                                    "id": "low",
+                                    "trigger": "state.currentValue < 2",
+                                    "text": "f(2) quá thấp so với đường cong. Giới hạn vẫn là 4 — chỉ f(2) thay đổi."
+                                }
+                            ],
+                            "prompt": "Kéo f(2) lên xuống. Khi nào hàm trở nên liên tục tại x = 2?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-ba-dieu-kien",
+                    "type": "text",
+                    "content": {
+                        "heading": "Ba điều kiện liên tục",
+                        "paragraphs": [
+                            "$f$ liên tục tại $x = a$ khi và chỉ khi: (1) $f(a)$ xác định, (2) $\\lim_{x \\to a} f(x)$ tồn tại, (3) $\\lim_{x \\to a} f(x) = f(a)$. Bỏ bất kỳ điều kiện nào → mất liên tục."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-loai-bat-lien-tuc",
+                    "type": "text",
+                    "content": {
+                        "heading": "Các loại bất liên tục",
+                        "paragraphs": [
+                            "<b>Tháo được</b>: giới hạn tồn tại nhưng $f(a)$ sai hoặc thiếu — sửa bằng cách đặt $f(a) = L$. <b>Nhảy</b>: giới hạn một phía bất đồng — không sửa được. <b>Vô cực</b>: $f(x) \\to \\pm\\infty$ — không sửa được."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l8-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại vị trí nào của f(2), hàm trở nên liên tục tại $x = 2$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$y = 0$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$y = 2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$y = 4$ (trên đường cong)"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$y = 6$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\lim_{x \\to 2} x^2 = 4$. Khi $f(2) = 4$, điều kiện (3) thỏa mãn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l8-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi $f(2)$ rời khỏi đường cong, điều kiện nào bị vi phạm?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f(2)$ không xác định"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\lim_{x \\to 2} f(x)$ không tồn tại"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\lim_{x \\to 2} f(x) = f(2)$ — chúng bất đồng"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Cả ba"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Giới hạn vẫn = 4, $f(2)$ vẫn xác định — nhưng chúng không bằng nhau."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l8-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = x^3$ liên tục tại $x = 1$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — lập phương có góc"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — $f(1) = 1$ và $\\lim_{x \\to 1} x^3 = 1$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chỉ từ bên trái"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Thế trực tiếp: $1^3 = 1 = \\lim$. Ba điều kiện đều thỏa mãn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l8-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = (x^2-1)/(x-1)$. $f$ liên tục tại $x = 1$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — $f(1)$ không xác định (điều kiện 1)"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — giới hạn không tồn tại"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tùy miền xác định"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f(1) = 0/0$ → không xác định. Điều kiện (1) thất bại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l8-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Định nghĩa $g(x) = (x^2-1)/(x-1)$ khi $x \\neq 1$ và $g(1) = 2$. $g$ liên tục tại 1?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — $g(1)$ nên bằng 0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — $g(1) = 2$ và $\\lim_{x \\to 1} g(x) = 2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — hàm ban đầu không xác định"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ từ bên phải"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\lim = 2 = g(1)$. Cả ba điều kiện thỏa → liên tục."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l8-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Bất liên tục tháo được có thể 'sửa' vì:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Giới hạn tồn tại — chỉ cần đặt $f(a) = L$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Giới hạn không bao giờ tồn tại"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Kéo dãn đồ thị"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ đa thức có bất liên tục tháo được"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Giới hạn đã tồn tại. Đặt $f(a) = \\lim$ → liên tục."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l8-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Bất liên tục nhảy có thể sửa bằng cách đặt lại $f(a)$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — chọn giới hạn trái"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — chọn trung bình"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — giới hạn một phía bất đồng, không có giá trị nào khiến $\\lim = f(a)$ từ cả hai phía"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ với hàm từng khúc"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Nhảy = hai phía bất đồng. Không thể chọn một giá trị thỏa cả hai."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l8-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nhiệt kế chính xác trừ 12:00 đọc 0°C (thực = 22°C). Hàm nhiệt liên tục tại 12:00?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — nhiệt luôn liên tục"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — giá trị đọc (0°C) ≠ giới hạn (22°C)"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chỉ nếu bỏ qua lỗi"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Giá trị tại điểm (0°C) ≠ giới hạn (22°C). Điều kiện (3) thất bại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l8-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Mọi đa thức liên tục khắp nơi vì:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không có phân số"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Thế trực tiếp luôn hoạt động: $\\lim_{x \\to a} p(x) = p(a)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đồ thị trơn"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ một mảnh"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Đa thức → thế trực tiếp luôn cho $\\lim = f(a)$. Ba điều kiện tự động thỏa."
+                    }
+                }
+            ]
+        }
+    ]
+}

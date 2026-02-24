@@ -1,0 +1,383 @@
+{
+    "id": "don-gian-hoa-dai-so",
+    "title": "Đơn Giản Hóa Đại Số",
+    "description": "Dạng 0/0 không phải câu trả lời — đó là tín hiệu để phân tích và rút gọn.",
+    "xp_reward": 15,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-rut-gon",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "A",
+                        "lesson": {
+                            "interactionType": "A",
+                            "parameterSpec": {
+                                "resolutionLevels": [
+                                    1,
+                                    2,
+                                    4,
+                                    8,
+                                    16,
+                                    32,
+                                    64,
+                                    100
+                                ]
+                            },
+                            "systemSpec": {
+                                "function": "x * x",
+                                "derivative": "2 * x",
+                                "domain": [
+                                    0,
+                                    5
+                                ],
+                                "range": [
+                                    -1,
+                                    26
+                                ],
+                                "anchor": 2
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "condition": "state.resolution >= 50",
+                                        "message": "Δf/Δx → 4 khi khoảng thu nhỏ. Thế trực tiếp cho (x²−4)/(x−2) tại x=2 cũng cho 0/0, nhưng rút gọn cho x+2 = 4."
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-tin-hieu",
+                    "type": "text",
+                    "content": {
+                        "heading": "Dạng 0/0 — tín hiệu, không phải câu trả lời",
+                        "paragraphs": [
+                            "Khi thế trực tiếp cho $0/0$, giới hạn là <b>bất định</b> — có thể là bất kỳ giá trị nào. Đây không phải câu trả lời mà là tín hiệu cần xử lý đại số."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-phan-tich",
+                    "type": "text",
+                    "content": {
+                        "heading": "Phân tích, rút gọn, thế",
+                        "paragraphs": [
+                            "$\\frac{x^2 - 4}{x - 2} = \\frac{(x-2)(x+2)}{x-2} = x + 2$ với $x \\neq 2$. Giờ $\\lim_{x \\to 2}(x+2) = 4$.",
+                            "Phép rút gọn loại bỏ nghiệm chung. Hợp lệ vì giới hạn xét lân cận $x = 2$, không phải tại $x = 2$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-rut-gon",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = \\lim_{x \\to 2}(x + 2) = 4"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l5-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Thế $x = 2$ vào $(x^2 - 4)/(x - 2)$ cho:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "4"
+                            },
+                            {
+                                "value": "b",
+                                "label": "0"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$0/0$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "2"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Tử = $4 - 4 = 0$, mẫu = $2 - 2 = 0$. Dạng bất định $0/0$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l5-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Phân tích $x^2 - 4$:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$(x-4)(x+1)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$(x-2)(x+2)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$x(x-4)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$(x-2)^2$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Hiệu hai bình phương: $x^2 - 4 = (x-2)(x+2)$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l5-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "2"
+                            },
+                            {
+                                "value": "c",
+                                "label": "4"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Rút gọn: $(x+2)$. Tại $x \\to 2$: $2 + 2 = 4$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l5-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "3"
+                            },
+                            {
+                                "value": "c",
+                                "label": "6"
+                            },
+                            {
+                                "value": "d",
+                                "label": "9"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$x^2 - 9 = (x-3)(x+3)$. Rút gọn: $x+3$. Tại $x = 3$: $3 + 3 = 6$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l5-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to -1} \\frac{x^2 - 1}{x + 1} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-1$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$x^2 - 1 = (x-1)(x+1)$. Rút gọn: $x - 1$. Tại $x = -1$: $-1 - 1 = -2$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l5-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Sau khi rút gọn $(x-2)$, ta được $x+2$. Tại sao $\\lim_{x \\to 2}(x+2)$ hợp lệ dù $f(2)$ ban đầu không xác định?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì ta đã đổi hàm"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì giới hạn chỉ xét lân cận $x = 2$ — hai hàm đồng nhất trừ tại $x = 2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì $x + 2$ luôn xác định"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không hợp lệ"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Giới hạn không xét tại $a$, chỉ gần $a$. Hai hàm bằng nhau gần $a$ → giới hạn giống nhau."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l5-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 0} \\frac{x^3 - x}{x} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-1$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "1"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\frac{x(x^2 - 1)}{x} = x^2 - 1$. Tại $x = 0$: $0 - 1 = -1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l5-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi thế trực tiếp cho $0/0$, bước tiếp theo là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Kết luận giới hạn bằng 0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Kết luận giới hạn không tồn tại"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Phân tích và rút gọn thừa số chung"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Dùng máy tính"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$0/0$ = bất định. Phải phân tích thừa số và rút gọn trước khi thế lại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l5-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$0/0$ có phải là một số không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có, bằng 0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có, bằng 1"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — đó là dạng bất định, tín hiệu cần xử lý thêm"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không — nó nghĩa là giới hạn không tồn tại"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$0/0$ không có giá trị xác định. Nó chỉ ra rằng phải dùng công cụ đại số."
+                    }
+                }
+            ]
+        }
+    ]
+}

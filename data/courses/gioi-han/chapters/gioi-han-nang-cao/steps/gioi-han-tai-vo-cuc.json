@@ -1,0 +1,385 @@
+{
+    "id": "gioi-han-tai-vo-cuc",
+    "title": "Giới Hạn Tại Vô Cực",
+    "description": "Hàm có thể ổn định ngay cả khi đầu vào tăng không giới hạn — tiệm cận ngang.",
+    "xp_reward": 15,
+    "order_index": 2,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-vo-cuc",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Tỉ lệ phóng"
+                            },
+                            "parameter": {
+                                "min": 1,
+                                "max": 100,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 300,
+                                "view": {
+                                    "xMin": -0.5,
+                                    "xMax": 10,
+                                    "yMin": -0.5,
+                                    "yMax": 4
+                                },
+                                "model": "(2 * p * x + 1) / (p * x + 3)"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "changing",
+                                    "trigger": "state.currentValue < 5",
+                                    "text": "Hàm vẫn đang thay đổi — chưa ổn định."
+                                },
+                                {
+                                    "id": "flattening",
+                                    "trigger": "state.currentValue > 15 && state.currentValue < 50",
+                                    "text": "Đồ thị đang phẳng dần → tiến về y = 2. Tiệm cận ngang xuất hiện."
+                                },
+                                {
+                                    "id": "flat",
+                                    "trigger": "state.currentValue > 70",
+                                    "text": "Gần như phẳng tại y = 2. Dù tử và mẫu đều → ∞, tỉ lệ → 2/1 = 2."
+                                }
+                            ],
+                            "prompt": "Phóng to trục x. Hàm (2x+1)/(x+3) tiến về giá trị nào?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-vo-cuc",
+                    "type": "text",
+                    "content": {
+                        "heading": "Giới hạn tại vô cực",
+                        "paragraphs": [
+                            "$\\lim_{x \\to \\infty} f(x) = L$ nghĩa là: khi $x$ tăng không giới hạn, $f(x)$ ổn định gần $L$. Ta gọi $y = L$ là <b>tiệm cận ngang</b>."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-so-hang-chu-dao",
+                    "type": "text",
+                    "content": {
+                        "heading": "Phân tích số hạng chủ đạo",
+                        "paragraphs": [
+                            "Với $\\frac{2x+1}{x+3}$: chia tử và mẫu cho $x$ → $\\frac{2 + 1/x}{1 + 3/x}$. Khi $x \\to \\infty$: $1/x \\to 0$, $3/x \\to 0$, nên tỉ lệ → $2/1 = 2$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-vo-cuc",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\lim_{x \\to \\infty} \\frac{2x + 1}{x + 3} = \\frac{2}{1} = 2"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l9-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi phóng to, $f(x)$ tiến về giá trị nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "1"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$\\infty$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Đồ thị phẳng dần tại $y = 2$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l9-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to \\infty} 1/x = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "1"
+                            },
+                            {
+                                "value": "b",
+                                "label": "0"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\infty$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$1/x$ giảm dần về 0 khi $x$ tăng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l9-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to \\infty} \\frac{3x^2 + 1}{x^2 - 2} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "1"
+                            },
+                            {
+                                "value": "b",
+                                "label": "3"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-1$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "0"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Cùng bậc 2. Tỉ lệ hệ số chủ đạo: $3/1 = 3$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l9-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to \\infty} \\frac{x + 1}{x^2 + 1} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "1"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\infty$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Bậc tử (1) < bậc mẫu (2) → tỉ lệ → 0."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l9-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to \\infty} \\frac{x^2 + 3}{2x + 1} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$1/2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\infty$ (tử tăng nhanh hơn)"
+                            },
+                            {
+                                "value": "d",
+                                "label": "3"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Bậc tử (2) > bậc mẫu (1) → tử thắng → $\\infty$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l9-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi bậc tử = bậc mẫu, giới hạn tại $\\infty$ là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Luôn 1"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tỉ lệ hệ số chủ đạo"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Chia cho $x^n$ → còn lại tỉ lệ hệ số bậc cao nhất."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l9-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tiệm cận ngang $y = L$ nghĩa là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f$ không bao giờ đạt $L$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f(x) \\to L$ khi $x \\to \\infty$ hoặc $x \\to -\\infty$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f(L) = 0$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đồ thị nằm ngang khắp nơi"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tiệm cận ngang = hành vi dài hạn, không phải tính chất cục bộ."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l9-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to -\\infty} \\frac{2x + 1}{x + 3} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$-2$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "2"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Chia cho $x$: $(2 + 1/x)/(1 + 3/x) \\to 2/1 = 2$. Giống $+\\infty$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l9-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Chi phí trung bình mỗi đơn vị = $(1000 + 2x)/x$. Khi $x \\to \\infty$, chi phí → ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$1000"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$2"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$\\infty$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$(1000 + 2x)/x = 1000/x + 2 \\to 0 + 2 = 2$."
+                    }
+                }
+            ]
+        }
+    ]
+}

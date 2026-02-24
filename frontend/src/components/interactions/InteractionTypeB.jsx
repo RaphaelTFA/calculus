@@ -149,7 +149,8 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
     })
 
     if (newCards.length > 0) {
-      setCards(prev => [...newCards.reverse(), ...prev])
+      // Show only the latest triggered card, replacing any previous one
+      setCards([{ ...newCards[newCards.length - 1], visible: false }])
     }
   }, [currentValue])
 

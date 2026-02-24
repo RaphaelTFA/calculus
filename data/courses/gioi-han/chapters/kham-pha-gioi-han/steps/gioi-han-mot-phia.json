@@ -1,0 +1,379 @@
+{
+    "id": "gioi-han-mot-phia",
+    "title": "Giới Hạn Một Phía",
+    "description": "Giới hạn trái và phải có thể khác nhau — giới hạn hai phía tồn tại khi chúng bằng nhau.",
+    "xp_reward": 10,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-mot-phia",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Độ lệch bên phải"
+                            },
+                            "parameter": {
+                                "min": -2,
+                                "max": 3,
+                                "initial": 0
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": 0,
+                                    "xMax": 4,
+                                    "yMin": 0,
+                                    "yMax": 8
+                                },
+                                "model": "(x < 2) ? (2 * x + 1) : (x * x + p)"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "jump",
+                                    "trigger": "state.currentValue > -0.5 && state.currentValue < 0.5",
+                                    "text": "Bên trái → 5, bên phải → 4. Hai giới hạn một phía khác nhau → giới hạn hai phía không tồn tại."
+                                },
+                                {
+                                    "id": "match",
+                                    "trigger": "state.currentValue > 0.8 && state.currentValue < 1.2",
+                                    "text": "Bên trái → 5, bên phải → 5. Hai phía đồng ý → giới hạn hai phía tồn tại và bằng 5."
+                                },
+                                {
+                                    "id": "big-gap",
+                                    "trigger": "state.currentValue < -1",
+                                    "text": "Khoảng nhảy lớn — hai phía hoàn toàn bất đồng."
+                                }
+                            ],
+                            "prompt": "Kéo thanh trượt để thay đổi độ lệch nhánh phải. Khi nào hai nhánh 'gặp nhau' tại x = 2?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-ky-hieu-mot-phia",
+                    "type": "text",
+                    "content": {
+                        "heading": "Ký hiệu giới hạn một phía",
+                        "paragraphs": [
+                            "Khi hai hướng tiếp cận cho giá trị khác nhau, ta dùng: $\\lim_{x \\to a^-} f(x)$ (giới hạn trái) và $\\lim_{x \\to a^+} f(x)$ (giới hạn phải). Dấu $-$ hoặc $+$ chỉ hướng tiếp cận.",
+                            "Ví dụ: $\\lim_{x \\to 2^-} f(x) = 5$ (từ bên trái) và $\\lim_{x \\to 2^+} f(x) = 4$ (từ bên phải) khi $p = 0$."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-dieu-kien-ton-tai",
+                    "type": "text",
+                    "content": {
+                        "heading": "Điều kiện tồn tại",
+                        "paragraphs": [
+                            "$\\lim_{x \\to a} f(x)$ tồn tại khi và chỉ khi $\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x)$. Khi hai phía bất đồng, giới hạn hai phía <b>không tồn tại</b>."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l2-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $p = 0$, $f(x)$ tiến về giá trị nào khi $x \\to 2$ từ bên trái?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "4"
+                            },
+                            {
+                                "value": "b",
+                                "label": "5"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2"
+                            },
+                            {
+                                "value": "d",
+                                "label": "3"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Nhánh trái: $2x + 1$. Tại $x \\to 2^-$: $2(2) + 1 = 5$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l2-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $p = 0$, $f(x)$ tiến về giá trị nào khi $x \\to 2$ từ bên phải?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "4"
+                            },
+                            {
+                                "value": "b",
+                                "label": "5"
+                            },
+                            {
+                                "value": "c",
+                                "label": "2"
+                            },
+                            {
+                                "value": "d",
+                                "label": "3"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Nhánh phải: $x^2 + p = x^2$. Tại $x \\to 2^+$: $4 + 0 = 4$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l2-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $p = 0$, $\\lim_{x \\to 2} f(x)$ có tồn tại không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có, bằng 5"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có, bằng 4"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có, bằng 4.5"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không — giới hạn một phía khác nhau"
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "$\\lim_{x \\to 2^-} = 5 \\neq 4 = \\lim_{x \\to 2^+}$. Bất đồng → giới hạn không tồn tại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l2-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$g(x) = |x|/x$. $\\lim_{x \\to 0^-} g(x) = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "1"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-1$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Với $x < 0$: $|x|/x = -x/x = -1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l2-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Cùng $g(x) = |x|/x$. $\\lim_{x \\to 0^+} g(x) = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "1"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-1$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Với $x > 0$: $|x|/x = x/x = 1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l2-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to a} f(x) = L$ đòi hỏi:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f(a) = L$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\lim_{x \\to a^-} f(x) = L$ và $\\lim_{x \\to a^+} f(x) = L$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f$ xác định tại $a$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f$ dương gần $a$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Giới hạn hai phía tồn tại ⟺ cả hai giới hạn một phía tồn tại và bằng nhau."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l2-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$h(x) = x + 3$ cho mọi $x$ (kể cả $x = 1$). Giới hạn một phía tại $x = 1$ có đồng ý không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — hàm từng khúc luôn bất đồng"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — cả hai phía tiến về 4"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Trái = 3, Phải = 4"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định được"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Hàm liên tục $h(x) = x+3$ cho giới hạn trái = phải = $1 + 3 = 4$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l2-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nhiệt độ cửa: 18°C phía trong, 5°C phía ngoài. $\\lim_{x \\to \\text{cửa}} T(x)$ tồn tại?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có, bằng 18"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có, bằng 5"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có, bằng 11.5"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không — giới hạn một phía khác nhau"
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "Giới hạn trái (trong) = 18°C ≠ 5°C = giới hạn phải (ngoài). Bất đồng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l2-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x) = 7$ nhưng $f(a) = 3$. $\\lim_{x \\to a} f(x) = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "3"
+                            },
+                            {
+                                "value": "b",
+                                "label": "7"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không tồn tại"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$(7+3)/2 = 5$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Hai phía đồng ý ở 7 → giới hạn = 7. Giá trị $f(a) = 3$ không liên quan đến giới hạn."
+                    }
+                }
+            ]
+        }
+    ]
+}

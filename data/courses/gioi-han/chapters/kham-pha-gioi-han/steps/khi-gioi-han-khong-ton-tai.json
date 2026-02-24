@@ -1,0 +1,364 @@
+{
+    "id": "khi-gioi-han-khong-ton-tai",
+    "title": "Khi Giới Hạn Không Tồn Tại",
+    "description": "Ba cách giới hạn thất bại: nhảy, không bị chặn, và dao động.",
+    "xp_reward": 10,
+    "order_index": 2,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-dao-dong",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "C",
+                        "lesson": {
+                            "interactionType": "C",
+                            "parameterSpec": {
+                                "time": {
+                                    "start": 0,
+                                    "end": 9,
+                                    "step": 0.01
+                                }
+                            },
+                            "systemSpec": {
+                                "initialState": {
+                                    "x": 1,
+                                    "y": 0.84
+                                },
+                                "evolutionRule": {
+                                    "type": "expression",
+                                    "expression": "[-0.1, 50 * (sin(1 / (abs(x) + 0.01)) - y)]",
+                                    "variables": [
+                                        "t",
+                                        "x",
+                                        "y"
+                                    ]
+                                }
+                            },
+                            "representationSpec": {
+                                "encoding": "positionTime",
+                                "viewBox": {
+                                    "xMin": 0,
+                                    "xMax": 1.2,
+                                    "yMin": -1.5,
+                                    "yMax": 1.5
+                                },
+                                "xLabel": "x",
+                                "yLabel": "f(x) = sin(1/x)"
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "type": "timeReached",
+                                        "value": 7.5,
+                                        "message": "Dao động vĩnh viễn giữa −1 và 1. Không có giá trị giới hạn nào — giới hạn không tồn tại."
+                                    },
+                                    {
+                                        "type": "timeReached",
+                                        "value": 5.0,
+                                        "message": "Dao động ngày càng dữ dội — f(x) không ổn định khi x tiến về 0."
+                                    },
+                                    {
+                                        "type": "timeReached",
+                                        "value": 2.0,
+                                        "message": "Quan sát: khi x giảm dần, sin(1/x) bắt đầu lắc nhanh hơn."
+                                    }
+                                ]
+                            },
+                            "prompt": "Quan sát sin(1/x) khi x tiến về 0. Giá trị có ổn định không?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-ba-cach-that-bai",
+                    "type": "text",
+                    "content": {
+                        "heading": "Ba cách giới hạn thất bại",
+                        "paragraphs": [
+                            "$\\lim_{x \\to a} f(x)$ không tồn tại khi: (1) Giới hạn một phía bất đồng (<b>nhảy</b>). (2) $f(x) \\to \\pm\\infty$ (<b>không bị chặn</b>). (3) $f(x)$ dao động không ngừng (<b>dao động</b>).",
+                            "Tương tác vừa minh họa trường hợp (3): $\\sin(1/x)$ dao động vô hạn khi $x \\to 0$."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-dao-dong",
+                    "type": "text",
+                    "content": {
+                        "heading": "Dao động ngăn cản hội tụ",
+                        "paragraphs": [
+                            "Với $f(x) = \\sin(1/x)$: khi $x \\to 0^+$, đối số $1/x \\to \\infty$ khiến $\\sin$ xoay vòng vô hạn. Không có giá trị $L$ nào thỏa mãn điều kiện hội tụ."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l3-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong hoạt hình, $f(x) = \\sin(1/x)$ có tiến về một giá trị khi $x \\to 0$ không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có, tiến về 0"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có, tiến về 1"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — dao động giữa −1 và 1 không ngừng"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tiến về $\\infty$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$\\sin(1/x)$ lắc vĩnh viễn giữa $-1$ và $1$ — không ổn định."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l3-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = 1/(x - 3)$. Chuyện gì xảy ra khi $x \\to 3$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f(x) \\to 0$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f(x) \\to 3$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f(x) \\to +\\infty$ từ phải, $-\\infty$ từ trái"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f(x) \\to 1$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Mẫu tiến về 0 → hàm phát tán. Dấu khác nhau từ mỗi phía."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l3-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trường hợp thất bại nào áp dụng cho $f(x) = 1/(x-3)$ tại $x = 3$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nhảy"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không bị chặn"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Dao động"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giới hạn tồn tại"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f(x) \\to \\pm\\infty$ — không bị chặn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l3-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = \\begin{cases} 1 & x < 0 \\\\ -1 & x \\geq 0 \\end{cases}$ tại $x = 0$: loại thất bại nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nhảy"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không bị chặn"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Dao động"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giới hạn tồn tại"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Giới hạn trái = 1 ≠ −1 = giới hạn phải. Đây là bất liên tục nhảy."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l3-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$g(x) = x \\cdot \\sin(1/x)$. Khi $x \\to 0$, giới hạn có tồn tại?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — $\\sin(1/x)$ vẫn dao động"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — thừa số $x$ thu nhỏ dao động về 0"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Bằng 1"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không bị chặn"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$|x \\cdot \\sin(1/x)| \\leq |x| \\to 0$. Thừa số $x$ kẹp dao động."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l3-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Đúng hay Sai: Nếu $f(a)$ không xác định thì $\\lim_{x \\to a} f(x)$ không tồn tại.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đúng — không có giá trị thì không có giới hạn"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Sai — L1 cho thấy $(x^2-1)/(x-1)$ có giới hạn tại $x = 1$ dù không xác định"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đúng chỉ với dao động"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tùy miền xác định"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Giới hạn xét hành vi lân cận, không cần $f(a)$ tồn tại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l3-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Giá cổ phiếu dao động giữa $90 và $110 mỗi mili-giây khi thị trường đóng cửa. Giới hạn giá khi $t \\to$ đóng cửa?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có, bằng $100"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có, bằng $110"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — dao động ngăn cản hội tụ"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Bằng giá đóng cửa"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Giá lắc liên tục không ổn định → giới hạn không tồn tại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l3-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Để giới hạn tồn tại, $f(x)$ phải ______ khi $x \\to a$:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Xác định tại $a$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tiến về một giá trị duy nhất từ cả hai phía"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Dương"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Liên tục"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Hội tụ = tiến về một giá trị duy nhất từ mọi hướng."
+                    }
+                }
+            ]
+        }
+    ]
+}

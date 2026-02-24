@@ -1,0 +1,385 @@
+{
+    "id": "cac-quy-tac-gioi-han",
+    "title": "Các Quy Tắc Giới Hạn",
+    "description": "Giới hạn của tổng = tổng các giới hạn — phép tính và giới hạn giao hoán.",
+    "xp_reward": 15,
+    "order_index": 2,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-quy-tac",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Hệ số g(x)"
+                            },
+                            "parameter": {
+                                "min": -2,
+                                "max": 3,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": -2,
+                                    "xMax": 4,
+                                    "yMin": -6,
+                                    "yMax": 12
+                                },
+                                "model": "(x + 1) + p * x"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "sum-law",
+                                    "trigger": "state.currentValue > 0.8 && state.currentValue < 1.2",
+                                    "text": "lim f = 3, lim g = 2. lim(f+g) = 5 = 3 + 2. Quy tắc tổng hoạt động!"
+                                },
+                                {
+                                    "id": "negative",
+                                    "trigger": "state.currentValue < -1",
+                                    "text": "p âm → g(x) dốc xuống. Nhưng lim(f+g) vẫn = lim f + lim g."
+                                },
+                                {
+                                    "id": "large",
+                                    "trigger": "state.currentValue > 2.5",
+                                    "text": "p lớn → g(x) dốc lên mạnh. lim(f+g) = 3 + 2p — luôn đúng quy tắc."
+                                }
+                            ],
+                            "prompt": "Thay đổi hệ số p. Kiểm tra: lim(f+g) có luôn bằng lim f + lim g?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-tong-tich",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quy tắc tổng và tích",
+                        "paragraphs": [
+                            "Nếu $\\lim_{x \\to a} f(x) = L$ và $\\lim_{x \\to a} g(x) = M$ thì: $\\lim[f+g] = L + M$, $\\lim[f \\cdot g] = L \\cdot M$, $\\lim[c \\cdot f] = c \\cdot L$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-tong",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\lim_{x \\to a}[f(x) + g(x)] = \\lim_{x \\to a} f(x) + \\lim_{x \\to a} g(x)"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-thuong",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quy tắc thương và điều kiện",
+                        "paragraphs": [
+                            "$\\lim[f/g] = L/M$ khi $M \\neq 0$. Khi $M = 0$, quy tắc thương thất bại — đây chính là tình huống $0/0$ từ Bài 5 cần xử lý riêng."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l6-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $p = 1$: $\\lim_{x \\to 2} g(x) = 2$, $\\lim_{x \\to 2} f(x) = 3$. $\\lim_{x \\to 2}[f+g] = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "3"
+                            },
+                            {
+                                "value": "b",
+                                "label": "5"
+                            },
+                            {
+                                "value": "c",
+                                "label": "4"
+                            },
+                            {
+                                "value": "d",
+                                "label": "6"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Quy tắc tổng: $3 + 2 = 5$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l6-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 1}(x^2 + 3x) = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "3"
+                            },
+                            {
+                                "value": "b",
+                                "label": "4"
+                            },
+                            {
+                                "value": "c",
+                                "label": "1"
+                            },
+                            {
+                                "value": "d",
+                                "label": "0"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\lim x^2 + \\lim 3x = 1 + 3 = 4$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l6-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 3}[(x+1)(x-2)] = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "4"
+                            },
+                            {
+                                "value": "b",
+                                "label": "3"
+                            },
+                            {
+                                "value": "c",
+                                "label": "12"
+                            },
+                            {
+                                "value": "d",
+                                "label": "1"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Quy tắc tích: $\\lim(x+1) \\cdot \\lim(x-2) = 4 \\cdot 1 = 4$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l6-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 4} \\frac{2x+1}{x-1} = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "3"
+                            },
+                            {
+                                "value": "b",
+                                "label": "9"
+                            },
+                            {
+                                "value": "c",
+                                "label": "1"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không tồn tại"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Quy tắc thương: $\\frac{9}{3} = 3$. Mẫu $\\neq 0$ nên hợp lệ."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l6-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Quy tắc nào thất bại khi giới hạn mẫu bằng 0?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tổng"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tích"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Thương"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Hằng số nhân"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Quy tắc thương yêu cầu $M \\neq 0$. Khi $M = 0$ → dạng bất định."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l6-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 2}[5 \\cdot f(x)]$ với $\\lim f = 3$:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "8"
+                            },
+                            {
+                                "value": "b",
+                                "label": "15"
+                            },
+                            {
+                                "value": "c",
+                                "label": "5"
+                            },
+                            {
+                                "value": "d",
+                                "label": "3"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Quy tắc hằng số nhân: $5 \\cdot 3 = 15$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l6-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$\\lim_{x \\to 0} \\frac{x^2 + x}{x}$. Có thể dùng quy tắc thương trực tiếp?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — áp dụng quy tắc thương"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — giới hạn mẫu = 0, phải rút gọn trước"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Giới hạn không tồn tại"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Bằng $0/0$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\lim x = 0$ → mẫu = 0. Phải rút gọn: $\\frac{x(x+1)}{x} = x + 1 \\to 1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l6-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Chi phí = vật liệu + nhân công. $\\lim$ vật liệu = $50, $\\lim$ nhân công = $30. $\\lim$ chi phí = ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$80"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$50"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$30"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Quy tắc tổng: $50 + 30 = 80$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l6-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Các quy tắc giới hạn hoạt động vì:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Mọi hàm đều là đa thức"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Phép tính số học bảo toàn hội tụ khi các giới hạn riêng tồn tại"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Giới hạn luôn tồn tại"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f$ và $g$ phải bằng nhau"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Khi mỗi giới hạn tồn tại, phép cộng/nhân/chia bảo toàn sự hội tụ."
+                    }
+                }
+            ]
+        }
+    ]
+}

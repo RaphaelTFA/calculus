@@ -1,0 +1,386 @@
+{
+    "id": "dinh-nghia-epsilon-delta",
+    "title": "Định Nghĩa ε–δ",
+    "description": "ε–δ không tính giới hạn — nó chứng nhận giới hạn: với mọi dung sai đầu ra, tồn tại dung sai đầu vào tương ứng.",
+    "xp_reward": 20,
+    "order_index": 3,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-epsilon-delta",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Bán kính δ"
+                            },
+                            "parameter": {
+                                "min": 0.01,
+                                "max": 2,
+                                "initial": 1.5
+                            },
+                            "system": {
+                                "resolution": 200,
+                                "view": {
+                                    "xMin": -1,
+                                    "xMax": 3,
+                                    "yMin": 0,
+                                    "yMax": 7
+                                },
+                                "model": "(abs(x - 1) < p) ? (2 * x + 1) : 3"
+                            },
+                            "reflections": [
+                                {
+                                    "id": "wide",
+                                    "trigger": "state.currentValue > 1.2",
+                                    "text": "Vùng δ rộng — f(x) dao động nhiều quanh L = 3. Dung sai ε lớn."
+                                },
+                                {
+                                    "id": "medium",
+                                    "trigger": "state.currentValue > 0.3 && state.currentValue < 0.8",
+                                    "text": "Vùng δ thu hẹp — f(x) gần L = 3 hơn. |f(x) - 3| < ε với ε nhỏ hơn."
+                                },
+                                {
+                                    "id": "tight",
+                                    "trigger": "state.currentValue < 0.15",
+                                    "text": "δ rất nhỏ → |f(x) - 3| rất nhỏ. Với MỌI ε > 0, tồn tại δ. Giới hạn được chứng nhận!"
+                                }
+                            ],
+                            "prompt": "Thu nhỏ δ. Vùng đường cong hiện ra có gần L = 3 hơn không?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "text-dinh-nghia",
+                    "type": "text",
+                    "content": {
+                        "heading": "Định nghĩa chính thức",
+                        "paragraphs": [
+                            "$\\lim_{x \\to a} f(x) = L$ nghĩa là: với mọi $\\varepsilon > 0$, tồn tại $\\delta > 0$ sao cho $0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon$.",
+                            "Đây không phải phương pháp tính. Đây là <b>chứng nhận</b> rằng $L$ thực sự là giới hạn."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-ed",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\forall \\varepsilon > 0,\\ \\exists \\delta > 0:\\ 0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "text-doc-dinh-nghia",
+                    "type": "text",
+                    "content": {
+                        "heading": "Đọc định nghĩa",
+                        "paragraphs": [
+                            "\"Với mọi ε\" = dù dung sai đầu ra nghiêm ngặt đến đâu. \"Tồn tại δ\" = luôn tìm được dung sai đầu vào phù hợp. Điều kiện $0 < |x - a|$ loại trừ chính $x = a$ — giới hạn không quan tâm tại điểm."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-l10-1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi thu nhỏ δ, δ phù hợp có luôn tồn tại không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — dưới $\\varepsilon = 0.1$ thì thất bại"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — $\\delta = \\varepsilon/2$ luôn hoạt động"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chỉ với ε nguyên"
+                            },
+                            {
+                                "value": "d",
+                                "label": "δ cố định tại 1"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Với $f(x) = 2x+1$: $|f(x) - 3| = 2|x-1|$. Chọn $\\delta = \\varepsilon/2$ luôn đủ."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-l10-2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong ε–δ, ai chọn ε?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hàm số"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Đối thủ / thử thách — ε được cho trước"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nhà toán học chọn cả hai"
+                            },
+                            {
+                                "value": "d",
+                                "label": "ε luôn = 0.01"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "ε là thử thách: 'Tôi muốn $f(x)$ nằm trong ε quanh $L$.' Ta phải đáp lại bằng δ."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-l10-3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Ai đáp lại bằng δ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đối thủ"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Chứng minh — δ là phản hồi cho thấy giới hạn đúng"
+                            },
+                            {
+                                "value": "c",
+                                "label": "δ ngẫu nhiên"
+                            },
+                            {
+                                "value": "d",
+                                "label": "δ = ε luôn"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "δ là phản hồi: 'Nếu $x$ nằm trong δ quanh $a$, thì $f(x)$ nằm trong ε quanh $L$.'"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-l10-4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = 2x+1$, $a = 1$, $L = 3$. Nếu $\\varepsilon = 0.1$, tìm $\\delta$:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$\\delta = 0.1$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\delta = 0.05$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\delta = 0.2$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$\\delta = 1$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$|2x+1-3| = 2|x-1| < 0.1 \\Rightarrow |x-1| < 0.05$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-l10-5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Cùng hàm. $\\varepsilon = 0.5 \\Rightarrow \\delta = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0.5"
+                            },
+                            {
+                                "value": "b",
+                                "label": "1"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0.25"
+                            },
+                            {
+                                "value": "d",
+                                "label": "0.1"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$2|x-1| < 0.5 \\Rightarrow |x-1| < 0.25$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-l10-6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Điều kiện $0 < |x - a|$ (không chỉ $|x-a| < \\delta$) có mặt vì:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$x = a$ sẽ khiến $\\delta = 0$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Giới hạn loại trừ $x = a$ — chỉ xét lân cận"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chia cho 0"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$x = a$ nằm ngoài miền"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Giới hạn xét hành vi gần $a$, không phải tại $a$. Bỏ $x = a$ ra khỏi xem xét."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-l10-7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu không tìm được $\\delta$ cho một $\\varepsilon > 0$ nào đó:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Giới hạn bằng giá trị khác"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Giới hạn không bằng $L$ — chứng nhận ε–δ thất bại"
+                            },
+                            {
+                                "value": "c",
+                                "label": "ε quá nhỏ"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Cần hàm tốt hơn"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Chỉ CẦN MỘT ε thất bại để phủ nhận. ε–δ yêu cầu MỌI ε."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-l10-8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = 3x$, $a = 2$, $L = 6$, $\\varepsilon = 0.3$. $\\delta = $?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "0.3"
+                            },
+                            {
+                                "value": "b",
+                                "label": "0.1"
+                            },
+                            {
+                                "value": "c",
+                                "label": "0.9"
+                            },
+                            {
+                                "value": "d",
+                                "label": "0.01"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$|3x - 6| = 3|x-2| < 0.3 \\Rightarrow |x-2| < 0.1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-l10-9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Thợ máy cần bu-lông sai số $\\varepsilon = 0.01$ mm. ε–δ nói:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không thể"
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nếu máy đủ chính xác (δ nhỏ), dung sai ε luôn đạt được"
+                            },
+                            {
+                                "value": "c",
+                                "label": "Bu-lông lớn dễ hơn"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ máy hoàn hảo"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Điều chỉnh đầu vào (δ) đủ nhỏ → đầu ra nằm trong dung sai (ε). Chính xác như ε–δ."
+                    }
+                }
+            ]
+        }
+    ]
+}
