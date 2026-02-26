@@ -105,6 +105,11 @@ class StepCompleteRequest(BaseModel):
     score: int = 100
     time_spent_seconds: int = 0
 
+
+class SlideCompleteRequest(BaseModel):
+    xp: int = 0
+    time_spent_seconds: int = 0
+
 # Achievements
 class AchievementResponse(BaseModel):
     id: int

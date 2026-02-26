@@ -125,6 +125,18 @@ class StepProgress(Base):
     step = relationship("Step", back_populates="progress")
 
 
+class SlideProgress(Base):
+    __tablename__ = "slide_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    slide_id = Column(Integer, ForeignKey("slides.id"), nullable=False)
+    xp_earned = Column(Integer, default=0)
+    completed_at = Column(DateTime)
+
+    # relationships kept minimal to avoid circular imports
+
+
 class Achievement(Base):
     __tablename__ = "achievements"
     

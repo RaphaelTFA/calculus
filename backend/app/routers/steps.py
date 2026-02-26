@@ -4,8 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from datetime import datetime, date, timedelta
 from app.database import get_db
-from app.models import Step, Slide, StepProgress, Chapter, Story, User, Enrollment
-from app.schemas import StepDetailResponse, SlideResponse, StepCompleteRequest
+from app.models import Step, Slide, StepProgress, Chapter, Story, User, Enrollment, SlideProgress
+from app.schemas import StepDetailResponse, SlideResponse, StepCompleteRequest, SlideCompleteRequest
 from app.auth import get_current_user
 
 router = APIRouter(prefix="/steps", tags=["steps"])
@@ -151,4 +151,71 @@ async def complete_step(
         "xp_earned": xp_earned,
         "total_xp": current_user.xp,
         "streak": streak_info
+    }
+
+
+@router.post("/{step_id}/slides/{slide_id}/complete")
+async def complete_slide(
+    step_id: int,
+    slide_id: int,
+    data: SlideCompleteRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Verify step and slide
+    result = await db.execute(
+        select(Step)
+        .options(selectinload(Step.chapter).selectinload(Chapter.story))
+        .where(Step.id == step_id)
+    )
+    step = result.scalar_one_or_none()
+    if not step:
+        raise HTTPException(status_code=404, detail="Step not found")
+
+    slide_res = await db.execute(select(Slide).where(Slide.id == slide_id, Slide.step_id == step_id))
+    slide = slide_res.scalar_one_or_none()
+    if not slide:
+        raise HTTPException(status_code=404, detail="Slide not found")
+
+    # Require enrollment
+    enroll_res = await db.execute(
+        select(Enrollment).where(
+            Enrollment.user_id == current_user.id,
+            Enrollment.story_id == step.chapter.story_id
+        )
+    )
+    if enroll_res.scalar_one_or_none() is None:
+        raise HTTPException(status_code=403, detail="You must enroll in the course to study this lesson")
+
+    # Check if already completed
+    sp_res = await db.execute(
+        select(SlideProgress).where(
+            SlideProgress.user_id == current_user.id,
+            SlideProgress.slide_id == slide_id
+        )
+    )
+    sp = sp_res.scalar_one_or_none()
+
+    xp_earned = 0
+    if sp is None:
+        sp = SlideProgress(
+            user_id=current_user.id,
+            slide_id=slide_id,
+            xp_earned=data.xp,
+            completed_at=datetime.utcnow()
+        )
+        db.add(sp)
+        xp_earned = data.xp or 0
+        current_user.xp += xp_earned
+        # update streak as activity
+        streak_info = update_streak(current_user)
+        await db.commit()
+    else:
+        # already completed — idempotent
+        xp_earned = 0
+
+    return {
+        "success": True,
+        "xp_earned": xp_earned,
+        "total_xp": current_user.xp
     }

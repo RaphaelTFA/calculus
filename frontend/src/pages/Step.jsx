@@ -32,6 +32,7 @@ export default function Step() {
 
   // Slide navigation
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
+  const [completedSlideIds, setCompletedSlideIds] = useState([])
 
   // Quiz state: per-block
   const [quizAnswers, setQuizAnswers] = useState({})
@@ -93,9 +94,35 @@ export default function Step() {
   const [showExplanation, setShowExplanation] = useState(false)
   const [currentExplanation, setCurrentExplanation] = useState('')
 
-  const goNext = useCallback(() => {
-    if (currentSlideIndex < slides.length - 1) setCurrentSlideIndex(i => i + 1)
-  }, [currentSlideIndex, slides.length])
+  const awardSlideXp = useCallback(async (slideId, xp) => {
+    if (!slideId || !xp) return
+    if (completedSlideIds.includes(slideId)) return
+    try {
+      const res = await api.post(`/steps/${id}/slides/${slideId}/complete`, { xp })
+      if (res) {
+        setCompletedSlideIds(prev => [...prev, slideId])
+        setTotalXpEarned(prev => prev + (res.xp_earned || 0))
+        if (res) updateUserStats(res)
+        await fetchUser()
+      }
+    } catch (e) {
+      console.error('Error awarding slide xp', e)
+    }
+  }, [id, completedSlideIds, updateUserStats, fetchUser])
+
+  const goNext = useCallback(async () => {
+    if (currentSlideIndex < slides.length - 1) {
+      try {
+        const blocks = currentSlide?.blocks || []
+        const quizBlocks = blocks.filter(b => (b.type || b.block_type) === 'quiz')
+        const xp = quizBlocks.reduce((sum, b) => sum + (quizResults[b.id]?.xp || 0), 0)
+        await awardSlideXp(currentSlide?.id, xp)
+      } catch (e) {
+        console.error('Error computing slide xp on next', e)
+      }
+      setCurrentSlideIndex(i => i + 1)
+    }
+  }, [currentSlideIndex, slides.length, awardSlideXp, currentSlide, quizResults])
 
   // Is the current slide an interaction slide? (true when at least one block is interaction)
   const isInteractionSlide = useMemo(() => {
@@ -128,7 +155,6 @@ export default function Step() {
     const xp = isCorrect ? 15 : 0
     setQuizSubmitted(prev => ({ ...prev, [blockId]: true }))
     setQuizResults(prev => ({ ...prev, [blockId]: { correct: isCorrect, xp, explanation } }))
-    if (isCorrect) setTotalXpEarned(prev => prev + xp)
   }
 
   const handleQuizRetry = (blockId) => {
@@ -220,7 +246,17 @@ export default function Step() {
     }
     // Continue / Complete (works for both correct and incorrect)
     if (isLastSlide) {
-      handleComplete()
+      ;(async () => {
+        try {
+          const blocks = currentSlide?.blocks || []
+          const quizBlocks = blocks.filter(b => (b.type || b.block_type) === 'quiz')
+          const xp = quizBlocks.reduce((sum, b) => sum + (quizResults[b.id]?.xp || 0), 0)
+          await awardSlideXp(currentSlide?.id, xp)
+        } catch (e) {
+          console.error('Error computing slide xp on complete', e)
+        }
+        handleComplete()
+      })()
     } else {
       goNext()
     }
