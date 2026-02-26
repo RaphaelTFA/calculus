@@ -1,0 +1,406 @@
+{
+    "id": "quy-tac-tich",
+    "title": "Quy tắc tích",
+    "description": "Đạo hàm của tích hai hàm là tổng hai đóng góp chéo: $f'g + fg'$, không phải $f'g'$.",
+    "xp_reward": 15,
+    "order_index": 5,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l6-struct",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "E",
+                        "lesson": {
+                            "interactionType": "E",
+                            "parameterSpec": {
+                                "structure": {
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01,
+                                    "initial": 0.5,
+                                    "label": "Phân chia đóng góp"
+                                }
+                            },
+                            "systemSpec": {
+                                "baseValues": {},
+                                "conservedObject": {
+                                    "type": "expression",
+                                    "expression": "4 * 3",
+                                    "variables": []
+                                }
+                            },
+                            "representationSpec": {
+                                "mode": "geometricSplit",
+                                "geometryBase": {
+                                    "type": "rectangle",
+                                    "width": 4,
+                                    "height": 3
+                                },
+                                "splitSpec": {
+                                    "type": "rectangleContribution"
+                                },
+                                "viewBox": {
+                                    "xMin": 0,
+                                    "xMax": 5,
+                                    "yMin": 0,
+                                    "yMax": 4
+                                }
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "type": "structureNear",
+                                        "value": 0.5,
+                                        "tolerance": 0.05,
+                                        "message": "Hai đóng góp cân bằng nhau — nhưng tổng thay đổi diện tích vẫn yêu cầu cả hai. Không thể bỏ một phần nào."
+                                    },
+                                    {
+                                        "type": "structureBelow",
+                                        "value": 0.1,
+                                        "message": "Một số hạng gần như chiếm toàn bộ — nhưng số hạng kia vẫn khác không. Chỉ khi một hàm là hằng số, đóng góp của nó mới triệt tiêu."
+                                    },
+                                    {
+                                        "type": "structureAbove",
+                                        "value": 0.9,
+                                        "message": "Đổi vai: số hạng $fg'$ chiếm ưu thế. Cả hai số hạng trong quy tắc tích đều cần thiết."
+                                    }
+                                ]
+                            },
+                            "prompt": "Khi bạn thay đổi cách chia, tổng diện tích thay đổi không? Mỗi phần đóng góp bao nhiêu vào tổng thay đổi?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l6-rule",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quy tắc tích: phát biểu và ý tưởng dẫn chứng",
+                        "paragraphs": [
+                            "Hình chữ nhật cho thấy hai đóng góp chéo. Khi cả hai đều vô cùng nhỏ, chúng kết hợp thành đúng công thức sau.",
+                            "**Quy tắc tích:** Nếu $f$ và $g$ khả vi: $(f \\cdot g)'(x) = f'(x) \\cdot g(x) + f(x) \\cdot g'(x)$. Số hạng chéo $\\Delta f \\cdot \\Delta g$ triệt tiêu khi $h \\to 0$, chỉ còn hai số hạng."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l6-rule",
+                    "type": "math",
+                    "content": {
+                        "latex": "(f \\cdot g)'(x) = f'(x) \\cdot g(x) + f(x) \\cdot g'(x)"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l6-error",
+                    "type": "text",
+                    "content": {
+                        "heading": "Áp dụng và lỗi sai thường gặp",
+                        "paragraphs": [
+                            "Ví dụ: $h(x) = x^2 \\sin(x)$. Quy tắc tích cho $h'(x) = 2x \\sin(x) + x^2 \\cos(x)$. (Đạo hàm của $\\sin$ sẽ được chứng minh ở bài 9 — tạm thời dùng làm ví dụ.)",
+                            "**Lỗi sai phổ biến:** $(f \\cdot g)' \\neq f' \\cdot g'$. Kiểm chứng: $\\frac{d}{dx}[x^2 \\cdot x^3] = \\frac{d}{dx} x^5 = 5x^4$, nhưng $f'g' = 2x \\cdot 3x^2 = 6x^3 \\neq 5x^4$."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong tương tác, khi bạn di chuyển thanh phân chia, tổng diện tích của hình chữ nhật không đổi. Điều này hàm ý gì về quy tắc tích?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Đạo hàm của tích bằng $0$ vì tổng được bảo toàn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tốc độ thay đổi diện tích chia thành hai đóng góp đồng thời — cả hai đều khác không về nguyên tắc."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chỉ một trong hai hàm đóng góp vào đạo hàm."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Quy tắc tích chỉ áp dụng khi tổng diện tích không đổi."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tổng được bảo toàn không có nghĩa là tốc độ thay đổi bằng $0$. Bức tranh phân chia cho thấy hai đóng góp cộng lại tạo nên đạo hàm của tích."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính $(f \\cdot g)'$ với $f(x) = x^3$ và $g(x) = x^2$. Kiểm chứng bằng quy tắc lũy thừa.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$5x^4$ — cả hai phương pháp đồng thuận."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$6x^4$ — chỉ từ quy tắc tích."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$3x^2 \\cdot 2x = 6x^3$ — chỉ từ quy tắc tích."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$5x^3$."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$\\frac{d}{dx} x^5 = 5x^4$. Quy tắc tích: $3x^2 \\cdot x^2 + x^3 \\cdot 2x = 3x^4 + 2x^4 = 5x^4$. Hai phương pháp cho kết quả nhất quán."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao $(f \\cdot g)' \\neq f' \\cdot g'$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì phép nhân không có tính kết hợp."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì cả hai nhân tử có thể thay đổi đồng thời — đạo hàm của tích ghi nhận cả hai đóng góp chéo, không chỉ tích các tốc độ riêng lẻ."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì $f'$ và $g'$ luôn bằng $0$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì quy tắc tích chỉ áp dụng cho đa thức."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tốc độ thay đổi của $f \\cdot g$ liên quan đến cả $f$ thay đổi khi $g$ cố định ($f'g$) và $g$ thay đổi khi $f$ cố định ($fg'$). Hai số hạng này cộng lại, không nhân."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $h(x) = (x^2 + 1)(x^3 - 2)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$2x \\cdot 3x^2 = 6x^3$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$5x^4 - 4x + 3x^2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$2x(x^3 - 2) + (x^2+1)(3x^2) = 5x^4 + 3x^2 - 4x$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$5x^4 - 4x$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$h'(x) = 2x(x^3 - 2) + (x^2+1)(3x^2) = 2x^4 - 4x + 3x^4 + 3x^2 = 5x^4 + 3x^2 - 4x$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu $g(x) = c$ (hằng số) trong quy tắc tích $(f \\cdot g)' = f'g + fg'$, quy tắc rút gọn thành:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f'g + f \\cdot 0 = cf'$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f' \\cdot g' = 0$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f'g$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$fg'$."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$g' = 0$ với hằng số, nên $(f \\cdot c)' = f'c + f \\cdot 0 = cf'$ — quy tắc hằng số nhân của bài trước được phục hồi."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$h(x) = x \\cdot x^4$. Tính $h'(x)$ bằng quy tắc tích, rồi kiểm chứng bằng quy tắc lũy thừa.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$5x^4$ — cả hai đồng thuận."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$4x^3 + x^4 = x^3(4 + x)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$x^4 + 4x^4 = 5x^4$ — quy tắc tích; $5x^4$ — quy tắc lũy thừa. ✓"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$4x^4$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$1 \\cdot x^4 + x \\cdot 4x^3 = x^4 + 4x^4 = 5x^4$. Trực tiếp: $\\frac{d}{dx} x^5 = 5x^4$. Hai phương pháp nhất quán."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Biết $f(2) = 3$, $f'(2) = 1$, $g(2) = 5$, $g'(2) = -2$. Tính $(fg)'(2)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$-5$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-7$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-1$"
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "$(fg)'(2) = f'(2)g(2) + f(2)g'(2) = 1 \\cdot 5 + 3 \\cdot (-2) = 5 - 6 = -1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Doanh thu $R(q) = p(q) \\cdot q$ (giá nhân số lượng). Doanh thu biên $R'(q)$ bằng:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$p'(q)$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$p'(q) \\cdot q + p(q)$ — từ quy tắc tích."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$p(q) \\cdot q'(q) = p(q)$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$p'(q) \\cdot 1 = p'(q)$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$R'(q) = p'(q) \\cdot q + p(q) \\cdot 1$. Quy tắc tích cho doanh thu biên = biến động giá × số lượng + giá hiện tại × tốc độ thay đổi số lượng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l6-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Học sinh tính $(x^2 \\cdot x^3)' = 2x \\cdot 3x^2 = 6x^3$. Chỉ ra lỗi sai và đáp án đúng.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Sai: $f'g'$ bỏ qua các số hạng chéo. Đúng: $(x^2 \\cdot x^3)' = (x^5)' = 5x^4$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Sai: số mũ phải trừ đi. Đúng: $x^{2-3} = x^{-1}$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đúng: $6x^3$ là đáp án."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Sai: học sinh phải cộng, không nhân: $2x + 3x^2$."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$(f \\cdot g)' \\neq f'g'$. Quy tắc tích đúng cho $5x^4$, xác nhận trực tiếp bởi quy tắc lũy thừa: $\\frac{d}{dx} x^5 = 5x^4$."
+                    }
+                }
+            ]
+        }
+    ]
+}

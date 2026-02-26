@@ -1,0 +1,397 @@
+{
+    "id": "tinh-lom-dao-ham-bac-hai",
+    "title": "Tính lõm và đạo hàm bậc hai",
+    "description": "Dấu của $f''$ xác định tính lõm — một thuộc tính của hình dạng đường cong, không phụ thuộc vào vị trí thẳng đứng.",
+    "xp_reward": 15,
+    "order_index": 10,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l11-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Dịch đứng $p$"
+                            },
+                            "parameter": {
+                                "min": -5,
+                                "max": 5,
+                                "initial": 0
+                            },
+                            "system": {
+                                "resolution": 300,
+                                "view": {
+                                    "xMin": -3,
+                                    "xMax": 3,
+                                    "yMin": -10,
+                                    "yMax": 15
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "pow(x, 4) - 6*x*x + p",
+                                        "color": "#3498db",
+                                        "label": "f(x)",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "12*x*x - 12",
+                                        "color": "#e74c3c",
+                                        "label": "f″(x) = 12x² − 12",
+                                        "style": "dashed",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "zero",
+                                    "trigger": "state.currentValue > -0.5 && state.currentValue < 0.5",
+                                    "text": "$f''$ tại $x = 0$: âm. Đường xanh lõm xuống quanh $x = 0$."
+                                },
+                                {
+                                    "id": "shifting",
+                                    "trigger": "state.currentValue > 2 || state.currentValue < -2",
+                                    "text": "$f''$ không thay đổi. Tính lõm là thuộc tính của hình dạng, không phải vị trí thẳng đứng."
+                                }
+                            ],
+                            "prompt": "Kéo $p$ để dịch đường xanh lên xuống. Đường đỏ $f''$ có thay đổi không? Khi $f'' > 0$ (đường đỏ trên trục $x$), đường xanh cong theo hướng nào?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l11-concavity",
+                    "type": "text",
+                    "content": {
+                        "heading": "Tính lõm và đạo hàm bậc hai",
+                        "paragraphs": [
+                            "**$f''(x) > 0$** trên khoảng $I$: $f$ **lõm lên** trên $I$ — đường cong cong kiểu bát nhỏ, tiếp tuyến nằm dưới đường cong. **$f''(x) < 0$**: $f$ **lõm xuống** — tiếp tuyến nằm trên đường cong.",
+                            "**Điểm uốn:** Điểm mà $f''$ đổi dấu — đường cong chuyển giữa lõm lên và lõm xuống. Với $f(x) = x^4 - 6x^2$: $f''(x) = 12(x-1)(x+1)$. Điểm uốn tại $x = \\pm 1$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l11-def",
+                    "type": "math",
+                    "content": {
+                        "latex": "f''(x) > 0 \\Rightarrow \\text{lõm lên} \\qquad f''(x) < 0 \\Rightarrow \\text{lõm xuống}"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l11-sdt",
+                    "type": "text",
+                    "content": {
+                        "heading": "Kiểm tra đạo hàm bậc hai cho cực trị",
+                        "paragraphs": [
+                            "**Kiểm tra đạo hàm bậc hai:** Nếu $f'(a) = 0$ và $f''(a) > 0$: cực tiểu cục bộ (đường cong lõm lên tại đó). Nếu $f''(a) < 0$: cực đại cục bộ. Nếu $f''(a) = 0$: không kết luận được — dùng kiểm tra đạo hàm bậc nhất.",
+                            "Ví dụ: $f(x) = x^3 - 3x$. Điểm tới hạn $x = \\pm 1$. $f''(x) = 6x$. $f''(1) = 6 > 0$: cực tiểu. $f''(-1) = -6 < 0$: cực đại."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi bạn kéo $p$ trong tương tác, đường đỏ $f''$ không thay đổi. Điều này hàm ý gì về tính lõm?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tính lõm phụ thuộc vào vị trí thẳng đứng của hàm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tính lõm là thuộc tính của hình dạng đường cong, không phụ thuộc vào dịch đứng."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f''$ luôn là hàm hằng."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Điểm uốn dịch chuyển khi $p$ thay đổi."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Dịch đứng ($+p$) cộng hằng số vào $f$ nhưng không ảnh hưởng $f'$ hay $f''$. Tính lõm là thuộc tính nội tại của hình dạng, không phải vị trí."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tìm điểm uốn của $f(x) = x^3 - 3x$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$x = \\pm 1$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$x = 0$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$x = 1$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$x = -1$ và $x = 0$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f''(x) = 6x = 0$ tại $x = 0$. Kiểm tra đổi dấu: $f'' < 0$ khi $x < 0$, $f'' > 0$ khi $x > 0$ — dấu đổi, xác nhận điểm uốn tại $x = 0$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Ý nghĩa hình học của $f''(a) > 0$ là gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hàm đang tăng tại $a$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tiếp tuyến tại $a$ nằm dưới đường cong trong lân cận của $a$ — lõm lên, đường cong cong theo hướng bát nhỏ."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Hàm đạt cực đại tại $a$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đạo hàm bậc hai là độ dốc tại $a$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Lõm lên nghĩa là đường cong dạng bát — tiếp tuyến nằm dưới và ước lượng thấp $f$ trong lân cận điểm tiếp xúc."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = x^4 - 6x^2$. Tìm $f''(x)$ và xác định khoảng lõm lên.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f''(x) = 12x^2 - 12$; lõm lên trên $(-\\infty,-1) \\cup (1,\\infty)$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f''(x) = 4x^3 - 12x$; lõm lên trên $(0,\\infty)$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f''(x) = 12x^2 - 12$; lõm lên trên $(-1,1)$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f''(x) = 12x - 12$; lõm lên trên $(1,\\infty)$."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f'(x) = 4x^3 - 12x$; $f''(x) = 12x^2 - 12 = 12(x^2-1) > 0$ khi $|x| > 1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu $f(x) = x^3 - 3x^2 + p$ với $p$ thay đổi, điểm uốn thay đổi thế nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó dịch chuyển cùng $p$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó cố định tại $x = 1$ bất kể $p$ — vì $f''$ không phụ thuộc $p$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó biến mất với $p$ lớn."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó dịch đến $x = p$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f''(x) = 6x - 6 = 0$ tại $x = 1$, độc lập với $p$. Dịch đứng bảo toàn cấu trúc tính lõm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Dùng kiểm tra đạo hàm bậc hai để phân loại điểm tới hạn của $f(x) = x^4 - 4x^3$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Cực đại tại $x = 0$, cực tiểu tại $x = 3$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Cực tiểu tại $x = 0$, cực đại tại $x = 3$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Cực tiểu tại $x = 3$; $x = 0$ không kết luận được."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Cả hai đều là điểm uốn."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$f'(x) = 4x^2(x-3)$. Điểm tới hạn: $x = 0$ và $x = 3$. $f''(x) = 12x^2 - 24x$. $f''(3) = 36 > 0$ → cực tiểu. $f''(0) = 0$ → không kết luận được từ kiểm tra bậc hai."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hàm có thể có điểm uốn mà không có điểm tới hạn gần đó không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không — điểm uốn và điểm tới hạn luôn trùng nhau."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có — $f(x) = x^3 + x$ có điểm uốn tại $x = 0$ với $f'(0) = 1 \\neq 0$ — hai khái niệm độc lập."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Không — $f''(a) = 0$ kéo theo $f'(a) = 0$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Có, nhưng chỉ với hàm lượng giác."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Điểm uốn đòi hỏi $f''$ đổi dấu, không phải $f'$ bằng $0$. Hai điều kiện độc lập nhau về mặt logic."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Doanh thu $R(q)$ lõm lên với $q < 50$ và lõm xuống với $q > 50$. Điều này nói gì về doanh thu biên $R'(q)$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$R'$ không đổi."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$R'$ tăng với $q < 50$ (doanh thu biên tăng) và giảm với $q > 50$ (thu nhập giảm dần)."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$R'(50) = 0$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$R'$ âm với $q > 50$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Lõm lên → $R'' > 0$ → $R'$ tăng (mỗi đơn vị thêm đóng góp nhiều hơn đơn vị trước). Lõm xuống → $R'' < 0$ → $R'$ giảm (thu nhập giảm dần)."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l11-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f''(a) = 0$ — $a$ có nhất thiết là điểm uốn không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — mỗi khi $f'' = 0$, hàm đổi tính lõm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — $f''(a) = 0$ là điều kiện cần nhưng chưa đủ; dấu $f''$ phải thực sự đổi tại $a$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có — trừ khi $f'(a) \\neq 0$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không — $f''(a) = 0$ nghĩa là $a$ là điểm tới hạn."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f(x) = x^4$: $f''(0) = 0$ nhưng $f''(x) = 12x^2 \\geq 0$ luôn luôn — không đổi dấu — $x = 0$ không phải điểm uốn."
+                    }
+                }
+            ]
+        }
+    ]
+}

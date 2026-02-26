@@ -1,0 +1,409 @@
+{
+    "id": "quy-tac-luy-thua",
+    "title": "Quy tắc lũy thừa",
+    "description": "Đạo hàm của $x^n$ tuân theo quy tắc lũy thừa: nhân hệ số $n$ và giảm số mũ đi một.",
+    "xp_reward": 10,
+    "order_index": 4,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l5-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Số mũ $n$"
+                            },
+                            "parameter": {
+                                "min": 1,
+                                "max": 4,
+                                "initial": 2
+                            },
+                            "system": {
+                                "resolution": 300,
+                                "view": {
+                                    "xMin": -2,
+                                    "xMax": 2,
+                                    "yMin": -5,
+                                    "yMax": 10
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "pow(x, p)",
+                                        "color": "#3498db",
+                                        "label": "f(x) = xⁿ",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "p * pow(x, p - 1)",
+                                        "color": "#e74c3c",
+                                        "label": "f′(x) = nxⁿ⁻¹",
+                                        "style": "dashed",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "n1",
+                                    "trigger": "state.currentValue < 1.1",
+                                    "text": "$n = 1$: đường xanh là đường thẳng $x$, đường đỏ nằm ngang tại $y = 1$ — đạo hàm của $x$ là hằng số $1$."
+                                },
+                                {
+                                    "id": "n3",
+                                    "trigger": "state.currentValue > 2.9 && state.currentValue < 3.1",
+                                    "text": "$n = 3$: đường đỏ là $3x^2$ — bạn đã tính kết quả này từ định nghĩa giới hạn ở bài trước. Hệ số $3$ xuất hiện đúng chỗ."
+                                },
+                                {
+                                    "id": "n4",
+                                    "trigger": "state.currentValue > 3.9",
+                                    "text": "$n = 4$: đạo hàm $4x^3$ cao hơn rõ rệt. Hệ số $n$ và sự giảm bậc đều có thể thấy trực tiếp."
+                                }
+                            ],
+                            "prompt": "Kéo số mũ $n$ từ 1 đến 4. Bậc của đồ thị đỏ $f'$ thay đổi thế nào so với đồ thị xanh $f$? Hệ số trước $x$ có quy luật gì không?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l5-rule",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quy tắc lũy thừa",
+                        "paragraphs": [
+                            "Bạn vừa quan sát: bậc của $f'$ luôn thấp hơn bậc của $f$ đúng một, và hệ số trước khớp với số mũ. Đây không phải trùng hợp — đây là định lý.",
+                            "**Quy tắc lũy thừa:** $\\frac{d}{dx} x^n = n x^{n-1}$ với mọi số thực $n$. Kiểm chứng ngay: $\\frac{d}{dx} x^2 = 2x$ ✓, $\\frac{d}{dx} x^3 = 3x^2$ ✓ — đúng với kết quả từ định nghĩa giới hạn."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l5-rule",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\frac{d}{dx} x^n = n x^{n-1}"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l5-linear",
+                    "type": "text",
+                    "content": {
+                        "heading": "Tính tuyến tính: hằng số và tổng",
+                        "paragraphs": [
+                            "**Quy tắc hằng số:** $\\frac{d}{dx}[c \\cdot f(x)] = c \\cdot f'(x)$. **Quy tắc tổng:** $\\frac{d}{dx}[f(x) + g(x)] = f'(x) + g'(x)$. Hai quy tắc này suy ra từ tính tuyến tính của giới hạn.",
+                            "Kết hợp: ta phân biệt bất kỳ đa thức nào theo từng số hạng. Ví dụ: $\\frac{d}{dx}[3x^4 - 5x^2 + 7] = 12x^3 - 10x$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l5-poly",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\frac{d}{dx}[3x^4 - 5x^2 + 7] = 12x^3 - 10x"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi bạn kéo số mũ từ $n = 2$ đến $n = 3$ trong tương tác, điều gì xảy ra với đường đạo hàm màu đỏ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó trở thành đường nằm ngang."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó chuyển từ đường thẳng có độ dốc $2$ thành parabol mở lên."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó dốc hơn nhưng vẫn tuyến tính."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó trở thành giống hệt đường $f$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tại $n = 2$: $f'(x) = 2x$ (bậc nhất). Tại $n = 3$: $f'(x) = 3x^2$ (bậc hai, dạng parabol). Bậc của $f'$ bằng bậc $f$ trừ một."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Dùng quy tắc lũy thừa, tính $f'(x)$ với $f(x) = x^7$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$7x^6$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$x^6$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$7x^8$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$6x^7$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$\\frac{d}{dx} x^7 = 7 x^{7-1} = 7x^6$. Nhân với số mũ và giảm số mũ đi một."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Quy tắc lũy thừa nói $\\frac{d}{dx} x^n = nx^{n-1}$. Hệ số $n$ xuất hiện từ đâu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó là bậc của đạo hàm, phải luôn bằng $n$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó xuất hiện từ khai triển $(x+h)^n$ theo nhị thức Newton và lấy giới hạn — số hạng dẫn đầu là $nx^{n-1}h$, sống sót sau phép chia cho $h$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó được định nghĩa theo quy ước cho tiện."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó là giá trị $f(0) = 0^n$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Khai triển $(x+h)^n = x^n + nx^{n-1}h + \\ldots$ và tính $\\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h}$ cho thấy chỉ số hạng $nx^{n-1}$ tồn tại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $f(x) = 4x^3 - 6x^2 + 1$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$12x^2 - 12x$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$12x^3 - 12x$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$4x^2 - 6x$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$12x^2 - 6x$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f'(x) = 4 \\cdot 3x^2 - 6 \\cdot 2x + 0 = 12x^2 - 12x$. Áp dụng quy tắc lũy thừa và tính tuyến tính cho từng số hạng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hệ số của $f'(x)$ tăng theo $n$. Tại $x = 1$, giá trị $f'(1)$ lớn nhất ứng với $n$ nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$n = 1$: $f'(1) = 1$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$n = 2$: $f'(1) = 2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$n = 3$: $f'(1) = 3$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$n = 4$: $f'(1) = 4$"
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "$f'(1) = n \\cdot 1^{n-1} = n$. Số mũ $n$ lớn hơn cho giá trị đạo hàm lớn hơn tại $x = 1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tìm độ dốc tiếp tuyến với $f(x) = x^5$ tại $x = -1$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$5$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-5$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-1$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$1$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f'(x) = 5x^4$. $f'(-1) = 5 \\cdot (-1)^4 = 5 \\cdot 1 = 5$. Lũy thừa bậc chẵn của $-1$ luôn bằng $1$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $f(x) = x^{1/2}$ (mở rộng quy tắc lũy thừa sang phân số), $f'(x) = ?$",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$x^{-1/2}$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\frac{1}{2} x^{-1/2}$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\frac{1}{2} x^{1/2}$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-\\frac{1}{2} x^{-3/2}$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\frac{d}{dx} x^{1/2} = \\frac{1}{2} x^{1/2 - 1} = \\frac{1}{2} x^{-1/2}$. Quy tắc lũy thừa áp dụng với mọi số mũ thực."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Vị trí của một hạt là $s(t) = t^4 - 3t^2$. Vận tốc tức thời tại $t = 2$ là bao nhiêu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$16$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$20$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$12$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$10$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$s'(t) = 4t^3 - 6t$. $s'(2) = 4 \\cdot 8 - 6 \\cdot 2 = 32 - 12 = 20$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l5-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Học sinh nói: \"Đạo hàm của $5x^3$ là $15x^3$ vì $5 \\times 3 = 15$.\" Sai ở đâu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hệ số phải là $5 + 3 = 8$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Số mũ phải giảm đi $1$: đáp án đúng là $15x^2$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Hệ số $5$ không ảnh hưởng đến đạo hàm."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Đạo hàm của $5x^3$ là $3x^2$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Quy tắc lũy thừa: $\\frac{d}{dx}[5x^3] = 5 \\cdot 3x^{3-1} = 15x^2$. Hệ số nhân đúng, nhưng số mũ phải giảm đi $1$ — không được giữ nguyên."
+                    }
+                }
+            ]
+        }
+    ]
+}

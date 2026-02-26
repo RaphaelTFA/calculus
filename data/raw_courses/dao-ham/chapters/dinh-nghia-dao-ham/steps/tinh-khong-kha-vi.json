@@ -1,0 +1,392 @@
+{
+    "id": "tinh-khong-kha-vi",
+    "title": "Tính không khả vi",
+    "description": "Một hàm liên tục vẫn có thể không có đạo hàm — khi giới hạn của tỉ số hiệu không tồn tại tại điểm góc.",
+    "xp_reward": 15,
+    "order_index": 3,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l4-res",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "A",
+                        "lesson": {
+                            "interactionType": "A",
+                            "parameterSpec": {
+                                "resolutionLevels": [
+                                    2,
+                                    4,
+                                    8,
+                                    16,
+                                    32,
+                                    64
+                                ]
+                            },
+                            "systemSpec": {
+                                "function": "abs(x)",
+                                "derivative": "sign(x)",
+                                "domain": [
+                                    -3,
+                                    3
+                                ],
+                                "range": [
+                                    0,
+                                    3
+                                ],
+                                "anchor": 0
+                            },
+                            "reflectionSpec": {
+                                "triggers": [
+                                    {
+                                        "condition": "state.resolution <= 4",
+                                        "message": "Ở độ phân giải thấp, góc nhọn chưa hiện rõ. Tăng thêm để thấy điều bất ngờ."
+                                    },
+                                    {
+                                        "condition": "state.resolution >= 32",
+                                        "message": "Cát tuyến từ bên phải ổn định ở độ dốc $+1$; từ bên trái ở $-1$. Hai phía không hội tụ về cùng một giá trị."
+                                    },
+                                    {
+                                        "condition": "state.resolution >= 50",
+                                        "message": "Giới hạn không tồn tại — không có đạo hàm tại $x = 0$. Hàm liên tục nhưng không khả vi."
+                                    }
+                                ]
+                            },
+                            "prompt": "Kéo thanh độ phân giải đến mức tối đa. Lần này, tỉ số $\\Delta f / \\Delta x$ có ổn định về một giá trị không? Điều gì khác biệt so với bài học trước?",
+                            "sliderLabel": "Độ phân giải"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l4-corner",
+                    "type": "text",
+                    "content": {
+                        "heading": "Khả vi đòi hỏi độ dốc giới hạn duy nhất",
+                        "paragraphs": [
+                            "$f'(a)$ tồn tại khi và chỉ khi giới hạn hai phía của tỉ số hiệu **tồn tại và bằng nhau**. Với $f(x) = |x|$ tại $a = 0$: giới hạn phải bằng $+1$; giới hạn trái bằng $-1$.",
+                            "Vì $1 \\neq -1$, giới hạn hai phía không nhất quán — $f'(0)$ không tồn tại. Góc nhọn là biểu hiện hình học của sự bất đồng này."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l4-onesided",
+                    "type": "math",
+                    "content": {
+                        "latex": "\\lim_{h \\to 0^+} \\frac{|h|}{h} = 1, \\qquad \\lim_{h \\to 0^-} \\frac{|h|}{h} = -1 \\quad \\Rightarrow \\quad f'(0) \\text{ không tồn tại}"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l4-hierarchy",
+                    "type": "text",
+                    "content": {
+                        "heading": "Khả vi là điều kiện mạnh hơn liên tục",
+                        "paragraphs": [
+                            "**Định lý:** Nếu $f$ khả vi tại $a$, thì $f$ liên tục tại $a$. **Đảo chiều:** không đúng — $f(x) = |x|$ liên tục tại $0$ nhưng không khả vi.",
+                            "Khả vi loại trừ thêm góc nhọn và điểm nhọn, ngoài các gián đoạn. Đây là điều kiện hình học chặt hơn liên tục."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong tương tác, khi bạn tăng độ phân giải trên $f(x) = |x|$ tại $a = 0$, điều gì xảy ra với độ dốc cát tuyến?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó hội tụ về $0$ — đạo hàm dự kiến."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Từ bên phải ổn định ở $+1$, từ bên trái ở $-1$ — hai phía không đồng thuận."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó phân kỳ về vô cực."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó hội tụ về $0.5$ — trung bình của $1$ và $-1$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Góc nhọn tại $x = 0$ khiến tỉ số hiệu trái và phải tiến về các giá trị khác nhau. Không có giới hạn duy nhất nào tồn tại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại điểm góc nhọn, tại sao đạo hàm không tồn tại?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hàm không xác định tại điểm góc."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Hàm gián đoạn tại điểm góc."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Giới hạn một phía của tỉ số hiệu tồn tại nhưng không bằng nhau."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giá trị hàm bằng $0$ tại điểm góc."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Cả hai giới hạn một phía tồn tại (như quan sát trong tương tác) nhưng khác nhau. Giới hạn chỉ tồn tại khi cả hai phía nhất quán."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = |x|$ liên tục tại $x = 0$ nhưng không khả vi. Điều này cho thấy điều gì về mối quan hệ giữa liên tục và khả vi?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Liên tục kéo theo khả vi."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Khả vi kéo theo liên tục, nhưng liên tục không kéo theo khả vi."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Hai điều kiện tương đương nhau."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không điều nào kéo theo điều kia."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Mọi hàm khả vi đều liên tục (định lý), nhưng chiều ngược lại sai. $|x|$ tại $x = 0$ là ví dụ điển hình."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $f(x) = |x|$, tính $f'(2)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không xác định."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$2$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$1$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-1$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Với $x > 0$: $|x| = x$, nên $f'(x) = 1$. Điểm không khả vi duy nhất là $x = 0$ — mọi điểm khác đều có đạo hàm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu góc nhọn của $f(x) = |x|$ được làm tròn, tức hàm khả vi tại $x = 0$, điều gì sẽ thay đổi?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hàm trở nên gián đoạn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Giới hạn một phía trái và phải của tỉ số hiệu sẽ hội tụ về cùng một giá trị."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Đạo hàm trở nên không xác định ở khắp nơi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Hàm mất tính liên tục tại $x = 0$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Khả vi tại một điểm đòi hỏi giới hạn trái và phải của tỉ số hiệu phải đồng thuận. Làm tròn góc nhọn chính xác là đạt được điều đó."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hàm nào sau đây KHÔNG khả vi tại $x = 0$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f(x) = x^2$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f(x) = x^3$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f(x) = |x|$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f(x) = \\sin(x)$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$|x|$ có góc nhọn tại $x = 0$ khiến giới hạn hai phía của tỉ số hiệu thất bại. Các hàm còn lại đều trơn tại đó."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu $f$ không liên tục tại $a$, có thể $f$ khả vi tại $a$ không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — khả vi và liên tục độc lập nhau."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — khả vi kéo theo liên tục, nên gián đoạn loại trừ khả vi."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chỉ nếu gián đoạn có thể loại bỏ được."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ nếu $f'$ tồn tại ở cả hai phía."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Theo định lý, khả vi tại $a$ kéo theo liên tục tại $a$. Suy ra ngược: gián đoạn tại $a$ loại trừ khả vi tại $a$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hàm giá $P(q)$ có góc nhọn tại $q = 100$ (hai mức giá tuyến tính khác nhau nối lại). $P'(100)$ có tồn tại không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — $P$ liên tục nên phải khả vi."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — góc nhọn là điểm góc; độ dốc trái và phải của $P$ tại $q = 100$ khác nhau."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có — liên tục tại góc nhọn luôn đảm bảo khả vi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ nếu cả hai mức giá đều có độ dốc dương."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Góc nhọn là điểm góc — giống hệt tình huống $|x|$. Độ dốc khác nhau ở hai phía nghĩa là giới hạn của tỉ số hiệu không tồn tại."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l4-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Học sinh nói: \"Hàm không khả vi tại mọi điểm mà hàm bằng $0$.\" Hãy chỉ ra lỗi sai.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hàm số có thể khả vi tại điểm mà nó bằng $0$ — ví dụ $f(x) = x^2$ tại $x = 0$: $f(0) = 0$, $f'(0) = 0$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Đúng — điểm không luôn là điểm không khả vi."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Hàm bằng $0$ là hằng số, luôn khả vi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Khả vi phụ thuộc vào giới hạn của tỉ số hiệu, không phụ thuộc vào giá trị đầu ra của hàm."
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "Khả vi phụ thuộc vào hành vi của tỉ số hiệu gần điểm đó, không phải vào giá trị hàm. $f(x) = x^2$ có $f(0) = 0$ và $f'(0) = 0$ — cả hai đều bằng $0$, hàm hoàn toàn khả vi."
+                    }
+                }
+            ]
+        }
+    ]
+}

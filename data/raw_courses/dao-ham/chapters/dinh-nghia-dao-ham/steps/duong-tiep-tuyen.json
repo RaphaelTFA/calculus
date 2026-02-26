@@ -1,0 +1,402 @@
+{
+    "id": "duong-tiep-tuyen",
+    "title": "Đường tiếp tuyến và ý nghĩa hình học",
+    "description": "Tiếp tuyến là đường thẳng duy nhất qua một điểm trên đồ thị có độ dốc bằng đạo hàm tại điểm đó.",
+    "xp_reward": 10,
+    "order_index": 1,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l2-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Điểm neo $a$"
+                            },
+                            "parameter": {
+                                "min": -2,
+                                "max": 2,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 300,
+                                "view": {
+                                    "xMin": -3,
+                                    "xMax": 3,
+                                    "yMin": -1,
+                                    "yMax": 9
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "x*x",
+                                        "color": "#3498db",
+                                        "label": "f(x) = x²",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "2*p*(x - p) + p*p",
+                                        "color": "#e74c3c",
+                                        "label": "Tiếp tuyến tại a",
+                                        "style": "solid",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "neg",
+                                    "trigger": "state.currentValue < -1",
+                                    "text": "Tại $a < 0$, tiếp tuyến dốc xuống — $f'(a) < 0$. Đạo hàm âm nghĩa là hàm đang giảm."
+                                },
+                                {
+                                    "id": "zero",
+                                    "trigger": "state.currentValue > -0.15 && state.currentValue < 0.15",
+                                    "text": "Tại $a = 0$, tiếp tuyến nằm ngang — $f'(0) = 0$. Đây là điểm cực tiểu của parabol."
+                                },
+                                {
+                                    "id": "pos",
+                                    "trigger": "state.currentValue > 1.5",
+                                    "text": "Tại $a > 0$, tiếp tuyến dốc lên — $f'(a) > 0$. Dấu đạo hàm mã hóa hướng đi của đồ thị."
+                                }
+                            ],
+                            "prompt": "Di chuyển điểm neo $a$ dọc đồ thị. Tiếp tuyến (đỏ) thay đổi thế nào? Khi nào nó nằm ngang? Khi nào nó dốc nhất?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l2-eq",
+                    "type": "text",
+                    "content": {
+                        "heading": "Phương trình tiếp tuyến",
+                        "paragraphs": [
+                            "Tiếp tuyến với $f$ tại điểm $(a, f(a))$ là đường thẳng đi qua điểm đó với độ dốc đúng bằng $f'(a)$.",
+                            "**Phương trình tiếp tuyến:** $y = f(a) + f'(a)(x - a)$. Đây là dạng điểm-dốc — độ dốc là $f'(a)$, điểm là $(a, f(a))$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l2-ex",
+                    "type": "math",
+                    "content": {
+                        "latex": "f(x) = x^2,\\; a = 1 \\Rightarrow f'(1) = 2 \\Rightarrow y = 1 + 2(x-1) = 2x - 1"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l2-sign",
+                    "type": "text",
+                    "content": {
+                        "heading": "Dấu của $f'$ cho biết điều gì?",
+                        "paragraphs": [
+                            "Khi $f'(a) > 0$: đồ thị đang **tăng** tại $a$. Khi $f'(a) < 0$: đồ thị đang **giảm**. Khi $f'(a) = 0$: tiếp tuyến nằm ngang — điểm cực trị tiềm năng.",
+                            "Đây là cầu nối đầu tiên từ đạo hàm sang phân tích hành vi đồ thị — một công cụ sẽ được khai thác đầy đủ ở các bài sau."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi bạn di chuyển điểm neo qua $a = 0$ trên đồ thị $f(x) = x^2$, điều gì xảy ra với tiếp tuyến màu đỏ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó trở thành đường thẳng đứng."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó trở thành nằm ngang — độ dốc đi qua $0$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó biến mất khỏi màn hình."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó trùng khít với đường parabol xanh."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f'(0) = 2 \\cdot 0 = 0$. Tại $a = 0$, độ dốc tiếp tuyến bằng $0$ — đường thẳng nằm ngang, phản ánh điểm cực tiểu của parabol."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Viết phương trình tiếp tuyến với $f(x) = x^2$ tại $a = 2$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$y = 4x - 4$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$y = 2x$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$y = 4x$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$y = 4x + 4$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f(2) = 4$, $f'(2) = 4$. Tiếp tuyến: $y = 4 + 4(x-2) = 4x - 4$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính chất nào phân biệt tiếp tuyến tại một điểm với mọi đường thẳng khác qua điểm đó?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó không bao giờ cắt đồ thị tại điểm nào khác."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó có đúng độ dốc bằng tốc độ thay đổi tức thời của hàm tại điểm đó."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó luôn nằm ngang."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó đi qua giao điểm với trục $y$ của $f$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tiếp tuyến được định nghĩa bởi sự bằng nhau về độ dốc với $f'(a)$, không phải bởi tính duy nhất của giao điểm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $f(x) = x^2$, khi $a$ tăng từ $0$ đến $3$, điều gì xảy ra với độ dốc tiếp tuyến?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó giảm từ $0$ xuống $-6$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó không đổi, bằng $2$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó tăng từ $0$ đến $6$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nó tăng rồi giảm."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$f'(x) = 2x$ là hàm tăng với $x > 0$. Tại $a = 0$: độ dốc $= 0$; tại $a = 3$: độ dốc $= 6$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại giá trị nào của $a$, tiếp tuyến với $f(x) = x^2$ song song với đường thẳng $y = 6x - 1$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$a = 6$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$a = 3$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$a = 2$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$a = 1$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Song song nghĩa là cùng độ dốc: $f'(a) = 2a = 6 \\Rightarrow a = 3$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu $f'(a) = 0$, phát biểu nào sau đây nhất định đúng?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f(a)$ là giá trị lớn nhất toàn cục của $f$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tiếp tuyến tại $a$ nằm ngang."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f$ không khả vi tại $a$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f$ có điểm uốn tại $a$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f'(a) = 0$ nghĩa là độ dốc $= 0$ — tiếp tuyến nằm ngang. Để xác định đó là cực đại, cực tiểu hay điểm uốn, cần phân tích thêm."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tìm phương trình tiếp tuyến với $f(x) = x^2 - 4x + 3$ tại $x = 1$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$y = -2x + 2$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$y = -2x$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$y = -2x + 1$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$y = 0$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f(1) = 0$, $f'(x) = 2x - 4$, $f'(1) = -2$. Tiếp tuyến: $y = 0 + (-2)(x - 1) = -2x + 2$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hai hàm $f$ và $g$ thỏa $f(1) = g(1) = 4$ nhưng có tiếp tuyến khác nhau tại $x = 1$. Điều gì nhất định đúng?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f$ và $g$ là cùng một hàm số."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f'(1) \\neq g'(1)$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Cả hai hàm không khả vi tại $x = 1$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f$ và $g$ không thể giao nhau với $x \\neq 1$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tiếp tuyến khác nhau tại cùng một điểm nghĩa là độ dốc khác nhau, tức là $f'(1) \\neq g'(1)$. Giá trị hàm có thể bằng nhau trong khi đạo hàm khác."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l2-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Hàm doanh thu $R(q)$ cho tổng doanh thu khi bán $q$ đơn vị. Độ dốc tiếp tuyến với $R$ tại $q = 50$ biểu diễn điều gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tổng doanh thu từ $50$ đơn vị đầu tiên."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Doanh thu trung bình trên $[0, 50]$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Doanh thu biên — mỗi đơn vị bổ sung thêm bao nhiêu — tại $q = 50$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Doanh thu tối đa có thể đạt được."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$R'(50)$ là tốc độ thay đổi tức thời của doanh thu theo số lượng — khái niệm doanh thu biên trong kinh tế. Cấu trúc tiếp tuyến áp dụng trong mọi ngữ cảnh khả vi."
+                    }
+                }
+            ]
+        }
+    ]
+}

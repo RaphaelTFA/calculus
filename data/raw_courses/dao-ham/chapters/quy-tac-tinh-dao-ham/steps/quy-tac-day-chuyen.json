@@ -1,0 +1,402 @@
+{
+    "id": "quy-tac-day-chuyen",
+    "title": "Quy tắc dây chuyền",
+    "description": "Đạo hàm của hàm hợp bằng tích đạo hàm ngoài (tại giá trị hàm trong) và đạo hàm trong.",
+    "xp_reward": 15,
+    "order_index": 7,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l8-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Tốc độ hàm trong $p$"
+                            },
+                            "parameter": {
+                                "min": 0.5,
+                                "max": 3,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 300,
+                                "view": {
+                                    "xMin": -3,
+                                    "xMax": 3,
+                                    "yMin": -1,
+                                    "yMax": 16
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "pow(p*x + 1, 2)",
+                                        "color": "#3498db",
+                                        "label": "h(x) = (px+1)²",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "2*(p*x + 1)*p",
+                                        "color": "#e74c3c",
+                                        "label": "h′(x) = 2(px+1)·p",
+                                        "style": "dashed",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "p-slow",
+                                    "trigger": "state.currentValue < 0.65",
+                                    "text": "Độ dốc hàm trong nhỏ — đường đỏ $h'$ tương đối phẳng. Hàm trong chuyển động chậm qua miền hàm ngoài."
+                                },
+                                {
+                                    "id": "p-one",
+                                    "trigger": "state.currentValue > 0.95 && state.currentValue < 1.05",
+                                    "text": "Tại $p = 1$: $h'(x) = 2(x+1)$. Đây chính là kết quả từ quy tắc lũy thừa — nhưng tại $p = 2$, quy tắc lũy thừa đơn giản sẽ cho kết quả sai."
+                                },
+                                {
+                                    "id": "p-high",
+                                    "trigger": "state.currentValue > 2",
+                                    "text": "Đường đỏ cao hơn gấp đôi so với $p = 1$. Nhân tử $p$ từ hàm trong là hệ số tỉ lệ — đây là quy tắc dây chuyền."
+                                }
+                            ],
+                            "prompt": "Kéo độ dốc $p$ của hàm trong. Đường đỏ $h'$ thay đổi thế nào? Nếu bạn chỉ dùng quy tắc lũy thừa cho $(px+1)^2$, bạn được gì? Tại sao đó chưa đủ?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l8-rule",
+                    "type": "text",
+                    "content": {
+                        "heading": "Quy tắc dây chuyền: phát biểu và trực giác",
+                        "paragraphs": [
+                            "Bạn đã thấy $p$ nhân trực tiếp vào đạo hàm ngoài. Đây là quy tắc dây chuyền: tốc độ hàm trong điều chỉnh tốc độ hàm ngoài phản ứng.",
+                            "**Quy tắc dây chuyền:** $(f \\circ g)'(x) = f'(g(x)) \\cdot g'(x)$. Kiểm chứng: $h(x) = (px+1)^2$, $u = px+1$, $f(u) = u^2$. Thì $f'(u) = 2u$, $g'(x) = p$, nên $h'(x) = 2(px+1) \\cdot p$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l8-rule",
+                    "type": "math",
+                    "content": {
+                        "latex": "(f \\circ g)'(x) = f'(g(x)) \\cdot g'(x)"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l8-decomp",
+                    "type": "text",
+                    "content": {
+                        "heading": "Xác định hàm trong và hàm ngoài",
+                        "paragraphs": [
+                            "Với mọi biểu thức hợp: xác định $u = g(x)$ (hàm trong) và viết toàn bộ biểu thức là $f(u)$ (hàm ngoài). Sau đó: (1) tính $f'(u)$, (2) thế $u = g(x)$ vào, (3) nhân với $g'(x)$.",
+                            "Ví dụ: $h(x) = (x^2+1)^5$ — ngoài $f(u) = u^5$, trong $g(x) = x^2+1$. Kết quả: $h'(x) = 5(x^2+1)^4 \\cdot 2x = 10x(x^2+1)^4$."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại $p = 2$, đường đạo hàm dốc hơn khoảng gấp đôi so với $p = 1$. Tại sao?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì hàm $h(x) = (px+1)^2$ cao hơn, nên độ dốc phải lớn hơn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì hàm trong $g(x) = px+1$ thay đổi nhanh gấp đôi, nhân toàn bộ đạo hàm với $2$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì hệ số của quy tắc lũy thừa tăng gấp đôi khi cơ số thay đổi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì hàm ngoài $f(u) = u^2$ thay đổi."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$h'(x) = 2(px+1) \\cdot p$. Khi $p$ tăng gấp đôi, nhân tử $p$ từ hàm trong tăng gấp đôi — đây là hệ số tỉ lệ của quy tắc dây chuyền."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $h(x) = (x^3 + 2)^4$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$4(x^3+2)^3$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$12x^2(x^3+2)^3$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$4x^3(x^3+2)^3$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$4(x^3+2)^4 \\cdot 3x^2$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Ngoài $f(u) = u^4$, $f'(u) = 4u^3$; trong $g(x) = x^3+2$, $g'(x) = 3x^2$. Kết quả: $4(x^3+2)^3 \\cdot 3x^2 = 12x^2(x^3+2)^3$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao tính đạo hàm $(g(x))^n$ không bằng $n(g(x))^{n-1}$ nếu thiếu nhân tử $g'(x)$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì quy tắc lũy thừa chỉ áp dụng cho $x^n$, không áp dụng cho biểu thức hợp."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì chuỗi đạo hàm đòi hỏi nhân cả đạo hàm ngoài lẫn tốc độ thay đổi hàm trong — thiếu một là sai."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì $g(x)$ phải bằng $x$ để quy tắc lũy thừa áp dụng."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì $n$ phải là số nguyên để quy tắc lũy thừa áp dụng."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Đầu vào của hàm lũy thừa là $g(x)$, không phải $x$. Tốc độ thay đổi của đầu vào này là $g'(x)$ — thiếu nó dẫn đến kết quả sai."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $h(x) = \\sqrt{x^2 - 1}$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$\\dfrac{x}{\\sqrt{x^2-1}}$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\dfrac{1}{2\\sqrt{x^2-1}}$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\dfrac{2x}{2\\sqrt{x^2-1}}$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$\\dfrac{-x}{\\sqrt{x^2-1}}$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f(u) = u^{1/2}$, $g(x) = x^2-1$. $h'(x) = \\frac{1}{2}(x^2-1)^{-1/2} \\cdot 2x = \\frac{x}{\\sqrt{x^2-1}}$. (Lưu ý: tùy chọn C là cùng giá trị với A sau rút gọn.)"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $h(x) = (px+1)^2$, khi $p = 3$, tính $h'(0)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$2$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$6$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$3$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$9$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$h'(x) = 2(px+1) \\cdot p$. Tại $x = 0$: $h'(0) = 2(3 \\cdot 0 + 1) \\cdot 3 = 2 \\cdot 1 \\cdot 3 = 6$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Xác định hàm trong và hàm ngoài cho $h(x) = \\dfrac{1}{(x^2+1)^3}$, rồi tính đạo hàm.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Trong $g = x^2+1$, ngoài $f(u) = u^{-3}$. $h'(x) = -3(x^2+1)^{-4} \\cdot 2x = \\dfrac{-6x}{(x^2+1)^4}$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$h'(x) = -3(x^2+1)^{-4}$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$h'(x) = \\dfrac{-6x}{(x^2+1)^3}$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$h'(x) = 3(x^2+1)^{-2} \\cdot 2x$."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Ngoài $f(u) = u^{-3}$, $f'(u) = -3u^{-4}$; trong $g(x) = x^2+1$, $g'(x) = 2x$. Quy tắc dây chuyền: $-3(x^2+1)^{-4} \\cdot 2x$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Biết $g(1) = 3$, $g'(1) = 4$, $f'(3) = 5$. Tính $(f \\circ g)'(1)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$12$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$20$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$15$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$9$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$(f \\circ g)'(1) = f'(g(1)) \\cdot g'(1) = f'(3) \\cdot 4 = 5 \\cdot 4 = 20$. Đạo hàm ngoài được tính tại giá trị đầu ra của hàm trong."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Quần thể vi sinh vật $P = f(T(t))$ với $T$ là nhiệt độ. Quy tắc dây chuyền cho $\\frac{dP}{dt} = ?$",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f'(T) \\cdot T(t)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f'(T(t)) \\cdot T'(t)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f(T) \\cdot T'(t)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f'(T) + T'(t)$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$\\frac{dP}{dt} = f'(T(t)) \\cdot T'(t)$ — tốc độ phản ứng của $P$ với nhiệt độ nhân tốc độ nhiệt độ thay đổi theo thời gian. Quy tắc dây chuyền là cấu trúc hình thức của \"tốc độ hợp\"."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l8-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi áp dụng quy tắc dây chuyền cho $(f \\circ g)(x)$, thứ tự tính đạo hàm là gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tính $g'(x)$ trước, rồi $f'(x)$, nhân lại."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tính $f'(g(x))$ — đạo hàm ngoài tại giá trị hàm trong — rồi nhân với $g'(x)$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Thứ tự không quan trọng vì phép nhân có tính giao hoán."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Tính $f'(x)$ trước, rồi thế $g(x)$ vào."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Phải tính $f'$ tại $g(x)$, không phải tại $x$. Đạo hàm ngoài áp dụng tại đầu ra của hàm trong — không được nhầm với $f'(x)$."
+                    }
+                }
+            ]
+        }
+    ]
+}

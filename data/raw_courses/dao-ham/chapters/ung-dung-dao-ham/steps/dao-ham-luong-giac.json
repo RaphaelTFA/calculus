@@ -1,0 +1,404 @@
+{
+    "id": "dao-ham-luong-giac",
+    "title": "Đạo hàm hàm lượng giác",
+    "description": "Đạo hàm của $\\sin(x)$ là $\\cos(x)$ — hai hàm là cùng một sóng, lệch pha một phần tư chu kỳ.",
+    "xp_reward": 15,
+    "order_index": 8,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l9-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Độ lệch pha $p$"
+                            },
+                            "parameter": {
+                                "min": 0,
+                                "max": 1.57,
+                                "initial": 0
+                            },
+                            "system": {
+                                "resolution": 400,
+                                "view": {
+                                    "xMin": -6.3,
+                                    "xMax": 6.3,
+                                    "yMin": -1.5,
+                                    "yMax": 1.5
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "sin(x)",
+                                        "color": "#3498db",
+                                        "label": "f(x) = sin(x)",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "cos(x + p)",
+                                        "color": "#e74c3c",
+                                        "label": "Đạo hàm thử: cos(x + p)",
+                                        "style": "dashed",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "aligned",
+                                    "trigger": "state.currentValue < 0.05",
+                                    "text": "Tại $p = 0$: hai đường thẳng hàng hoàn hảo. Tại mọi đỉnh của $\\sin$, $\\cos$ đúng bằng $0$ — đạo hàm tại đỉnh bằng $0$."
+                                },
+                                {
+                                    "id": "misaligned",
+                                    "trigger": "state.currentValue > 0.3",
+                                    "text": "Dịch pha làm mất sự thẳng hàng — $p = 0$ là giá trị đúng duy nhất. Đạo hàm của $\\sin$ chính xác là $\\cos$, không lệch."
+                                }
+                            ],
+                            "prompt": "Kéo độ lệch pha về $0$. Quan sát: tại các đỉnh và đáy của $\\sin$ (đường xanh), giá trị của đường đỏ là bao nhiêu? Điều đó có nghĩa gì về độ dốc của $\\sin$ tại những điểm đó?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l9-deriv",
+                    "type": "text",
+                    "content": {
+                        "heading": "Chứng minh: $\\sin$ và $\\cos$ liên kết qua đạo hàm",
+                        "paragraphs": [
+                            "Bạn đã xác minh sự thẳng hàng bằng quan sát. Đây là lý do nó chính xác: khai triển $\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$ rồi lấy giới hạn.",
+                            "Kết quả: $(\\sin x)' = \\sin x \\cdot 0 + \\cos x \\cdot 1 = \\cos x$. Dấu cộng và giá trị $1$ đến từ $\\lim_{h\\to 0}\\frac{\\sin h}{h} = 1$ và $\\lim_{h\\to 0}\\frac{1-\\cos h}{h} = 0$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l9-sin",
+                    "type": "math",
+                    "content": {
+                        "latex": "(\\sin x)' = \\cos x \\qquad (\\cos x)' = -\\sin x"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l9-tan",
+                    "type": "text",
+                    "content": {
+                        "heading": "Đạo hàm $\\tan(x)$ và kết hợp với quy tắc dây chuyền",
+                        "paragraphs": [
+                            "$(\\tan x)' = \\left(\\frac{\\sin x}{\\cos x}\\right)' = \\frac{\\cos^2 x + \\sin^2 x}{\\cos^2 x} = \\frac{1}{\\cos^2 x}$. Kết quả trực tiếp từ quy tắc thương và đồng nhất thức lượng giác $\\sin^2 x + \\cos^2 x = 1$.",
+                            "Kết hợp với quy tắc dây chuyền: $\\frac{d}{dx}\\sin(x^2) = \\cos(x^2) \\cdot 2x$. Mọi đạo hàm lượng giác kéo dài từ hai đạo hàm gốc $\\sin$ và $\\cos$."
+                        ]
+                    }
+                },
+                {
+                    "id": "math-m3l9-tan",
+                    "type": "math",
+                    "content": {
+                        "latex": "(\\tan x)' = \\frac{1}{\\cos^2 x}"
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại các đỉnh của $f(x) = \\sin(x)$, đường màu đỏ (đạo hàm thử tại $p = 0$) có giá trị bao nhiêu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$1$ — khớp với chiều cao đỉnh."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$0$ — đạo hàm bằng $0$ tại đỉnh."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-1$ — đối của đỉnh."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Dao động không theo quy luật."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tại cực đại cục bộ của $\\sin$, tiếp tuyến nằm ngang: $f'(x) = \\cos(x) = 0$ tại những điểm đó. Đạo hàm mã hóa tốc độ thay đổi, không phải vị trí."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $f(x) = \\sin(3x)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$\\cos(3x)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$3\\cos(3x)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-\\cos(3x)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$3\\sin(3x)$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Quy tắc dây chuyền: ngoài $\\sin$, trong $3x$. $f'(x) = \\cos(3x) \\cdot 3 = 3\\cos(3x)$. Nhân tử $3$ đến từ đạo hàm hàm trong."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao $(\\sin x)' = \\cos x$ (dương) chứ không phải $-\\cos x$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì sine được định nghĩa là hàm lượng giác dương."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì $\\lim_{h\\to 0} \\frac{\\sin h}{h} = 1$ (dương), không phải $-1$, xác định dấu trong phép dẫn xuất."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Theo quy ước để chu kỳ đạo hàm đẹp hơn."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì $\\cos x \\geq 0$ với mọi $x$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Dấu của $(\\sin x)' = \\cos x$ đến từ hai giới hạn nền tảng. Cả hai đều cho giá trị không âm ($+1$ và $0$), dẫn đến kết quả $+\\cos x$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $f(x) = x^2 \\cos(x)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$2x\\cos(x) + x^2\\sin(x)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$2x\\cos(x) - x^2\\sin(x)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-2x\\sin(x)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$x^2(-\\sin x) + 2x\\cos x$"
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Quy tắc tích: $f'(x) = 2x\\cos(x) + x^2(-\\sin x) = 2x\\cos(x) - x^2\\sin(x)$. Tùy chọn D đúng về mặt đại số nhưng chưa rút gọn — B là dạng chuẩn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu lệch pha $p = \\pi/2$, đường ứng viên là $\\cos(x + \\pi/2) = -\\sin(x)$. Đây là đạo hàm của hàm nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$\\sin(x)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$-\\cos(x)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\cos(x)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$\\tan(x)$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$(\\cos x)' = -\\sin x$. Do đó $-\\sin(x)$ là đạo hàm của $\\cos(x)$, không phải $\\sin(x)$. Lệch pha $\\pi/2$ chuyển từ $\\sin$ sang $\\cos$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tính đạo hàm $h(x) = \\tan(x^2)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$\\frac{1}{\\cos^2(x^2)}$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\frac{2x}{\\cos^2(x^2)}$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$2x \\cdot \\frac{1}{\\cos^2(x^2)}$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "B và C tương đương nhau."
+                            }
+                        ],
+                        "correct": "d",
+                        "explanation": "$h'(x) = \\frac{1}{\\cos^2(x^2)} \\cdot 2x$. Tùy chọn B và C viết cùng một biểu thức theo hai cách khác nhau — cả hai đều đúng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Chu kỳ đạo hàm $\\sin \\to \\cos \\to -\\sin \\to -\\cos \\to \\sin \\to \\ldots$ có chu kỳ $4$. Đạo hàm bậc bốn của $\\sin(x)$ bằng gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$-\\sin(x)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$\\cos(x)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$\\sin(x)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$-\\cos(x)$"
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "Bốn bước trong chu kỳ: $\\sin \\to \\cos \\to -\\sin \\to -\\cos \\to \\sin$. Sau bốn lần lấy đạo hàm, ta trở về $\\sin(x)$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Độ dịch chuyển của dây đàn dao động là $s(t) = A\\sin(\\omega t)$. Vận tốc tức thời là:",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$A\\omega\\cos(\\omega t)$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$A\\cos(\\omega t)$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-A\\omega\\sin(\\omega t)$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$A\\sin(\\omega t)$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "Quy tắc dây chuyền: $s'(t) = A\\cos(\\omega t) \\cdot \\omega = A\\omega\\cos(\\omega t)$. Tần số $\\omega$ xuất hiện là đạo hàm hàm trong."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l9-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại $x = \\pi/2$, $\\sin(x)$ đạt cực đại. Không tính toán, $(\\sin x)'|_{x=\\pi/2}$ phải bằng bao nhiêu và tại sao?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$1$ — vì $\\sin(\\pi/2) = 1$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$0$ — vì tại cực đại trơn, tiếp tuyến nằm ngang và tốc độ thay đổi tức thời bằng $0$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$-1$ — vì hàm sắp giảm."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không xác định — cực đại tạo ra góc nhọn."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tại cực đại trơn, tiếp tuyến nằm ngang và $f' = 0$. Thật vậy $\\cos(\\pi/2) = 0$. Đạo hàm mã hóa tốc độ, không phải vị trí của hàm."
+                    }
+                }
+            ]
+        }
+    ]
+}

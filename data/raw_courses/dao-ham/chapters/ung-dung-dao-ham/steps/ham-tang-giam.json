@@ -1,0 +1,395 @@
+{
+    "id": "ham-tang-giam",
+    "title": "Hàm tăng và hàm giảm",
+    "description": "Dấu của $f'$ phân chia miền xác định thành các khoảng tăng giảm — và điểm đổi dấu là điểm cực trị.",
+    "xp_reward": 10,
+    "order_index": 9,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l10-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Tham số $p$ (dịch chuyển điểm cực trị)"
+                            },
+                            "parameter": {
+                                "min": 0.5,
+                                "max": 2,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 300,
+                                "view": {
+                                    "xMin": -1,
+                                    "xMax": 4,
+                                    "yMin": -5,
+                                    "yMax": 10
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "x*x*x - 3*p*x*x + 2",
+                                        "color": "#3498db",
+                                        "label": "f(x) = x³ − 3px² + 2",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "3*x*x - 6*p*x",
+                                        "color": "#e74c3c",
+                                        "label": "f′(x) = 3x² − 6px",
+                                        "style": "dashed",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "p-small",
+                                    "trigger": "state.currentValue < 0.6",
+                                    "text": "Hai điểm cực trị gần nhau tại $x = 0$ và $x \\approx 1$. Khoảng giảm $(0, 2p)$ còn hẹp."
+                                },
+                                {
+                                    "id": "p-one",
+                                    "trigger": "state.currentValue > 0.95 && state.currentValue < 1.05",
+                                    "text": "Tại $p = 1$: điểm cắt trục $x$ của $f'$ ở $x = 0$ và $x = 2$. Đây chính xác là các điểm mà $f$ đổi chiều."
+                                },
+                                {
+                                    "id": "p-large",
+                                    "trigger": "state.currentValue > 1.8",
+                                    "text": "Điểm cực trị thứ hai tiến về cạnh phải của màn hình. Khoảng giảm $(0, 2p)$ mở rộng rõ rệt."
+                                }
+                            ],
+                            "prompt": "Kéo $p$. Điểm nào mà đường đỏ ($f'$) cắt trục $x$? Tại đó, đường xanh ($f$) làm gì? Khi $f' > 0$, $f$ đang tăng hay giảm?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l10-mono",
+                    "type": "text",
+                    "content": {
+                        "heading": "Định lý đơn điệu và điểm tới hạn",
+                        "paragraphs": [
+                            "**Định lý đơn điệu:** Nếu $f'(x) > 0$ trên khoảng $I$, $f$ tăng đơn điệu trên $I$. Nếu $f'(x) < 0$, $f$ giảm đơn điệu. Đây không phải định nghĩa mà là định lý — xuất phát từ định lý giá trị trung bình.",
+                            "**Điểm tới hạn:** Điểm $a$ mà $f'(a) = 0$ hoặc $f'(a)$ không tồn tại. Điểm tới hạn là ứng viên duy nhất cho cực trị cục bộ — nhưng không phải mọi điểm tới hạn đều là cực trị."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l10-fdt",
+                    "type": "text",
+                    "content": {
+                        "heading": "Kiểm tra đạo hàm bậc nhất cho cực trị",
+                        "paragraphs": [
+                            "**Kiểm tra đạo hàm bậc nhất:** Nếu $f'$ đổi dấu từ $+$ sang $-$ tại $a$: cực đại cục bộ. Từ $-$ sang $+$: cực tiểu cục bộ. Không đổi dấu: không phải cực trị.",
+                            "Ví dụ ($p = 1$): $f'(x) = 3x(x-2)$. Điểm tới hạn $x = 0$, $x = 2$. Dấu: $+$ trên $(-\\infty,0)$, $-$ trên $(0,2)$, $+$ trên $(2,\\infty)$. Cực đại tại $x = 0$, cực tiểu tại $x = 2$."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong tương tác, khi $p = 1$, đường đỏ $f'$ cắt trục $x$ ở đâu? Đường xanh $f$ làm gì tại những điểm đó?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$f'$ cắt tại $x = 0$ và $x = 2$; $f$ có điểm quay tại mỗi điểm đó."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$f'$ cắt tại $x = 1$ và $x = 3$; $f$ có điểm uốn."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$f'$ không cắt — luôn dương."
+                            },
+                            {
+                                "value": "d",
+                                "label": "$f'$ cắt tại $x = \\pm 1$; $f$ đạt cực đại toàn cục."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f'(x) = 3x^2 - 6x = 3x(x-2) = 0$ tại $x = 0$ và $x = 2$. Tại các điểm này, $f$ chuyển giữa tăng và giảm — đây là các điểm quay."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tìm các điểm tới hạn của $f(x) = x^4 - 8x^2$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$x = 0, \\pm 2$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$x = \\pm 4$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$x = 0$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "$x = \\pm 2$"
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f'(x) = 4x^3 - 16x = 4x(x^2-4) = 4x(x-2)(x+2) = 0$ tại $x = 0, 2, -2$. Cả ba đều là điểm tới hạn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Điểm tới hạn là nơi $f'(a) = 0$. Điều này có đảm bảo cực trị cục bộ không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — mọi điểm tới hạn đều là cực đại hoặc cực tiểu."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — $f'$ phải đổi dấu tại $a$ thì mới là cực trị."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có — nhưng chỉ với đa thức."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không — điểm tới hạn chỉ liên quan đến hàm lượng giác."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f(x) = x^3$ tại $x = 0$: $f'(0) = 0$ nhưng $f'$ không đổi dấu — $x = 0$ không phải cực trị. Dấu hiệu đổi dấu là điều kiện cần và đủ."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = x^3 - 3x$ tăng trên khoảng nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$(-\\infty, -1)$ và $(1, \\infty)$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "$(-1, 1)$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "$(0, \\infty)$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Toàn bộ $\\mathbb{R}$."
+                            }
+                        ],
+                        "correct": "a",
+                        "explanation": "$f'(x) = 3x^2 - 3 = 3(x^2-1) > 0$ khi $|x| > 1$, tức trên $(-\\infty,-1) \\cup (1,\\infty)$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi $p$ tăng trong $f(x) = x^3 - 3px^2 + 2$, điểm tới hạn thứ hai ($x = 2p$) dịch sang phải. Điều gì xảy ra với khoảng giảm?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Nó thu hẹp lại."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Nó mở rộng — khoảng $(0, 2p)$ rộng hơn."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nó không đổi."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Hàm ngừng giảm."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Khoảng giảm là $(0, 2p)$. Khi $p$ tăng, $2p$ lớn hơn — khoảng mở rộng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "$f(x) = x^3 - 3x^2 + 2$ có điểm tới hạn tại $x = 0$ và $x = 2$. Phân loại từng điểm bằng kiểm tra đạo hàm bậc nhất.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Cực tiểu tại $x = 0$, cực đại tại $x = 2$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Cực đại tại $x = 0$, cực tiểu tại $x = 2$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Cả hai đều là cực tiểu."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không điểm nào là cực trị."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f'$ đổi từ $+$ sang $-$ tại $x = 0$ (cực đại) và từ $-$ sang $+$ tại $x = 2$ (cực tiểu)."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nếu $f'(x) > 0$ với mọi $x \\in \\mathbb{R}$, $f$ có thể có cực đại cục bộ không?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Có — nếu $f$ bị chặn trên."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Không — nếu $f'$ luôn dương, $f$ luôn tăng và không bao giờ quay lại."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Có — tại biên của miền xác định."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chỉ nếu $f$ không khả vi ở đâu đó."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Cực đại cục bộ đòi hỏi $f$ tăng rồi giảm — điều đó yêu cầu $f'$ đổi dấu. $f'$ luôn dương loại trừ mọi điểm quay."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Lợi nhuận $P(q)$ có $P'(q) > 0$ khi $q < 100$ và $P'(q) < 0$ khi $q > 100$. Lợi nhuận tối đa ở đâu?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tại $q = 0$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tại $q = 100$ — nơi $P'$ đổi từ dương sang âm (kiểm tra đạo hàm bậc nhất)."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Nơi $P(q)$ lớn nhất về số trị."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Nơi $P'(q)$ nhỏ nhất."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$P'$ đổi từ dương sang âm tại $q = 100$ — theo kiểm tra đạo hàm bậc nhất, đây là cực đại cục bộ (và ở đây là toàn cục)."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l10-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao chỉ tìm $f' = 0$ mà không kiểm tra đổi dấu là chưa đủ?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì $f'$ có thể bằng $0$ tại mọi điểm."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì $f' = 0$ chỉ xác định ứng viên — một điểm có thể là nghiệm của $f'$ mà không phải cực trị khi $f'$ không đổi dấu."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì công thức bậc hai luôn cho nghiệm thừa."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì điểm tới hạn đòi hỏi $f'$ không tồn tại, không phải bằng $0$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f(x) = x^3$ là ví dụ điển hình: $f'(0) = 0$ nhưng không đổi dấu — $x = 0$ là điểm uốn, không phải cực trị."
+                    }
+                }
+            ]
+        }
+    ]
+}

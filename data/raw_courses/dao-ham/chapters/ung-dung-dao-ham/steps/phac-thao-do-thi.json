@@ -1,0 +1,395 @@
+{
+    "id": "phac-thao-do-thi",
+    "title": "Tổng hợp phác thảo đồ thị",
+    "description": "Phác thảo đồ thị là đọc toàn bộ cấu trúc hàm từ đạo hàm — đơn điệu, tính lõm, tiệm cận — như một hệ thống ràng buộc thống nhất.",
+    "xp_reward": 20,
+    "order_index": 11,
+    "slides": [
+        {
+            "order_index": 0,
+            "blocks": [
+                {
+                    "id": "ia-m3l12-param",
+                    "type": "interaction",
+                    "content": {
+                        "interactionType": "B",
+                        "lesson": {
+                            "interactionType": "B",
+                            "meta": {
+                                "parameterLabel": "Tham số hình dạng $p$"
+                            },
+                            "parameter": {
+                                "min": 0.5,
+                                "max": 4,
+                                "initial": 1
+                            },
+                            "system": {
+                                "resolution": 400,
+                                "view": {
+                                    "xMin": -5,
+                                    "xMax": 5,
+                                    "yMin": -0.2,
+                                    "yMax": 1.2
+                                },
+                                "curves": [
+                                    {
+                                        "expr": "x*x / (x*x + p)",
+                                        "color": "#3498db",
+                                        "label": "f(x) = x²/(x²+p)",
+                                        "style": "solid",
+                                        "width": 2
+                                    },
+                                    {
+                                        "expr": "2*p*x / pow(x*x + p, 2)",
+                                        "color": "#e74c3c",
+                                        "label": "f′(x)",
+                                        "style": "dashed",
+                                        "width": 2
+                                    }
+                                ]
+                            },
+                            "reflections": [
+                                {
+                                    "id": "p-small",
+                                    "trigger": "state.currentValue < 0.7",
+                                    "text": "$p$ nhỏ: đường cong tăng dốc, điểm uốn gần $x = 0$, $f'$ có đỉnh nhọn."
+                                },
+                                {
+                                    "id": "p-med",
+                                    "trigger": "state.currentValue > 1.8 && state.currentValue < 2.3",
+                                    "text": "$p \\approx 2$: điểm uốn dịch ra ngoài khoảng $x \\approx \\pm 1.4$. Hàm vẫn tiệm cận $y = 1$."
+                                },
+                                {
+                                    "id": "p-large",
+                                    "trigger": "state.currentValue > 3.5",
+                                    "text": "$p$ lớn: đường cong tăng chậm và phẳng hơn nhiều. Tiệm cận ngang $y = 1$ không đổi."
+                                }
+                            ],
+                            "prompt": "Kéo $p$ từ nhỏ đến lớn. Điều gì thay đổi: hình dạng tổng thể, điểm cực trị, điểm uốn? Điều gì KHÔNG thay đổi? Có thể phác thảo đồ thị chỉ từ thông tin về $f'$ và các tiệm cận không?"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 1,
+            "blocks": [
+                {
+                    "id": "txt-m3l12-protocol",
+                    "type": "text",
+                    "content": {
+                        "heading": "Giao thức phác thảo đồ thị: sáu bước",
+                        "paragraphs": [
+                            "(1) **Miền xác định** — có tiệm cận đứng không? (2) **Cắt trục và giá trị đặc biệt** — $f(0)$, nghiệm của $f$. (3) **Đơn điệu** — giải $f'(x) = 0$; bảng dấu $f'$; khoảng tăng/giảm. (4) **Phân loại điểm tới hạn** — kiểm tra đạo hàm bậc nhất hoặc bậc hai.",
+                            "(5) **Tính lõm** — giải $f''(x) = 0$; bảng dấu $f''$; khoảng lõm lên/xuống và điểm uốn. (6) **Tiệm cận và hành vi cuối** — $\\lim_{x\\to\\pm\\infty} f(x)$; tiệm cận đứng khi mẫu số bằng $0$."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 2,
+            "blocks": [
+                {
+                    "id": "txt-m3l12-constraints",
+                    "type": "text",
+                    "content": {
+                        "heading": "Các ràng buộc tự kiểm tra nhau",
+                        "paragraphs": [
+                            "Với $f(x) = x^2/(x^2+p)$: hàm chẵn ($f(-x) = f(x)$) — chỉ cần phân tích $x \\geq 0$. $f(0) = 0$, $\\lim_{x\\to\\pm\\infty} f(x) = 1$ — hàm tăng từ $0$ đến $1$ trên $[0,\\infty)$.",
+                            "Sáu đặc trưng không độc lập: chúng tạo thành hệ ràng buộc. Nếu tìm thấy mâu thuẫn (ví dụ: tuyên bố cực đại nơi $f' > 0$), có lỗi tính toán — các ràng buộc là công cụ tự kiểm tra."
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 3,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q1",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Trong tương tác, khi $p$ tăng, đường cong phẳng hơn nhưng tiệm cận ngang vẫn là $y = 1$. Điều gì đảm bảo tiệm cận luôn là $1$ bất kể $p$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Hằng số ở tử số."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Tỉ số hệ số bậc cao: $\\lim_{x\\to\\infty} x^2/(x^2+p) = 1$ với mọi $p$ cố định."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Sự kiện $f$ luôn nhỏ hơn $1$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Điểm tới hạn tại $x = 0$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Với hàm hữu tỉ có cùng bậc trong tử và mẫu, tiệm cận ngang bằng tỉ số hệ số bậc cao: $1/1 = 1$ — độc lập với $p$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 4,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q2",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tìm điểm uốn của $f(x) = x^2/(x^2+1)$.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "$x = 0$"
+                            },
+                            {
+                                "value": "b",
+                                "label": "$x = \\pm 1/\\sqrt{3}$"
+                            },
+                            {
+                                "value": "c",
+                                "label": "$x = \\pm 1$"
+                            },
+                            {
+                                "value": "d",
+                                "label": "Không có điểm uốn."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f''(x) = 2(1-3x^2)/(x^2+1)^3 = 0 \\Rightarrow x^2 = 1/3 \\Rightarrow x = \\pm 1/\\sqrt{3}$. $f''$ đổi dấu tại mỗi điểm — xác nhận điểm uốn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 5,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q3",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao $f(x) = x^2/(x^2+p)$ có cực tiểu cục bộ tại $x = 0$ chứ không phải cực đại?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì $f(0) = 0$ là giá trị nhỏ nhất có thể của $f$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì $f'$ đổi từ âm sang dương tại $x = 0$ (kiểm tra đạo hàm bậc nhất) — hàm giảm rồi tăng."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì $f$ là hàm chẵn."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì đạo hàm bậc hai tại $x = 0$ dương."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f'(x) = 2px/(x^2+p)^2$ âm với $x < 0$ và dương với $x > 0$ — đổi dấu từ $-$ sang $+$ tại $x = 0$, xác nhận cực tiểu. Đáp án D cũng đúng nhưng B là cơ sở đầy đủ hơn."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 6,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q4",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Lập bảng dấu của $f'(x) = 2x/(x^2+1)^2$. $f(x) = x^2/(x^2+1)$ tăng trên khoảng nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Tăng trên $(-\\infty, 0)$, giảm trên $(0,\\infty)$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Giảm trên $(-\\infty, 0)$, tăng trên $(0,\\infty)$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Tăng trên toàn bộ $\\mathbb{R}$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giảm trên toàn bộ $\\mathbb{R}$."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$f'(x) = 2x/(x^2+1)^2$; tử số $2x$ âm với $x < 0$ và dương với $x > 0$; mẫu luôn dương. Vậy $f' < 0$ trên $(-\\infty,0)$ và $f' > 0$ trên $(0,\\infty)$."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 7,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q5",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Khi $p$ tăng từ $0.5$ đến $4$, điểm uốn của $f(x) = x^2/(x^2+p)$ thay đổi thế nào?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Chúng tiến về $x = 0$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Chúng di chuyển ra xa $x = 0$ (về phía ngoài)."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Chúng cố định bất kể $p$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Chúng biến mất với $p$ lớn."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Điểm uốn tại $x = \\pm\\sqrt{p/3}$ (từ $f''=0$). Khi $p$ tăng, $\\sqrt{p/3}$ tăng — các điểm uốn di chuyển ra ngoài."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 8,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q6",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Tại sao $f(x) = x^2/(x^2+p)$ không có tiệm cận đứng với $p > 0$?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Vì tử số và mẫu số bằng nhau."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Vì $x^2 + p > 0$ với mọi $x$ khi $p > 0$ — mẫu số không bao giờ bằng $0$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Vì $f$ bị chặn trên bởi $1$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Vì $f$ là hàm chẵn."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Tiệm cận đứng xuất hiện tại nghiệm của mẫu số. Vì $x^2 + p \\geq p > 0$ luôn luôn, không có nghiệm nào — không có tiệm cận đứng."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 9,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q7",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Với $f(x) = x^3 - 3x + 1$, không vẽ đồ thị, xác định có bao nhiêu cực trị cục bộ.",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không có."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Một cực tiểu."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Một cực đại và một cực tiểu."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Hai cực đại và một cực tiểu."
+                            }
+                        ],
+                        "correct": "c",
+                        "explanation": "$f'(x) = 3x^2 - 3 = 3(x^2-1) = 0$ tại $x = \\pm 1$. $f''(x) = 6x$. $f''(-1) = -6 < 0$: cực đại. $f''(1) = 6 > 0$: cực tiểu."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 10,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q8",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Nồng độ thuốc $C(t) = t^2/(t^2 + 4)$. Phân loại hành vi: có cực đại hữu hạn không, và khi nào đường cong đổi tính lõm?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Không có cực đại; tính lõm đổi tại $t = 2$."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Cực đại khi $t \\to \\infty$; tính lõm đổi tại $t = 2/\\sqrt{3}$."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Cực đại cục bộ tại $t = 0$; không có điểm uốn."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Hàm luôn tăng — không có cực đại."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "$C(t) \\to 1$ khi $t \\to \\infty$ (tiệm cận ngang, không có cực đại hữu hạn). Điểm uốn: $p = 4$, tại $t = \\sqrt{4/3} = 2/\\sqrt{3}$ — cùng công thức với tương tác."
+                    }
+                }
+            ]
+        },
+        {
+            "order_index": 11,
+            "blocks": [
+                {
+                    "id": "quiz-m3l12-q9",
+                    "type": "quiz",
+                    "content": {
+                        "question": "Phác thảo đồ thị dùng sáu thông tin. Nếu học sinh tính đúng cả sáu nhưng tìm ra mâu thuẫn (ví dụ: $f'(a) > 0$ nhưng tuyên bố $a$ là cực đại), điều đó cho thấy gì?",
+                        "options": [
+                            {
+                                "value": "a",
+                                "label": "Cực đại có thể xảy ra nơi $f' > 0$ — không mâu thuẫn."
+                            },
+                            {
+                                "value": "b",
+                                "label": "Có lỗi tính toán — các ràng buộc tự kiểm tra nhau; mâu thuẫn xác nhận có sai sót."
+                            },
+                            {
+                                "value": "c",
+                                "label": "Hàm phải gián đoạn tại $a$."
+                            },
+                            {
+                                "value": "d",
+                                "label": "Giao thức phác thảo có ngoại lệ cho loại hàm này."
+                            }
+                        ],
+                        "correct": "b",
+                        "explanation": "Sáu đặc trưng không phải danh sách độc lập — chúng tạo thành hệ ràng buộc tương hỗ. Mâu thuẫn báo hiệu lỗi tính toán, không phải ngoại lệ lý thuyết."
+                    }
+                }
+            ]
+        }
+    ]
+}
