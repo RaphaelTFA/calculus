@@ -31,7 +31,13 @@
                                     "yMin": -1,
                                     "yMax": 18
                                 },
-                                "model": "(abs(x - 2) < 0.12) ? p : (x * x)"
+                                "model": "x * x",
+                                "point": {
+                                    "x": 2
+                                },
+                                "hole": {
+                                    "x": 2
+                                }
                             },
                             "reflections": [
                                 {

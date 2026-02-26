@@ -104,6 +104,10 @@ TYPE A — Resolution slider (secant → tangent convergence)
 }
 
 TYPE B — Semantic parameter slider
+
+Type B supports two modes: legacy single-model and extended multi-curve.
+
+LEGACY MODE (single curve + optional reference curves):
 {
   "interactionType": "B",
   "meta": { "parameterLabel": "<Vietnamese label>" },
@@ -121,6 +125,60 @@ TYPE B — Semantic parameter slider
     }
   ]
 }
+
+EXTENDED MODE (multi-curve with approach point and annotations):
+Use this mode when the lesson involves RELATIONSHIPS between functions
+(sum/product/quotient rules, comparison, squeeze theorem, etc.).
+{
+  "interactionType": "B",
+  "meta": { "parameterLabel": "<Vietnamese label>" },
+  "parameter": { "min": <n>, "max": <n>, "initial": <n> },
+  "prompt": "<Vietnamese instruction telling user what to do>",
+  "system": {
+    "resolution": 200,
+    "view": { "xMin": <n>, "xMax": <n>, "yMin": <n>, "yMax": <n> },
+    "curves": [
+      { "expr": "<JS expr using x and p>", "label": "<display name>", "color": "<hex>", "style": "dashed", "width": 2 },
+      { "expr": "<JS expr using x and p>", "label": "<display name>", "color": "<hex>", "style": "solid", "width": 3 }
+    ],
+    "approachPoint": {
+      "x": <number>,
+      "label": "x → <value>"
+    },
+    "annotations": [
+      { "type": "limitValue", "expr": "<JS expr using x and p>", "at": <x-value>, "label": "lim f = {value}", "color": "<hex>" },
+      { "type": "horizontalLine", "expr": "<JS expr using p>", "color": "<hex>" }
+    ]
+  },
+  "reflections": [
+    {
+      "id": "<unique id>",
+      "trigger": "<JS expression using state.currentValue>",
+      "text": "<Vietnamese text — may use {p} for param value, {eval:expression} for computed values>"
+    }
+  ]
+}
+
+Extended mode fields:
+- curves[]: Array of named curves. Each has expr (JS using x,p), label, color, style (solid|dashed|dotted), width.
+  The curves are drawn in order; put the "result" curve last with style "solid" and width 3.
+- approachPoint: Draws a vertical dashed line at x. Colored dots appear where each curve intersects.
+- annotations[]:
+  - "limitValue": Evaluates expr at x=at, displays "label" with {value} replaced by computed number. Shown in a panel.
+  - "horizontalLine": Draws a dotted horizontal line at the computed y-value.
+- Reflection text supports {p} (parameter value) and {eval:JS_expression_using_p} for dynamic computed values.
+
+WHEN TO USE EXTENDED MODE:
+- Limit arithmetic rules (sum, product, quotient, constant multiple)
+- Comparing multiple functions (e.g., f vs f', upper vs lower bound)
+- Squeeze theorem (show inner function + bounding functions)
+- Continuity checks (show function alongside limit behavior)
+
+CRITICAL RULE FOR ALL INTERACTIONS:
+The interaction MUST visually demonstrate the specific mathematical concept.
+A good interaction is ISOMORPHIC to the concept — the visual change directly
+represents the mathematical idea. Bad: a tilting line for "limit rules".
+Good: separate colored curves f(x), g(x), f+g(x) with live limit values.
 
 TYPE C — Temporal animation (parametric motion)
 {

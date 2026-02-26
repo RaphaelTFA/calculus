@@ -35,8 +35,9 @@ function recompute(interaction, state) {
   const { function: fnExpr, derivative: dfExpr, domain, anchor } = interaction.systemSpec
   const resolution = state.resolution
 
-  const f = interaction.systemSpec._f || new Function("x", `return ${fnExpr}`)
-  const df = interaction.systemSpec._df || new Function("x", `return ${dfExpr}`)
+  const mathHelpers = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
+  const f = interaction.systemSpec._f || new Function("x", `${mathHelpers} return ${fnExpr}`)
+  const df = interaction.systemSpec._df || new Function("x", `${mathHelpers} return ${dfExpr}`)
 
   const graph = []
   const dxGraph = (domain[1] - domain[0]) / 300
@@ -196,10 +197,13 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   const [resolution, setResolution] = useState(LESSON.parameterSpec.resolutionLevels[0])
   const canvasRef = useRef(null)
 
-  const { f, df } = useMemo(() => ({
-    f: new Function("x", `return ${LESSON.systemSpec.function}`),
-    df: new Function("x", `return ${LESSON.systemSpec.derivative}`)
-  }), [LESSON])
+  const { f, df } = useMemo(() => {
+    const mh = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
+    return {
+      f: new Function("x", `${mh} return ${LESSON.systemSpec.function}`),
+      df: new Function("x", `${mh} return ${LESSON.systemSpec.derivative}`)
+    }
+  }, [LESSON])
 
   const interaction = useMemo(() => ({
     ...LESSON,

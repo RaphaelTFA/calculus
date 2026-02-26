@@ -13,9 +13,9 @@ const DEFAULT_LESSON = {
   },
   "reflectionSpec": {
     "triggers": [
-      { "type": "structureNear",  "value": 0.5, "tolerance": 0.05, "message": "Diện tích được chia thành hai phần bằng nhau." },
-      { "type": "structureBelow", "value": 0.15,                   "message": "Hầu hết diện tích nằm về phía phải điểm chia." },
-      { "type": "structureAbove", "value": 0.85,                   "message": "Hầu hết diện tích nằm về phía trái điểm chia." }
+      { "type": "structureNear", "value": 0.5, "tolerance": 0.05, "message": "Diện tích được chia thành hai phần bằng nhau." },
+      { "type": "structureBelow", "value": 0.15, "message": "Hầu hết diện tích nằm về phía phải điểm chia." },
+      { "type": "structureAbove", "value": 0.85, "message": "Hầu hết diện tích nằm về phía trái điểm chia." }
     ]
   },
   "representationSpec": {
@@ -31,6 +31,11 @@ const DEFAULT_LESSON = {
 function evalExpr(expr, scope) {
   const fn = new Function(...Object.keys(scope), `"use strict"; return (${expr});`)
   return fn(...Object.values(scope))
+}
+
+const MATH_HELPERS = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
+function makeFn(expr) {
+  return new Function("x", `${MATH_HELPERS} return ${expr}`)
 }
 
 function integrate(f, a, b, n = 300) {
@@ -83,8 +88,8 @@ function applySplit(splitSpec, base, structure, scope) {
     case "rectangleContribution": {
       const { u, v, du, dv } = scope
       return [
-        { type: "rectangle", x: base.x, y: base.y + v, width: u,  height: dv, contribution: "u·dv" },
-        { type: "rectangle", x: base.x + u, y: base.y, width: du, height: v,  contribution: "v·du" }
+        { type: "rectangle", x: base.x, y: base.y + v, width: u, height: dv, contribution: "u·dv" },
+        { type: "rectangle", x: base.x + u, y: base.y, width: du, height: v, contribution: "v·du" }
       ]
     }
     case "domainSplit": {
@@ -96,8 +101,8 @@ function applySplit(splitSpec, base, structure, scope) {
       ]
     }
     case "signPartition": {
-      const f = new Function("x", `return ${base.f}`)
-      const g = new Function("x", `return ${base.g}`)
+      const f = makeFn(base.f)
+      const g = makeFn(base.g)
       const h = x => f(x) - g(x)
       const [a, b] = base.domain
       const roots = detectRoots(h, a, b)
@@ -120,12 +125,12 @@ function measure(geom) {
   switch (geom.type) {
     case "rectangle": return geom.width * geom.height
     case "areaUnderCurve": {
-      const f = new Function("x", `return ${geom.functionSpec}`)
+      const f = makeFn(geom.functionSpec)
       return integrate(f, geom.domain[0], geom.domain[1])
     }
     case "regionBetweenCurves": {
-      const f = new Function("x", `return ${geom.f}`)
-      const g = new Function("x", `return ${geom.g}`)
+      const f = makeFn(geom.f)
+      const g = makeFn(geom.g)
       return Math.abs(integrate(x => f(x) - g(x), geom.domain[0], geom.domain[1]))
     }
     default: return 0
@@ -167,19 +172,19 @@ function evaluateReflection(lesson, state) {
 // ─── SVG HELPERS ─────────────────────────────────────────────────────────────
 
 const COLORS = {
-  left:       { fill: '#6366f1', stroke: '#4338ca', text: '#4338ca' },   // indigo
-  right:      { fill: '#38bdf8', stroke: '#0284c7', text: '#0369a1' },   // sky
-  positive:   { fill: '#34d399', stroke: '#059669', text: '#065f46' },   // emerald
-  negative:   { fill: '#f87171', stroke: '#dc2626', text: '#991b1b' },   // red
-  splitLine:  '#f59e0b',                                                  // amber
-  curve:      '#1e293b',
-  axis:       '#94a3b8',
-  grid:       '#e2e8f0',
-  label:      '#64748b',
+  left: { fill: '#6366f1', stroke: '#4338ca', text: '#4338ca' },   // indigo
+  right: { fill: '#38bdf8', stroke: '#0284c7', text: '#0369a1' },   // sky
+  positive: { fill: '#34d399', stroke: '#059669', text: '#065f46' },   // emerald
+  negative: { fill: '#f87171', stroke: '#dc2626', text: '#991b1b' },   // red
+  splitLine: '#f59e0b',                                                  // amber
+  curve: '#1e293b',
+  axis: '#94a3b8',
+  grid: '#e2e8f0',
+  label: '#64748b',
 }
 
 function buildCurvePath(fnSpec, domain, mapX, mapY, steps = 300) {
-  const f = new Function("x", `return ${fnSpec}`)
+  const f = makeFn(fnSpec)
   const [a, b] = domain
   const dx = (b - a) / steps
   let d = ""
@@ -193,7 +198,7 @@ function buildCurvePath(fnSpec, domain, mapX, mapY, steps = 300) {
 
 function buildAreaPath(geom, mapX, mapY, steps = 300) {
   if (geom.type === "areaUnderCurve") {
-    const f = new Function("x", `return ${geom.functionSpec}`)
+    const f = makeFn(geom.functionSpec)
     const [a, b] = geom.domain
     if (a >= b) return ""
     const dx = (b - a) / steps
@@ -205,8 +210,8 @@ function buildAreaPath(geom, mapX, mapY, steps = 300) {
     return `M ${mapX(a)},${mapY(0)} L ${pts.join(" L ")} L ${mapX(b)},${mapY(0)} Z`
   }
   if (geom.type === "regionBetweenCurves") {
-    const f = new Function("x", `return ${geom.f}`)
-    const g = new Function("x", `return ${geom.g}`)
+    const f = makeFn(geom.f)
+    const g = makeFn(geom.g)
     const [a, b] = geom.domain
     const dx = (b - a) / steps
     const top = [], bot = []
@@ -258,7 +263,7 @@ function GraphView({ lesson, structure, system }) {
   if (system.base.type === "areaUnderCurve")
     curvePath = buildCurvePath(system.base.functionSpec, system.base.domain, mapX, mapY)
   else if (system.base.type === "regionBetweenCurves") {
-    curvePath  = buildCurvePath(system.base.f, system.base.domain, mapX, mapY)
+    curvePath = buildCurvePath(system.base.f, system.base.domain, mapX, mapY)
     curvePath += " " + buildCurvePath(system.base.g, system.base.domain, mapX, mapY)
   }
 
@@ -283,28 +288,28 @@ function GraphView({ lesson, structure, system }) {
   let leftLabelX = null, rightLabelX = null, labelY = null
   if (splitType === "domainSplit" && splitX !== null) {
     const [a, b] = system.base.domain
-    leftLabelX  = mapX((a + splitX) / 2)
+    leftLabelX = mapX((a + splitX) / 2)
     rightLabelX = mapX((splitX + b) / 2)
-    labelY      = mapY(vb.yMax * 0.35)
+    labelY = mapY(vb.yMax * 0.35)
   }
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" style={{ display: 'block', overflow: 'visible' }}>
       <defs>
-        <linearGradient id="grad-left"  x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={COLORS.left.fill}  stopOpacity="0.9" />
-          <stop offset="100%" stopColor={COLORS.left.fill}  stopOpacity="0.4" />
+        <linearGradient id="grad-left" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={COLORS.left.fill} stopOpacity="0.9" />
+          <stop offset="100%" stopColor={COLORS.left.fill} stopOpacity="0.4" />
         </linearGradient>
         <linearGradient id="grad-right" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={COLORS.right.fill} stopOpacity="0.9" />
+          <stop offset="0%" stopColor={COLORS.right.fill} stopOpacity="0.9" />
           <stop offset="100%" stopColor={COLORS.right.fill} stopOpacity="0.4" />
         </linearGradient>
-        <linearGradient id="grad-pos"   x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={COLORS.positive.fill} stopOpacity="0.9" />
+        <linearGradient id="grad-pos" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={COLORS.positive.fill} stopOpacity="0.9" />
           <stop offset="100%" stopColor={COLORS.positive.fill} stopOpacity="0.4" />
         </linearGradient>
-        <linearGradient id="grad-neg"   x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={COLORS.negative.fill} stopOpacity="0.9" />
+        <linearGradient id="grad-neg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={COLORS.negative.fill} stopOpacity="0.9" />
           <stop offset="100%" stopColor={COLORS.negative.fill} stopOpacity="0.4" />
         </linearGradient>
         <clipPath id="graph-clip">

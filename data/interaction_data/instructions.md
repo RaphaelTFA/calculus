@@ -31,6 +31,30 @@ recompute(interaction, state) → { newState, systemState }
 - **State**: `{ parameterValue: number }`
 - **Semantics**: Parameter modifies semantic function. Sampling fidelity is fixed. No time or structural reordering.
 
+#### Type B Extended Mode — Multi-Curve with Annotations
+
+Type B supports an **extended mode** for lessons involving relationships between functions (limit rules, comparison, squeeze theorem, etc.).
+
+**Extended system spec fields:**
+- `curves[]`: Array of named curves. Each: `{ expr, label, color, style (solid|dashed|dotted), width }`. Replaces `model` + `refCurves`. Drawn in array order (last = on top).
+- `approachPoint`: `{ x, label }` — vertical dashed line at x, with colored dots where each curve intersects.
+- `annotations[]`:
+  - `{ type: "limitValue", expr, at, label, color }` — evaluates `expr` at `x=at`, renders in a panel. Use `{value}` in label for computed substitution.
+  - `{ type: "horizontalLine", expr, color }` — evaluates `expr` (using `p` only), draws a dotted horizontal line.
+- `prompt`: Vietnamese instruction text displayed above the slider.
+
+**Reflection text interpolation:**
+- `{p}` → current parameter value (2 decimals)
+- `{eval:JS_expression_using_p}` → evaluated expression result
+
+**When to use extended mode:**
+- Limit arithmetic (sum, product, quotient rules) — show f, g, and f∘g simultaneously
+- Squeeze theorem — show bounded function + envelope curves
+- Function comparison — show f vs f' or f vs g
+- Continuity — show function value vs limit behavior
+
+**Backward compatibility:** If `curves[]` is absent, the renderer falls back to `model` + `refCurves` (legacy mode). All existing lessons continue to work unchanged.
+
 ### 🔷 Type C — Temporal Playback
 - **Primitive Owned**: Time
 - **State**: `{ t: number }`
