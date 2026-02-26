@@ -117,53 +117,54 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
   const vb = representationSpec.viewBox
   const w = cssW; const h = cssH
 
-  // Add a small padding so axes and arrowheads are not clipped
-  const pad = Math.max(12, Math.round(Math.min(w, h) / 20))
-  const innerW = Math.max(1, w - 2 * pad)
-  const innerH = Math.max(1, h - 2 * pad)
+  // Minimal, precise padding for arrowheads only
+  const pad = 10;
+  const innerW = w - 2 * pad;
+  const innerH = h - 2 * pad;
 
-  const mapX = x => pad + (x - vb.xMin) / (vb.xMax - vb.xMin) * innerW
-  const mapY = y => pad + innerH - (y - vb.yMin) / (vb.yMax - vb.yMin) * innerH
+  // Centered mapping: ensures (0,0) is visually centered if in viewBox
+  const mapX = x => pad + ((x - vb.xMin) / (vb.xMax - vb.xMin)) * innerW;
+  const mapY = y => pad + innerH - ((y - vb.yMin) / (vb.yMax - vb.yMin)) * innerH;
 
   // Draw each geometry object with a clean, textbook style
   systemState.geometry.forEach(obj => {
-    // Bold black axes with arrowheads
+    // Bold black axes with arrowheads, axes extended beyond viewBox
     if (obj.type === 'axes') {
       ctx.save()
       ctx.strokeStyle = '#000000'
-      ctx.lineWidth = Math.max(1.5, Math.min(3, Math.round(w / 300)))
+      ctx.lineWidth = Math.max(3, Math.min(5, Math.round(w / 120))) // thicker axes
       ctx.beginPath()
-      // x-axis
+      // x-axis (extend beyond viewBox)
       const y0 = mapY(0)
-      ctx.moveTo(pad, y0); ctx.lineTo(w - pad, y0)
-      // y-axis
+      ctx.moveTo(0, y0); ctx.lineTo(w, y0)
+      // y-axis (extend beyond viewBox)
       const x0 = mapX(0)
-      ctx.moveTo(x0, pad); ctx.lineTo(x0, h - pad)
+      ctx.moveTo(x0, 0); ctx.lineTo(x0, h)
       ctx.stroke()
 
-      // arrowheads (small, proportional)
-      const ah = Math.max(6, Math.round(Math.min(innerW, innerH) / 80))
+      // arrowheads (slightly larger, proportional)
+      const ah = Math.max(10, Math.round(Math.min(innerW, innerH) / 60))
       // x-axis arrow (right)
       ctx.beginPath()
-      ctx.moveTo(w - pad - ah, y0 - ah / 2)
-      ctx.lineTo(w - pad, y0)
-      ctx.lineTo(w - pad - ah, y0 + ah / 2)
+      ctx.moveTo(w - ah, y0 - ah / 2)
+      ctx.lineTo(w, y0)
+      ctx.lineTo(w - ah, y0 + ah / 2)
       ctx.fillStyle = '#000'
       ctx.fill()
       // y-axis arrow (top)
       ctx.beginPath()
-      ctx.moveTo(x0 - ah / 2, pad + ah)
-      ctx.lineTo(x0, pad)
-      ctx.lineTo(x0 + ah / 2, pad + ah)
+      ctx.moveTo(x0 - ah / 2, ah)
+      ctx.lineTo(x0, 0)
+      ctx.lineTo(x0 + ah / 2, ah)
       ctx.fill()
       ctx.restore()
     }
 
-    // Secondary reference: thin orange line (low weight)
+    // Secondary reference: orange line, thicker
     if (obj.type === 'fullCurve') {
       ctx.save()
       ctx.strokeStyle = '#fb923c' // orange-400
-      ctx.lineWidth = 1
+      ctx.lineWidth = 2.2 // thicker
       ctx.setLineDash([6, 6])
       ctx.beginPath()
       obj.data.forEach((pt, i) => {
@@ -175,11 +176,11 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
       ctx.restore()
     }
 
-    // Main trace: strong blue
+    // Main trace: strong blue, thicker
     if (obj.type === 'trace') {
       ctx.save()
       ctx.strokeStyle = '#1e40af' // strong indigo-blue
-      ctx.lineWidth = 2.5
+      ctx.lineWidth = 4.5 // thicker
       ctx.lineJoin = 'round'
       ctx.lineCap = 'round'
       ctx.beginPath()
@@ -191,13 +192,13 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
       ctx.restore()
     }
 
-    // Highlight points with solid circular markers and dashed projections
+    // Highlight points with larger markers and projections
     if (obj.type === 'point') {
       const px = mapX(obj.x); const py = mapY(obj.y)
       // dashed projection to axes
       ctx.save()
       ctx.strokeStyle = 'rgba(0,0,0,0.25)'
-      ctx.lineWidth = 1
+      ctx.lineWidth = 1.5
       ctx.setLineDash([4, 4])
       ctx.beginPath()
       // vertical to x-axis
@@ -206,12 +207,12 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
       ctx.moveTo(px, py); ctx.lineTo(mapX(0), py)
       ctx.stroke()
       ctx.setLineDash([])
-      // filled circular marker with white ring
+      // filled circular marker with white ring, larger
       ctx.beginPath()
       ctx.fillStyle = '#1e40af'
-      ctx.arc(px, py, 5, 0, Math.PI * 2)
+      ctx.arc(px, py, 8, 0, Math.PI * 2)
       ctx.fill()
-      ctx.lineWidth = 2
+      ctx.lineWidth = 2.5
       ctx.strokeStyle = '#ffffff'
       ctx.stroke()
       ctx.restore()
