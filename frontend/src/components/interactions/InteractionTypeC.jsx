@@ -251,8 +251,7 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
   const [playing, setPlaying] = useState(false)
   const [reflection, setReflection] = useState("")
 
-  // Shrink all sizes by ~20% and make slide-friendly
-  // For best appearance, Step.jsx should use a white or transparent background for interaction slides.
+  // Layout: canvas fills all available space, controls are compact below
   const styles = {
     root: {
       width: '100%',
@@ -262,21 +261,29 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
       alignItems: 'center',
       fontFamily: 'system-ui',
       background: 'transparent',
+      padding: '12px 16px',
+      boxSizing: 'border-box',
       gap: 8
     },
-    canvas: {
+    canvasWrapper: {
+      flex: '1 1 0',
       width: '100%',
-      maxWidth: 420,
-      aspectRatio: '7/5',
+      minHeight: 0,
+      position: 'relative'
+    },
+    canvas: {
+      position: 'absolute',
+      inset: 0,
+      width: '100%',
+      height: '100%',
       background: '#fff',
       border: '1px solid #e5e7eb',
-      borderRadius: 6,
-      display: 'block',
-      marginBottom: 8,
-      height: 'auto'
+      borderRadius: 8,
+      display: 'block'
     },
     controls: {
       width: '100%',
+      flexShrink: 0,
       display: 'flex',
       alignItems: 'center',
       gap: 8
@@ -293,7 +300,8 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      outline: 'none'
+      outline: 'none',
+      flexShrink: 0
     },
     timelineBar: {
       flex: 1,
@@ -328,15 +336,16 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
       minWidth: 44,
       textAlign: 'right',
       color: '#555',
-      fontSize: 12
+      fontSize: 12,
+      flexShrink: 0
     },
     reflection: {
       width: '100%',
-      minHeight: 24,
+      flexShrink: 0,
       fontSize: 13,
       color: '#111827',
       textAlign: 'center',
-      marginTop: 4
+      minHeight: 20
     }
   }
 
@@ -429,7 +438,9 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
 
   return (
     <div style={styles.root}>
-      <canvas ref={canvasRef} style={styles.canvas}></canvas>
+      <div style={styles.canvasWrapper}>
+        <canvas ref={canvasRef} style={styles.canvas}></canvas>
+      </div>
       <div style={styles.controls}>
         <button style={styles.playBtn} onClick={() => setPlaying(p => !p)}>
           {playing ? (

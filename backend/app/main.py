@@ -172,9 +172,13 @@ async def seed_from_json():
                 categories_map[cat["slug"]] = category
                 logger.debug(f"  ✅ Category: {cat['name']}")
         
-        # 2. Load courses from folder-based structure
-        courses_dir = DATA_DIR / "courses"
-        if courses_dir.exists():
+        # 2. Load courses from folder-based structure (both courses/ and raw_courses/)
+        course_source_dirs = [DATA_DIR / "courses", DATA_DIR / "raw_courses"]
+        seen_slugs = set()
+
+        for courses_dir in course_source_dirs:
+            if not courses_dir.exists():
+                continue
             for course_folder in sorted(courses_dir.iterdir()):
                 if not course_folder.is_dir():
                     continue
@@ -184,6 +188,12 @@ async def seed_from_json():
 
                 with open(course_file, 'r', encoding='utf-8') as f:
                     course_data = json.load(f)
+
+                # Skip if we already processed this slug from a previous source dir
+                slug = course_data.get("slug")
+                if slug in seen_slugs:
+                    continue
+                seen_slugs.add(slug)
 
                 # Load chapters from subfolders
                 chapters_dir = course_folder / "chapters"

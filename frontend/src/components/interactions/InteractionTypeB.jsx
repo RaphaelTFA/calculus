@@ -406,9 +406,12 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
       renderCanvas(canvas, recomputeSystem(config, valueRef.current))
     }
 
-    window.addEventListener('resize', handleResize)
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const obs = new ResizeObserver(handleResize)
+    obs.observe(canvas.parentElement)
     handleResize()
-    return () => window.removeEventListener('resize', handleResize)
+    return () => obs.disconnect()
   }, [])
 
   // Re-render on value change
@@ -470,84 +473,81 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative',
-      background: '#ffffff', overflow: 'hidden'
+      background: '#ffffff', overflow: 'hidden',
+      display: 'flex', flexDirection: 'column', padding: '12px 20px',
+      boxSizing: 'border-box', gap: 12
     }}>
-      {/* Main stage */}
+      {/* Canvas + reflection — grows to fill */}
       <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', padding: 20
+        flex: 1, minHeight: 0,
+        display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: 24
       }}>
-        {/* Canvas + reflections row */}
-        <div style={{
-          flex: 1, width: '100%', maxWidth: 1100,
-          display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: 40
-        }}>
-          {/* Canvas */}
-          <div style={{ flex: '0 0 700px', maxWidth: 800, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <canvas
-              ref={canvasRef}
-              style={{ width: '100%', maxHeight: 500, display: 'block' }}
-            />
-          </div>
-
-          {/* Reflection cards */}
-          <div style={{
-            flex: 1, maxWidth: 320,
-            display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto'
-          }}>
-            {cards.map(card => (
-              <div
-                key={card.id}
-                style={{
-                  background: 'rgba(255,255,255,0.95)',
-                  padding: 15,
-                  borderLeft: '4px solid #3498db',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                  borderRadius: 4,
-                  fontSize: '0.95rem',
-                  lineHeight: 1.4,
-                  opacity: card.visible ? 1 : 0,
-                  transform: card.visible ? 'translateX(0)' : 'translateX(20px)',
-                  transition: 'all 0.5s ease-out'
-                }}
-              >
-                {card.text}
-              </div>
-            ))}
-          </div>
+        {/* Canvas */}
+        <div style={{ flex: '1 1 0', minWidth: 0, position: 'relative' }}>
+          <canvas
+            ref={canvasRef}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
+          />
         </div>
 
-        {/* Slider panel */}
+        {/* Reflection cards */}
         <div style={{
-          width: '100%', maxWidth: 600,
-          padding: 20, background: '#f8f9fa',
-          borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-          marginTop: 20, border: '1px solid #ddd'
+          width: 260, flexShrink: 0,
+          display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto',
+          justifyContent: 'center'
         }}>
-          {config.prompt && (
-            <p style={{
-              margin: '0 0 12px', fontSize: 13, color: '#64748b',
-              lineHeight: 1.4, fontStyle: 'italic'
-            }}>{config.prompt}</p>
-          )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-            <label style={{ fontWeight: 600, minWidth: 120, fontSize: 14, color: '#2c3e50' }}>
-              {config.meta.parameterLabel}
-            </label>
-            <input
-              type="range"
-              step="0.001"
-              min={config.parameter.min}
-              max={config.parameter.max}
-              value={currentValue}
-              onChange={e => setCurrentValue(parseFloat(e.target.value))}
-              style={{ flex: 1, cursor: 'pointer', accentColor: '#3498db' }}
-            />
-            <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#3498db', fontWeight: 700, minWidth: 40 }}>
-              {currentValue.toFixed(2)}
-            </span>
-          </div>
+          {cards.map(card => (
+            <div
+              key={card.id}
+              style={{
+                background: 'rgba(255,255,255,0.95)',
+                padding: 14,
+                borderLeft: '4px solid #3498db',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.07)',
+                borderRadius: 6,
+                fontSize: '0.9rem',
+                lineHeight: 1.45,
+                opacity: card.visible ? 1 : 0,
+                transform: card.visible ? 'translateX(0)' : 'translateX(16px)',
+                transition: 'all 0.4s ease-out'
+              }}
+            >
+              {card.text}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Slider panel — compact, fixed height */}
+      <div style={{
+        flexShrink: 0,
+        padding: '12px 16px',
+        background: '#f8f9fa',
+        borderRadius: 10,
+        border: '1px solid #ddd'
+      }}>
+        {config.prompt && (
+          <p style={{
+            margin: '0 0 10px', fontSize: 12, color: '#64748b',
+            lineHeight: 1.4, fontStyle: 'italic'
+          }}>{config.prompt}</p>
+        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <label style={{ fontWeight: 600, minWidth: 120, fontSize: 13, color: '#2c3e50' }}>
+            {config.meta.parameterLabel}
+          </label>
+          <input
+            type="range"
+            step="0.001"
+            min={config.parameter.min}
+            max={config.parameter.max}
+            value={currentValue}
+            onChange={e => setCurrentValue(parseFloat(e.target.value))}
+            style={{ flex: 1, cursor: 'pointer', accentColor: '#3498db' }}
+          />
+          <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#3498db', fontWeight: 700, minWidth: 40 }}>
+            {currentValue.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>
