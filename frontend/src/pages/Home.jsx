@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
+import { X as XIcon } from 'lucide-react'
 import { useAuthStore } from '../lib/store'
 import api from '../lib/api'
 
@@ -33,6 +34,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   useEffect(() => {
     // Fetch fresh user data to ensure XP/streak is synced
@@ -191,7 +193,8 @@ export default function Home() {
             <LeagueCard 
               xp={user?.xp || 0} 
               league={dashboardData.league} 
-              rank={dashboardData.rank || 0} 
+              rank={dashboardData.rank || 0}
+              onViewLeaderboard={() => setShowLeaderboard(true)}
             />
           )}
         </aside>
@@ -309,7 +312,7 @@ export default function Home() {
               icon={Trophy} 
               title="View Leaderboard" 
               description="See how you rank"
-              to="/profile"
+              onClick={() => setShowLeaderboard(true)}
             />
             <QuickActionCard 
               icon={Target} 
@@ -320,9 +323,119 @@ export default function Home() {
           </div>
         </main>
       </div>
+
+      <AnimatePresence>
+        {showLeaderboard && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+          >
+            <LeaderboardModal onClose={() => setShowLeaderboard(false)} user={user} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   )
 }
+
+    // Leaderboard Modal (mobile-first, modern minimal gamified look)
+    function LeaderboardModal({ onClose, user }) {
+      const [items, setItems] = useState(null)
+      const [loading, setLoading] = useState(true)
+      const [error, setError] = useState(null)
+
+      useEffect(() => {
+        let mounted = true
+        const fetchLeaderboard = async () => {
+          setLoading(true)
+          try {
+            // Request ranks 26-45 (start=26, limit=20)
+            const res = await api.get('/progress/leaderboard?start=26&limit=20')
+            if (!mounted) return
+            setItems(res?.entries || [])
+          } catch (e) {
+            console.error('Error loading leaderboard', e)
+            if (mounted) setError('Failed to load leaderboard')
+          } finally {
+            if (mounted) setLoading(false)
+          }
+        }
+        fetchLeaderboard()
+        return () => { mounted = false }
+      }, [])
+
+      const colors = ['bg-amber-300','bg-emerald-300','bg-sky-300','bg-pink-300','bg-violet-300']
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+
+          <div className="relative z-10 w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#ffba5a,#ff7a18)' }}>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2l3 4h4v6c0 5-3 9-7 10-4-1-7-5-7-10V6h4l3-4z" fill="#fff" opacity="0.95" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase font-semibold tracking-widest">HYDROGEN LEAGUE</div>
+                    <div className="text-sm font-bold">Top 15 advance · <span className="text-gray-400 font-medium">3 days left</span></div>
+                  </div>
+                </div>
+                <button onClick={onClose} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                  <XIcon className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* List */}
+            <div className="p-4">
+              <div className="text-xs text-gray-400 mb-3">Rankings (showing 26–45)</div>
+              <div className="max-h-72 overflow-y-auto rounded-lg border border-gray-100 shadow-sm">
+                {loading ? (
+                  <div className="p-6 flex items-center justify-center text-sm text-gray-500">Loading…</div>
+                ) : error ? (
+                  <div className="p-6 text-sm text-red-500">{error}</div>
+                ) : (
+                  <ul className="divide-y divide-gray-100">
+                    {items.map((it, idx) => {
+                      const isCurrent = it.id === user?.id
+                      return (
+                        <li key={it.id} className={"flex items-center justify-between px-4 py-3 gap-3 " + (isCurrent ? 'bg-gray-100 rounded-lg mx-2 my-2' : '')}>
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="text-sm text-gray-400 w-6 text-right">{it.rank}</div>
+                            <div className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-bold ${colors[idx % colors.length]}`}>
+                              {String(it.username || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium truncate">{it.username}</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-500 font-medium">{it.xp} XP</div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-3 border-t flex items-center justify-between">
+              <div className="text-sm text-gray-500">Showing ranks 26–45 · Top 15 advances soon</div>
+              <div>
+                <button onClick={onClose} className="px-3 py-2 bg-emerald-500 text-white rounded-lg shadow-sm font-semibold">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
 
 // =============================================================================
 // MAIN CONTENT COMPONENTS
@@ -511,20 +624,32 @@ function AchievementItem({ icon, title, description, unlocked }) {
 /**
  * Quick Action Card Component
  */
-function QuickActionCard({ icon: Icon, title, description, to }) {
+function QuickActionCard({ icon: Icon, title, description, to, onClick }) {
+  const content = (
+    <Card className="hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer h-full">
+      <CardContent className="p-4 space-y-3">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-bold text-foreground">{title}</h3>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  if (onClick) {
+    return (
+      <div onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onClick() }}>
+        {content}
+      </div>
+    )
+  }
+
   return (
     <Link to={to}>
-      <Card className="hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer h-full">
-        <CardContent className="p-4 space-y-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Icon className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-bold text-foreground">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
-          </div>
-        </CardContent>
-      </Card>
+      {content}
     </Link>
   )
 }
@@ -587,7 +712,7 @@ function StreakCard({ streak }) {
 /**
  * League/XP Card
  */
-function LeagueCard({ xp, league, rank }) {
+function LeagueCard({ xp, league, rank, onViewLeaderboard = () => {} }) {
   const levelProgress = (xp % 100)
   const currentLevel = Math.floor(xp / 100)
 
@@ -616,7 +741,7 @@ function LeagueCard({ xp, league, rank }) {
           <p className="text-xs text-muted-foreground">{100 - levelProgress} XP to next level</p>
         </div>
         
-        <Button variant="outline" size="sm" className="w-full mt-2">
+        <Button variant="outline" size="sm" className="w-full mt-2" onClick={onViewLeaderboard}>
           View Leaderboard
         </Button>
       </CardContent>

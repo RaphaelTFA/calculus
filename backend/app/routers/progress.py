@@ -8,6 +8,7 @@ from app.schemas import (
     DashboardResponse, StoryDetailResponse, ChapterResponse, StepResponse,
     UserStatsResponse, UserProgressResponse, AchievementResponse
 )
+from app.schemas import LeaderboardResponse
 from app.auth import get_current_user
 from app.routers.stories import calculate_story_progress
 import logging
@@ -15,6 +16,37 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/progress", tags=["progress"])
+
+
+@router.get("/leaderboard", response_model=LeaderboardResponse)
+async def get_leaderboard(
+    start: int = 1,
+    limit: int = 30,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Return leaderboard entries ordered by XP descending."""
+    if start < 1:
+        start = 1
+    if limit < 1 or limit > 200:
+        limit = 30
+
+    offset = start - 1
+    result = await db.execute(
+        select(User).order_by(User.xp.desc()).offset(offset).limit(limit)
+    )
+    users = result.scalars().all()
+
+    entries = []
+    for idx, u in enumerate(users):
+        entries.append({
+            'id': u.id,
+            'rank': start + idx,
+            'username': u.display_name or u.username,
+            'xp': u.xp or 0
+        })
+
+    return LeaderboardResponse(entries=entries)
 
 @router.get("/dashboard", response_model=DashboardResponse)
 async def get_dashboard(

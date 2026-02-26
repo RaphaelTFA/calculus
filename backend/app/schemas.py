@@ -144,6 +144,17 @@ class UserProgressResponse(BaseModel):
     achievements: list[AchievementResponse]
     recent_activity: list[dict]
 
+
+class LeaderboardEntry(BaseModel):
+    id: int
+    rank: int
+    username: str
+    xp: int
+
+
+class LeaderboardResponse(BaseModel):
+    entries: list[LeaderboardEntry]
+
 # Generic
 class SuccessResponse(BaseModel):
     success: bool = True
