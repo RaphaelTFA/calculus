@@ -45,17 +45,10 @@ class Settings(BaseSettings):
             elif v.startswith("postgresql://") and "+asyncpg" not in v:
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-            # 🔥 BẮT BUỘC SSL CHO SUPABASE
-            if "postgresql+asyncpg://" in v and "sslmode" not in v:
-                if "?" in v:
-                    v += "&sslmode=require"
-                else:
-                    v += "?sslmode=require"
-
             # SQLite fallback
             if v.endswith(".db") and not v.startswith("sqlite"):
                 v = f"sqlite+aiosqlite:///{v}"
-
+        print(f"Normalized database URL: {v}")
         return v
 
 
