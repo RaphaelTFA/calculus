@@ -22,6 +22,7 @@ router = APIRouter(prefix="/progress", tags=["progress"])
 async def get_leaderboard(
     start: int = 1,
     limit: int = 30,
+    around: bool = False,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -30,6 +31,23 @@ async def get_leaderboard(
         start = 1
     if limit < 1 or limit > 200:
         limit = 30
+
+    # Total users count
+    total_result = await db.execute(select(func.count(User.id)))
+    total_count = total_result.scalar() or 0
+
+    # If client requests leaderboard centered around current user, compute their rank
+    current_user_rank = None
+    if around:
+        higher_result = await db.execute(
+            select(func.count(User.id)).where(User.xp > (current_user.xp or 0))
+        )
+        higher_count = higher_result.scalar() or 0
+        current_user_rank = int(higher_count) + 1
+
+        # center the returned page around the user's rank
+        half = max(0, limit // 2)
+        start = max(1, current_user_rank - half)
 
     offset = start - 1
     result = await db.execute(
@@ -46,7 +64,7 @@ async def get_leaderboard(
             'xp': u.xp or 0
         })
 
-    return LeaderboardResponse(entries=entries)
+    return LeaderboardResponse(entries=entries, current_user_rank=current_user_rank, total_count=total_count)
 
 @router.get("/dashboard", response_model=DashboardResponse)
 async def get_dashboard(

@@ -154,6 +154,8 @@ class LeaderboardEntry(BaseModel):
 
 class LeaderboardResponse(BaseModel):
     entries: list[LeaderboardEntry]
+    current_user_rank: Optional[int] = None
+    total_count: Optional[int] = None
 
 # Generic
 class SuccessResponse(BaseModel):
