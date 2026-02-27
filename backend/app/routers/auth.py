@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -6,6 +6,8 @@ from app.database import get_db
 from app.models import User
 from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse, UpdateProfile, ChangePassword
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
+from datetime import timedelta
+from app.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -38,7 +40,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     return TokenResponse(token=token, user=UserResponse.model_validate(user))
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
+async def login(data: UserLogin, response: Response, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
     
@@ -48,8 +50,26 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
             detail="Invalid email or password"
         )
     
-    token = create_access_token({"sub": str(user.id)})
-    
+    # Determine token expiry based on "remember me"
+    if getattr(data, 'remember', False):
+        access_expires = timedelta(days=30)
+    else:
+        access_expires = timedelta(minutes=settings.access_token_expire_minutes)
+
+    token = create_access_token({"sub": str(user.id)}, expires_delta=access_expires)
+
+    # Set HttpOnly cookie so browser stores the token (used for "remember me")
+    secure_flag = not settings.debug
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=secure_flag,
+        samesite="lax",
+        max_age=int(access_expires.total_seconds()),
+        path="/"
+    )
+
     return TokenResponse(token=token, user=UserResponse.model_validate(user))
 
 @router.get("/me", response_model=UserResponse)
@@ -57,7 +77,9 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return UserResponse.model_validate(current_user)
 
 @router.post("/logout")
-async def logout():
+async def logout(response: Response):
+    # Clear auth cookie
+    response.delete_cookie("access_token", path="/")
     return {"success": True}
 
 @router.put("/profile", response_model=UserResponse)

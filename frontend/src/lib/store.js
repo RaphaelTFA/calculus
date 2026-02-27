@@ -10,13 +10,13 @@ export const useAuthStore = create(
       isLoading: false,
       error: null,
 
-      login: async (email, password) => {
+      login: async (email, password, remember = false) => {
         set({ isLoading: true, error: null })
         try {
-          const data = await api.post('/auth/login', { email, password })
+          const data = await api.post('/auth/login', { email, password, remember })
           set({ 
-            user: data.user, 
-            token: data.token, 
+            user: data.user || null, 
+            token: data.token || null, 
             isLoading: false,
             error: null 
           })
@@ -50,15 +50,11 @@ export const useAuthStore = create(
       },
 
       fetchUser: async () => {
-        const token = get().token
-        if (!token) return null
-        
         try {
           const user = await api.get('/auth/me')
           set({ user })
           return user
         } catch (error) {
-          // Token invalid, clear auth
           set({ user: null, token: null })
           return null
         }
@@ -88,12 +84,17 @@ export const useAuthStore = create(
           return res
       },
 
-      logout: () => {
+      logout: async () => {
+        try {
+          await api.post('/auth/logout')
+        } catch (e) {
+          // ignore network errors
+        }
         set({ user: null, token: null, error: null })
         localStorage.removeItem('auth-storage')
       },
 
-      isAuthenticated: () => !!get().token,
+      isAuthenticated: () => !!get().user || !!get().token,
       
       clearError: () => set({ error: null }),
 

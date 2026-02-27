@@ -28,7 +28,7 @@ const api = {
       headers['Authorization'] = `Bearer ${token}`
     }
 
-    const res = await fetch(`${API_BASE}${endpoint}`, { headers })
+    const res = await fetch(`${API_BASE}${endpoint}`, { headers, credentials: 'include' })
     
     if (res.status === 401) {
       // Token expired or invalid, clear auth
@@ -64,7 +64,8 @@ const api = {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     })
 
     if (res.status === 401 && !endpoint.includes('/auth/')) {
@@ -97,7 +98,8 @@ const api = {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: 'PUT',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     })
 
     if (!res.ok) {
@@ -123,7 +125,8 @@ const api = {
 
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: 'DELETE',
-      headers
+      headers,
+      credentials: 'include'
     })
 
     if (!res.ok) {
