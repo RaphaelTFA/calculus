@@ -1,0 +1,301 @@
+{
+  "id": "ham-tich-luy",
+  "title": "Hàm Tích Lũy",
+  "description": "Hàm tích lũy F(x) = ∫ₐˣ f(t) dt biến cận trên thành biến số, tạo hàm mới từ diện tích.",
+  "xp_reward": 10,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-accumulation",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Cận trên x"
+              },
+              "parameter": {
+                "min": 0,
+                "max": 4,
+                "initial": 0
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -0.5,
+                  "xMax": 4.5,
+                  "yMin": -1,
+                  "yMax": 9
+                },
+                "curves": [
+                  {
+                    "expr": "2*x",
+                    "color": "#3498db",
+                    "label": "f(t) = 2t",
+                    "style": "solid",
+                    "width": 2
+                  },
+                  {
+                    "expr": "x*x",
+                    "color": "#e67e22",
+                    "label": "F(x) = x²",
+                    "style": "solid",
+                    "width": 2
+                  }
+                ],
+                "shading": {
+                  "curveIndex": 0,
+                  "from": 0,
+                  "to": "p",
+                  "color": "#3498db",
+                  "opacity": 0.25
+                }
+              },
+              "reflections": [
+                {
+                  "id": "start",
+                  "trigger": "state.currentValue < 0.5",
+                  "text": "Cận trên gần $0$: chưa tích lũy diện tích. $F(0) = 0$."
+                },
+                {
+                  "id": "mid",
+                  "trigger": "state.currentValue > 1.8 && state.currentValue < 2.2",
+                  "text": "Diện tích tô màu bằng đúng giá trị $F(x)$ trên đường cong cam. Vùng tô và điểm trên $F$ luôn khớp."
+                },
+                {
+                  "id": "large",
+                  "trigger": "state.currentValue > 3.5",
+                  "text": "Diện tích tăng nhanh vì $f(t) = 2t$ ngày càng lớn. $F$ là hàm bậc hai — tốc độ tích lũy tăng dần."
+                }
+              ],
+              "prompt": "Kéo cận trên $x$ từ $0$ đến $4$. Diện tích tô màu dưới $f(t) = 2t$ thay đổi thế nào? So sánh với giá trị $F(x)$ trên đường cong cam."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-ham-tich-luy",
+          "type": "text",
+          "content": {
+            "heading": "Hàm tích lũy",
+            "paragraphs": [
+              "Bạn vừa kéo cận trên $x$ và thấy diện tích tô màu tăng dần. Tại mỗi vị trí $x$, diện tích đó chính xác bằng giá trị $F(x)$ trên đường cong cam. Điều này không phải trùng hợp — $F(x)$ **được định nghĩa** là diện tích tích lũy.",
+              "Cho $f$ liên tục trên $[a, b]$. **Hàm tích lũy** $F(x) = \\int_a^x f(t)\\,dt$ gán cho mỗi $x \\in [a, b]$ giá trị bằng tích phân xác định từ $a$ đến $x$. Biến tích phân $t$ là biến câm; $x$ là biến thực sự."
+            ]
+          }
+        },
+        {
+          "id": "math-accumulation",
+          "type": "math",
+          "content": {
+            "latex": "F(x) = \\int_a^x f(t)\\,dt"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-tinh-chat-f",
+          "type": "text",
+          "content": {
+            "heading": "Tính chất của hàm tích lũy",
+            "paragraphs": [
+              "$F(a) = \\int_a^a f(t)\\,dt = 0$ — luôn đúng bất kể $f$. Khi $f(t) > 0$, diện tích tăng nên $F$ đồng biến. Khi $f(t) < 0$, diện tích \"bù trừ\" nên $F$ nghịch biến.",
+              "Hàm tích lũy biến một hàm cho trước $f$ thành một hàm mới $F$ — mỗi giá trị đầu ra là kết quả tích phân. Mối liên hệ giữa $F$ và $f$ sẽ là trọng tâm của bài tiếp theo."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l6-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi bạn kéo $x$ từ $0$ đến $4$, diện tích tô màu dưới $f(t) = 2t$ và giá trị $F(x)$ trên đường cam có mối quan hệ gì?",
+            "options": [
+              { "value": "a", "label": "Diện tích luôn lớn gấp đôi $F(x)$" },
+              { "value": "b", "label": "Diện tích tô màu luôn bằng đúng $F(x)$ tại mỗi vị trí $x$" },
+              { "value": "c", "label": "Diện tích và $F(x)$ bằng nhau chỉ tại $x = 2$" },
+              { "value": "d", "label": "Không có mối quan hệ rõ ràng" }
+            ],
+            "correct": "b",
+            "explanation": "$F(x) = \\int_0^x 2t\\,dt$, nên theo định nghĩa, $F(x)$ chính là diện tích tích lũy từ $0$ đến $x$. Sự trùng khớp xảy ra tại mọi $x$, không chỉ một điểm — vì $F$ được xây dựng từ phép tích phân."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l6-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $F(x) = \\int_0^x f(t)\\,dt$. Giá trị $F(0)$ bằng bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$f(0)$" },
+              { "value": "b", "label": "$1$" },
+              { "value": "c", "label": "$0$" },
+              { "value": "d", "label": "Không xác định" }
+            ],
+            "correct": "c",
+            "explanation": "$F(0) = \\int_0^0 f(t)\\,dt = 0$. Khoảng tích phân có chiều rộng bằng $0$, nên tích phân bằng $0$ bất kể $f$ là hàm gì. Đây là tính chất $\\int_a^a = 0$ đã học ở bài trước."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l6-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Với $f(t) = 2t$ và $F(x) = \\int_0^x 2t\\,dt$, tính $F(3)$.",
+            "options": [
+              { "value": "a", "label": "$6$" },
+              { "value": "b", "label": "$9$" },
+              { "value": "c", "label": "$3$" },
+              { "value": "d", "label": "$18$" }
+            ],
+            "correct": "b",
+            "explanation": "Diện tích dưới $f(t) = 2t$ từ $0$ đến $3$ là tam giác có đáy $3$ và chiều cao $2 \\times 3 = 6$. Diện tích = $\\frac{1}{2} \\times 3 \\times 6 = 9$. Hoặc: $F(x) = x^2$, nên $F(3) = 9$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l6-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu $f(t) > 0$ trên toàn khoảng $[a, b]$, hàm tích lũy $F(x) = \\int_a^x f(t)\\,dt$ có tính chất gì trên $[a, b]$?",
+            "options": [
+              { "value": "a", "label": "$F$ nghịch biến" },
+              { "value": "b", "label": "$F$ đồng biến" },
+              { "value": "c", "label": "$F$ là hằng số" },
+              { "value": "d", "label": "$F$ có thể tăng hoặc giảm" }
+            ],
+            "correct": "b",
+            "explanation": "Khi $f(t) > 0$, mỗi khi $x$ tăng, ta thêm diện tích dương vào tổng tích lũy. Do đó $F(x_2) > F(x_1)$ nếu $x_2 > x_1$ — tức $F$ đồng biến. Dấu của $f$ quyết định xu hướng tăng/giảm của $F$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l6-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu đổi cận dưới từ $0$ sang $1$, tức $G(x) = \\int_1^x 2t\\,dt$, giá trị $G(1)$ bằng bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$2$" },
+              { "value": "b", "label": "$1$" },
+              { "value": "c", "label": "$0$" },
+              { "value": "d", "label": "$-1$" }
+            ],
+            "correct": "c",
+            "explanation": "$G(1) = \\int_1^1 2t\\,dt = 0$. Bất kể cận dưới là bao nhiêu, khi cận trên trùng cận dưới thì khoảng tích phân rộng $0$. Hàm tích lũy luôn bắt đầu từ $0$ tại điểm xuất phát."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l6-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, tốc độ tăng của diện tích tô màu thay đổi khi $x$ tăng. Tại sao diện tích tăng nhanh hơn khi $x$ lớn?",
+            "options": [
+              { "value": "a", "label": "Vì $f(t) = 2t$ tăng — ở $x$ lớn hơn, \"lát\" diện tích mới cao hơn nên đóng góp nhiều hơn" },
+              { "value": "b", "label": "Vì khoảng $[0, x]$ rộng hơn" },
+              { "value": "c", "label": "Vì $F$ là hàm bậc ba" },
+              { "value": "d", "label": "Diện tích tăng đều, không nhanh hơn" }
+            ],
+            "correct": "a",
+            "explanation": "Khi tăng $x$ thêm $\\Delta x$ nhỏ, diện tích thêm vào xấp xỉ $f(x) \\cdot \\Delta x$. Vì $f(t) = 2t$ đồng biến, $f(x)$ lớn hơn khi $x$ lớn, nên mỗi \"lát\" mới đóng góp diện tích lớn hơn. Tốc độ tích lũy phụ thuộc giá trị của $f$ tại cận trên."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l6-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Lượng nước trong bể tính từ lúc mở van ($t = 0$) là $W(t) = \\int_0^t r(s)\\,ds$ với $r(s)$ là lưu lượng (lít/phút). $W(10) = 50$ nghĩa là gì?",
+            "options": [
+              { "value": "a", "label": "Lưu lượng tại phút $10$ là $50$ lít/phút" },
+              { "value": "b", "label": "Sau $10$ phút, bể đã nhận tổng cộng $50$ lít nước" },
+              { "value": "c", "label": "Bể chứa tối đa $50$ lít" },
+              { "value": "d", "label": "Lưu lượng trung bình là $50$ lít/phút" }
+            ],
+            "correct": "b",
+            "explanation": "$W(t) = \\int_0^t r(s)\\,ds$ là hàm tích lũy — nó cho tổng lượng nước tích lũy từ $0$ đến $t$. $W(10) = 50$ nghĩa là tổng cộng $50$ lít đã chảy vào bể trong $10$ phút đầu, không phải lưu lượng tại thời điểm đó."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l6-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $F(x) = \\int_0^x f(t)\\,dt$ và $G(x) = \\int_0^x g(t)\\,dt$. Nếu $f(t) > g(t) > 0$ trên $[0, 5]$, so sánh $F(5)$ và $G(5)$.",
+            "options": [
+              { "value": "a", "label": "$F(5) > G(5)$" },
+              { "value": "b", "label": "$F(5) < G(5)$" },
+              { "value": "c", "label": "$F(5) = G(5)$" },
+              { "value": "d", "label": "Không so sánh được" }
+            ],
+            "correct": "a",
+            "explanation": "Vì $f(t) > g(t) > 0$ trên $[0, 5]$, tại mỗi $t$ hàm $f$ đóng góp diện tích lớn hơn $g$. Tích lũy trên cùng khoảng, $F(5) = \\int_0^5 f > \\int_0^5 g = G(5)$. Tích phân bảo toàn bất đẳng thức giữa các hàm."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l6-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Biểu thức $\\int_a^x f(t)\\,dt$ tạo ra đối tượng toán học loại nào?",
+            "options": [
+              { "value": "a", "label": "Một số (giống $\\int_a^b f(x)\\,dx$)" },
+              { "value": "b", "label": "Một hàm số theo biến $x$" },
+              { "value": "c", "label": "Một hàm số theo biến $t$" },
+              { "value": "d", "label": "Một đạo hàm" }
+            ],
+            "correct": "b",
+            "explanation": "Khi cận trên là biến $x$, kết quả phụ thuộc vào $x$ — mỗi giá trị $x$ cho một tích phân khác. Do đó $F(x) = \\int_a^x f(t)\\,dt$ là hàm theo $x$. Biến $t$ là biến câm đã bị tích phân \"tiêu thụ\"; $x$ là biến tự do duy nhất."
+          }
+        }
+      ]
+    }
+  ]
+}

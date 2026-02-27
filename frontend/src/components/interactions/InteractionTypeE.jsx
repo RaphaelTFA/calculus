@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
+import { MathText } from './MathText'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -231,17 +232,58 @@ function buildAreaPath(geom, mapX, mapY, steps = 300) {
 
 // ─── SVG GRAPH VIEW ──────────────────────────────────────────────────────────
 
-function GraphView({ lesson, structure, system }) {
+function GraphView({ lesson, structure, system, onStructureChange }) {
   const vb = lesson.representationSpec.viewBox
   const splitType = lesson.representationSpec.splitSpec.type
+  const svgRef = useRef(null)
+  const draggingRef = useRef(false)
 
-  const W = 500, H = 280
+  const W = 600, H = 400
   const PAD = { top: 16, right: 16, bottom: 36, left: 42 }
   const gW = W - PAD.left - PAD.right
   const gH = H - PAD.top - PAD.bottom
 
   const mapX = x => PAD.left + (x - vb.xMin) / (vb.xMax - vb.xMin) * gW
   const mapY = y => PAD.top + gH - (y - vb.yMin) / (vb.yMax - vb.yMin) * gH
+  const unmapX = px => vb.xMin + (px - PAD.left) / gW * (vb.xMax - vb.xMin)
+
+  // Convert pointer event to structure value using SVG coordinate transform
+  const pointerToStructure = useCallback((e) => {
+    const svg = svgRef.current
+    if (!svg) return null
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    const pt = svg.createSVGPoint()
+    pt.x = clientX
+    pt.y = clientY
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse())
+    const dataX = unmapX(svgPt.x)
+    if (system.base.type === "areaUnderCurve") {
+      const [a, b] = system.base.domain
+      const s = (dataX - a) / (b - a)
+      return Math.max(0, Math.min(1, s))
+    }
+    return null
+  }, [system])
+
+  const handlePointerDown = useCallback((e) => {
+    if (splitType !== "domainSplit") return
+    draggingRef.current = true
+    const s = pointerToStructure(e)
+    if (s !== null) onStructureChange(s)
+    e.preventDefault()
+  }, [splitType, pointerToStructure, onStructureChange])
+
+  const handlePointerMove = useCallback((e) => {
+    if (!draggingRef.current) return
+    const s = pointerToStructure(e)
+    if (s !== null) onStructureChange(s)
+    e.preventDefault()
+  }, [pointerToStructure, onStructureChange])
+
+  const handlePointerUp = useCallback(() => {
+    draggingRef.current = false
+  }, [])
 
   // Grid lines
   const xTicks = []
@@ -294,7 +336,20 @@ function GraphView({ lesson, structure, system }) {
   }
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" style={{ display: 'block', overflow: 'visible' }}>
+    <svg
+      ref={svgRef}
+      viewBox={`0 0 ${W} ${H}`}
+      width="100%" height="100%"
+      preserveAspectRatio="xMidYMid meet"
+      style={{ display: 'block', cursor: splitType === 'domainSplit' ? 'ew-resize' : 'default', touchAction: 'none' }}
+      onMouseDown={handlePointerDown}
+      onMouseMove={handlePointerMove}
+      onMouseUp={handlePointerUp}
+      onMouseLeave={handlePointerUp}
+      onTouchStart={handlePointerDown}
+      onTouchMove={handlePointerMove}
+      onTouchEnd={handlePointerUp}
+    >
       <defs>
         <linearGradient id="grad-left" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={COLORS.left.fill} stopOpacity="0.9" />
@@ -354,15 +409,39 @@ function GraphView({ lesson, structure, system }) {
           <path d={curvePath} fill="none" stroke={COLORS.curve} strokeWidth="2.5" strokeLinejoin="round" />
         )}
 
-        {/* Split line */}
+        {/* Split line — draggable */}
         {splitX !== null && (
-          <line
-            x1={mapX(splitX)} y1={PAD.top}
-            x2={mapX(splitX)} y2={PAD.top + gH}
-            stroke={COLORS.splitLine} strokeWidth="2"
-            strokeDasharray="6 4"
-            style={{ transition: 'x1 0.05s, x2 0.05s' }}
-          />
+          <g style={{ cursor: 'ew-resize' }}>
+            {/* Wide invisible hit area */}
+            <line
+              x1={mapX(splitX)} y1={PAD.top}
+              x2={mapX(splitX)} y2={PAD.top + gH}
+              stroke="transparent" strokeWidth="16"
+            />
+            {/* Visible dashed line */}
+            <line
+              x1={mapX(splitX)} y1={PAD.top}
+              x2={mapX(splitX)} y2={PAD.top + gH}
+              stroke={COLORS.splitLine} strokeWidth="2.5"
+              strokeDasharray="6 4"
+              style={{ transition: 'x1 0.02s, x2 0.02s' }}
+            />
+            {/* Drag handle circle */}
+            <circle
+              cx={mapX(splitX)} cy={PAD.top + gH / 2}
+              r="8" fill="#fff" stroke={COLORS.splitLine} strokeWidth="2.5"
+            />
+            <line
+              x1={mapX(splitX) - 3} y1={PAD.top + gH / 2 - 3}
+              x2={mapX(splitX) - 3} y2={PAD.top + gH / 2 + 3}
+              stroke={COLORS.splitLine} strokeWidth="1.5" strokeLinecap="round"
+            />
+            <line
+              x1={mapX(splitX) + 3} y1={PAD.top + gH / 2 - 3}
+              x2={mapX(splitX) + 3} y2={PAD.top + gH / 2 + 3}
+              stroke={COLORS.splitLine} strokeWidth="1.5" strokeLinecap="round"
+            />
+          </g>
         )}
 
         {/* Area labels inside graph */}
@@ -417,19 +496,17 @@ function GraphView({ lesson, structure, system }) {
 function MetricCard({ label, value, color, textColor, isTotal }) {
   return (
     <div style={{
-      flex: 1,
-      background: isTotal ? '#1e293b' : color,
-      borderRadius: 12,
-      padding: '10px 14px',
-      display: 'flex', flexDirection: 'column', gap: 2,
-      border: isTotal ? 'none' : `1.5px solid ${textColor}33`,
+      background: '#f8f9fa',
+      borderRadius: 6,
+      padding: '8px 10px',
+      borderLeft: `3px solid ${isTotal ? '#475569' : textColor}`,
     }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: isTotal ? '#94a3b8' : textColor, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>
         {label}
-      </span>
-      <span style={{ fontSize: 20, fontWeight: 700, color: isTotal ? '#f1f5f9' : textColor, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+      </div>
+      <div style={{ fontSize: 17, fontWeight: 600, color: isTotal ? '#1e293b' : textColor, fontVariantNumeric: 'tabular-nums' }}>
         {typeof value === 'number' ? value.toFixed(3) : value}
-      </span>
+      </div>
     </div>
   )
 }
@@ -481,129 +558,108 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
   return (
     <div style={{
       width: '100%',
+      height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      gap: 12,
+      overflow: 'hidden',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       userSelect: 'none',
     }}>
 
-      {/* Metric cards */}
-      {metrics.length > 0 && (
-        <div style={{ display: 'flex', gap: 8 }}>
+      {/* Main content: graph (left) + info panel (right) */}
+      <div style={{
+        flex: 1, display: 'flex', gap: 8, padding: '6px 8px',
+        minHeight: 0, overflow: 'hidden'
+      }}>
+        {/* Graph area */}
+        <div style={{
+          flex: '1 1 0%',
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0,
+        }}>
+          <div style={{
+            flex: 1,
+            minHeight: 0,
+            background: '#fff',
+            border: '1.5px solid #e2e8f0',
+            borderRadius: 16,
+            padding: '8px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            overflow: 'hidden',
+          }}>
+            <GraphView lesson={lesson} structure={structure} system={system} onStructureChange={setStructure} />
+          </div>
+          {/* Legend — below graph */}
+          {splitType === "domainSplit" && (
+            <div style={{
+              display: 'flex', gap: 16, padding: '6px 4px 0',
+              fontSize: 11, color: '#6b7280', flexShrink: 0
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, background: COLORS.left.fill, display: 'inline-block', borderRadius: 2, opacity: 0.75 }} />
+                A₁
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, background: COLORS.right.fill, display: 'inline-block', borderRadius: 2, opacity: 0.75 }} />
+                A₂
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 14, height: 2, background: COLORS.splitLine, display: 'inline-block', borderRadius: 1, borderTop: '1px dashed ' + COLORS.splitLine }} />
+                Kéo để chia
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Right info panel */}
+        <div style={{
+          flex: '0 0 200px', display: 'flex', flexDirection: 'column',
+          gap: 8, overflow: 'hidden', justifyContent: 'center'
+        }}>
+          {/* Metric cards — stacked vertically */}
           {metrics.map((m, i) => (
             <MetricCard key={i} {...m} />
           ))}
-        </div>
-      )}
 
-      {/* Graph */}
-      <div style={{
-        background: '#fff',
-        border: '1.5px solid #e2e8f0',
-        borderRadius: 16,
-        padding: '12px 8px 8px',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-      }}>
-        <GraphView lesson={lesson} structure={structure} system={system} />
-      </div>
-
-      {/* Slider */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>
-            {paramSpec.label || "Cấu trúc"}
-          </span>
-          <span style={{
-            fontSize: 13, fontWeight: 700,
-            background: '#fef3c7',
-            color: '#92400e',
-            borderRadius: 6,
-            padding: '2px 8px',
-            border: '1px solid #fde68a',
-          }}>
-            {structure.toFixed(2)}
-          </span>
-        </div>
-        <div style={{ position: 'relative', height: 36, display: 'flex', alignItems: 'center' }}>
-          {/* Track background */}
-          <div style={{
-            position: 'absolute', left: 0, right: 0,
-            height: 6, borderRadius: 99,
-            background: '#e2e8f0',
-            overflow: 'hidden',
-          }}>
+          {/* Current value readout */}
+          {splitType === "domainSplit" && (
             <div style={{
-              width: `${(structure - paramSpec.min) / (paramSpec.max - paramSpec.min) * 100}%`,
-              height: '100%',
-              background: 'linear-gradient(90deg, #6366f1, #38bdf8)',
-              borderRadius: 99,
-              transition: 'width 0.05s',
-            }} />
+              background: '#f8f9fa',
+              borderRadius: 6,
+              padding: '8px 10px',
+              borderLeft: `3px solid ${COLORS.splitLine}`,
+            }}>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>
+                {paramSpec.label || "Điểm chia"}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 600, color: '#92400e', fontVariantNumeric: 'tabular-nums' }}>
+                {(() => {
+                  const [a, b] = lesson.representationSpec.geometryBase.domain
+                  return (a + structure * (b - a)).toFixed(2)
+                })()}
+              </div>
+            </div>
+          )}
+
+          {/* Reflection card */}
+          <div style={{
+            padding: '8px 10px',
+            borderRadius: 6,
+            background: message ? '#fffbeb' : '#f8f9fa',
+            border: '1px solid ' + (message ? '#fde68a' : '#e5e7eb'),
+            fontSize: 13,
+            lineHeight: 1.5,
+            color: message ? '#78350f' : '#9ca3af',
+          }}>
+            {message
+              ? <MathText text={message} />
+              : 'Kéo đường chia trên đồ thị để khám phá...'
+            }
           </div>
-          <input
-            type="range"
-            min={paramSpec.min}
-            max={paramSpec.max}
-            step={paramSpec.step}
-            value={structure}
-            onChange={e => setStructure(parseFloat(e.target.value))}
-            style={{
-              position: 'absolute', left: 0, right: 0,
-              width: '100%',
-              appearance: 'none', WebkitAppearance: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              margin: 0,
-            }}
-          />
         </div>
       </div>
-
-      {/* Reflection */}
-      <div style={{
-        minHeight: 40,
-        padding: '10px 14px',
-        borderRadius: 12,
-        background: message ? '#fefce8' : '#f8fafc',
-        border: message ? '1.5px solid #fde68a' : '1.5px solid #e2e8f0',
-        fontSize: 14,
-        color: message ? '#78350f' : '#94a3b8',
-        display: 'flex', alignItems: 'center', gap: 8,
-        transition: 'all 0.25s ease',
-      }}>
-        {message
-          ? <><span style={{ fontSize: 16 }}>💡</span> {message}</>
-          : <span>Kéo thanh trượt để khám phá...</span>
-        }
-      </div>
-
-      {/* Slider thumb styles */}
-      <style>{`
-        input[type=range]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 22px; height: 22px;
-          border-radius: 50%;
-          background: #fff;
-          border: 2.5px solid #6366f1;
-          box-shadow: 0 1px 6px rgba(99,102,241,0.4);
-          cursor: grab;
-          transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        input[type=range]::-webkit-slider-thumb:active {
-          cursor: grabbing;
-          border-color: #38bdf8;
-          box-shadow: 0 2px 10px rgba(56,189,248,0.5);
-        }
-        input[type=range]::-moz-range-thumb {
-          width: 22px; height: 22px;
-          border-radius: 50%;
-          background: #fff;
-          border: 2.5px solid #6366f1;
-          box-shadow: 0 1px 6px rgba(99,102,241,0.4);
-          cursor: grab;
-        }
-      `}</style>
     </div>
   )
 }

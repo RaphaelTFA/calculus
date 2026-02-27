@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { MathText } from './MathText'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -463,7 +464,7 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
         </div>
         <span style={styles.tLabel}>t = {t.toFixed(2)}</span>
       </div>
-      <div style={styles.reflection}>{reflection}</div>
+      <div style={styles.reflection}><MathText text={reflection} /></div>
     </div>
   )
 }

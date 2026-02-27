@@ -3,7 +3,7 @@
     "title": "Đạo hàm hàm lượng giác",
     "description": "Đạo hàm của $\\sin(x)$ là $\\cos(x)$ — hai hàm là cùng một sóng, lệch pha một phần tư chu kỳ.",
     "xp_reward": 15,
-    "order_index": 8,
+    "order_index": 0,
     "slides": [
         {
             "order_index": 0,

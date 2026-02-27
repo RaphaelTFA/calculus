@@ -1,0 +1,306 @@
+{
+  "id": "dinh-ly-co-ban-2",
+  "title": "Định Lý Cơ Bản Phần II",
+  "description": "Tích phân xác định tính được bằng hiệu nguyên hàm: ∫ₐᵇ f(x) dx = F(b) − F(a).",
+  "xp_reward": 15,
+  "order_index": 3,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-ftc2",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Cận trên b"
+              },
+              "parameter": {
+                "min": 0,
+                "max": 4,
+                "initial": 0
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -0.5,
+                  "xMax": 4.5,
+                  "yMin": -1,
+                  "yMax": 18
+                },
+                "curves": [
+                  {
+                    "expr": "x*x",
+                    "color": "#3498db",
+                    "label": "f(x) = x²",
+                    "style": "solid",
+                    "width": 2
+                  },
+                  {
+                    "expr": "x*x*x/3",
+                    "color": "#e67e22",
+                    "label": "F(x) = x³/3",
+                    "style": "solid",
+                    "width": 2
+                  }
+                ],
+                "shading": {
+                  "curveIndex": 0,
+                  "from": 0,
+                  "to": "p",
+                  "color": "#3498db",
+                  "opacity": 0.25
+                }
+              },
+              "reflections": [
+                {
+                  "id": "at-one",
+                  "trigger": "state.currentValue > 0.9 && state.currentValue < 1.1",
+                  "text": "Diện tích tô ≈ $\\frac{1}{3}$. Kiểm tra: $F(1) - F(0) = \\frac{1}{3} - 0 = \\frac{1}{3}$. Trùng khớp!"
+                },
+                {
+                  "id": "at-two",
+                  "trigger": "state.currentValue > 1.9 && state.currentValue < 2.1",
+                  "text": "Diện tích ≈ $\\frac{8}{3}$. $F(2) - F(0) = \\frac{8}{3} - 0 = \\frac{8}{3}$. Bạn thấy quy luật chưa?"
+                },
+                {
+                  "id": "at-three",
+                  "trigger": "state.currentValue > 2.9 && state.currentValue < 3.1",
+                  "text": "$F(3) - F(0) = 9 - 0 = 9$. Diện tích dưới $x^2$ tính ngay bằng hiệu nguyên hàm — không cần Riemann!"
+                },
+                {
+                  "id": "at-four",
+                  "trigger": "state.currentValue > 3.8",
+                  "text": "$F(4) - F(0) = \\frac{64}{3}$. Phương pháp này luôn hoạt động: $\\int_a^b f = F(b) - F(a)$."
+                }
+              ],
+              "prompt": "Kéo cận trên $b$ từ $0$ đến $4$. So sánh diện tích tô màu với $F(b) - F(0)$ trên đường cam. Có quy luật gì?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-ftc2-statement",
+          "type": "text",
+          "content": {
+            "heading": "Định lý cơ bản giải tích — Phần II",
+            "paragraphs": [
+              "Bạn vừa thấy: diện tích tô màu (tích phân $\\int_0^b x^2\\,dx$) luôn bằng $F(b) - F(0)$, với $F(x) = \\frac{x^3}{3}$ là nguyên hàm của $f(x) = x^2$. Không cần chia hình chữ nhật, không cần giới hạn — chỉ cần tính hiệu hai giá trị.",
+              "Nếu $f$ liên tục trên $[a, b]$ và $F$ là nguyên hàm của $f$ (tức $F' = f$), thì: $\\int_a^b f(x)\\,dx = F(b) - F(a)$. Đây là **Định lý Cơ bản Giải tích Phần II** — công cụ tính tích phân mạnh nhất."
+            ]
+          }
+        },
+        {
+          "id": "math-ftc2",
+          "type": "math",
+          "content": {
+            "latex": "\\int_a^b f(x)\\,dx = F(b) - F(a), \\quad \\text{trong đó } F'(x) = f(x)"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-ftc2-notation",
+          "type": "text",
+          "content": {
+            "heading": "Ký hiệu và ý nghĩa",
+            "paragraphs": [
+              "Viết gọn: $F(x) \\Big|_a^b = F(b) - F(a)$. Ký hiệu $\\Big|_a^b$ nghĩa là \"tính $F$ tại cận trên trừ $F$ tại cận dưới\". Ví dụ: $\\int_0^2 x^2\\,dx = \\frac{x^3}{3}\\Big|_0^2 = \\frac{8}{3} - 0 = \\frac{8}{3}$.",
+              "Ý nghĩa cách mạng: tích phân xác định — vốn được định nghĩa là giới hạn tổng Riemann vô hạn — giờ tính được bằng **một phép trừ**. Điều kiện duy nhất: phải tìm được nguyên hàm $F$ sao cho $F' = f$."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l8-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, tại $b = 2$, diện tích tô màu dưới $f(x) = x^2$ xấp xỉ $2{,}667$. Giá trị $F(2) - F(0)$ với $F(x) = \\frac{x^3}{3}$ bằng bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$4$" },
+              { "value": "b", "label": "$\\frac{8}{3} \\approx 2{,}667$" },
+              { "value": "c", "label": "$2$" },
+              { "value": "d", "label": "$8$" }
+            ],
+            "correct": "b",
+            "explanation": "$F(2) - F(0) = \\frac{2^3}{3} - \\frac{0^3}{3} = \\frac{8}{3} - 0 = \\frac{8}{3} \\approx 2{,}667$. Đúng bằng diện tích tô màu — FTC II xác nhận tích phân bằng hiệu nguyên hàm."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l8-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int_1^3 2x\\,dx$ bằng FTC II. Biết $F(x) = x^2$ là nguyên hàm của $2x$.",
+            "options": [
+              { "value": "a", "label": "$8$" },
+              { "value": "b", "label": "$4$" },
+              { "value": "c", "label": "$6$" },
+              { "value": "d", "label": "$10$" }
+            ],
+            "correct": "a",
+            "explanation": "$\\int_1^3 2x\\,dx = F(3) - F(1) = 3^2 - 1^2 = 9 - 1 = 8$. Chỉ cần tính nguyên hàm tại hai cận rồi trừ — không cần tổng Riemann hay giới hạn."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l8-q3",
+          "type": "quiz",
+          "content": {
+            "question": "FTC II yêu cầu $F'(x) = f(x)$. Phát biểu nào mô tả đúng vai trò của $F$?",
+            "options": [
+              { "value": "a", "label": "$F$ là đạo hàm của $f$" },
+              { "value": "b", "label": "$F$ là nguyên hàm (antiderivative) của $f$ — hàm có đạo hàm bằng $f$" },
+              { "value": "c", "label": "$F$ là tích phân của $f$" },
+              { "value": "d", "label": "$F$ là giới hạn của $f$" }
+            ],
+            "correct": "b",
+            "explanation": "Nguyên hàm $F$ là hàm thỏa $F' = f$. FTC II nối nguyên hàm với tích phân xác định: muốn tính $\\int_a^b f$, tìm $F$ sao cho $F' = f$, rồi lấy $F(b) - F(a)$. $F$ không phải đạo hàm hay giới hạn của $f$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l8-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int_0^{\\pi} \\sin(x)\\,dx$. Biết nguyên hàm của $\\sin(x)$ là $-\\cos(x)$.",
+            "options": [
+              { "value": "a", "label": "$0$" },
+              { "value": "b", "label": "$2$" },
+              { "value": "c", "label": "$-2$" },
+              { "value": "d", "label": "$1$" }
+            ],
+            "correct": "b",
+            "explanation": "$\\int_0^{\\pi} \\sin(x)\\,dx = -\\cos(x)\\Big|_0^{\\pi} = -\\cos(\\pi) - (-\\cos(0)) = -(-1) - (-1) = 1 + 1 = 2$. Đây cũng chính là giá trị mà tổng Riemann hội tụ đến ở bài 3 — giờ tính được trong một dòng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l8-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu dùng nguyên hàm $G(x) = \\frac{x^3}{3} + 7$ thay vì $F(x) = \\frac{x^3}{3}$ để tính $\\int_0^2 x^2\\,dx$, kết quả có thay đổi không?",
+            "options": [
+              { "value": "a", "label": "Có, kết quả tăng thêm $7$" },
+              { "value": "b", "label": "Có, kết quả tăng thêm $14$" },
+              { "value": "c", "label": "Không, vì hằng số triệt tiêu khi trừ: $G(2) - G(0) = F(2) - F(0)$" },
+              { "value": "d", "label": "Không thể dùng $G$ vì nó không phải nguyên hàm đúng" }
+            ],
+            "correct": "c",
+            "explanation": "$G(2) - G(0) = (\\frac{8}{3} + 7) - (0 + 7) = \\frac{8}{3}$. Hằng số $+7$ xuất hiện ở cả cận trên lẫn cận dưới, nên bị triệt tiêu khi trừ. Mọi nguyên hàm của $f$ cho cùng kết quả."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l8-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Trước FTC II, cách duy nhất tính $\\int_a^b f(x)\\,dx$ là gì? Sau FTC II, cách mới là gì?",
+            "options": [
+              { "value": "a", "label": "Trước: đo bằng thước. Sau: dùng máy tính" },
+              { "value": "b", "label": "Trước: lấy giới hạn tổng Riemann ($n \\to \\infty$). Sau: tìm nguyên hàm $F$ rồi tính $F(b) - F(a)$" },
+              { "value": "c", "label": "Trước: dùng FTC I. Sau: dùng FTC II" },
+              { "value": "d", "label": "Trước và sau đều dùng cùng phương pháp" }
+            ],
+            "correct": "b",
+            "explanation": "Bài 1–4 xây dựng tích phân qua tổng Riemann — phương pháp đúng nhưng cồng kềnh. FTC II mở đường tắt: chỉ cần nguyên hàm $F$, tính $F(b) - F(a)$ — biến bài toán tính giới hạn vô hạn thành phép trừ hai số."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l8-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Ô tô có vận tốc $v(t) = 3t^2$ (m/s). Quãng đường đi từ $t = 0$ đến $t = 4$ giây là $\\int_0^4 3t^2\\,dt$. Biết nguyên hàm của $3t^2$ là $t^3$, tính quãng đường.",
+            "options": [
+              { "value": "a", "label": "$48$ m" },
+              { "value": "b", "label": "$64$ m" },
+              { "value": "c", "label": "$12$ m" },
+              { "value": "d", "label": "$192$ m" }
+            ],
+            "correct": "b",
+            "explanation": "$\\int_0^4 3t^2\\,dt = t^3\\Big|_0^4 = 4^3 - 0^3 = 64$ m. FTC II biến bài toán chuyển động (tích phân vận tốc ra quãng đường) thành phép tính đại số: chỉ cần nguyên hàm."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l8-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int_0^2 3\\,dx$ bằng FTC II.",
+            "options": [
+              { "value": "a", "label": "$3$" },
+              { "value": "b", "label": "$6$" },
+              { "value": "c", "label": "$0$" },
+              { "value": "d", "label": "$9$" }
+            ],
+            "correct": "b",
+            "explanation": "Nguyên hàm của $f(x) = 3$ là $F(x) = 3x$. Áp dụng: $F(2) - F(0) = 6 - 0 = 6$. Kết quả trùng với diện tích hình chữ nhật $2 \\times 3 = 6$ — FTC II cho đáp án đúng ngay cả trường hợp đơn giản."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l8-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Ký hiệu $F(x)\\Big|_a^b$ nghĩa là gì?",
+            "options": [
+              { "value": "a", "label": "$F(a) - F(b)$" },
+              { "value": "b", "label": "$F(b) - F(a)$" },
+              { "value": "c", "label": "$F(a) \\times F(b)$" },
+              { "value": "d", "label": "$F(a) + F(b)$" }
+            ],
+            "correct": "b",
+            "explanation": "$F(x)\\Big|_a^b = F(b) - F(a)$: tính $F$ tại cận trên $b$ trừ $F$ tại cận dưới $a$. Thứ tự quan trọng — đảo cận sẽ đổi dấu kết quả, nhất quán với quy ước $\\int_b^a = -\\int_a^b$ đã học."
+          }
+        }
+      ]
+    }
+  ]
+}

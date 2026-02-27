@@ -3,7 +3,7 @@
     "title": "Hàm tăng và hàm giảm",
     "description": "Dấu của $f'$ phân chia miền xác định thành các khoảng tăng giảm — và điểm đổi dấu là điểm cực trị.",
     "xp_reward": 10,
-    "order_index": 9,
+    "order_index": 1,
     "slides": [
         {
             "order_index": 0,

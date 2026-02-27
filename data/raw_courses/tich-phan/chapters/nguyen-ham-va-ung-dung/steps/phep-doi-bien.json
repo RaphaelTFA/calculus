@@ -1,0 +1,306 @@
+{
+  "id": "phep-doi-bien",
+  "title": "Phép Đổi Biến",
+  "description": "Đảo ngược quy tắc dây chuyền: ∫f(g(x))·g'(x) dx = ∫f(u) du với u = g(x).",
+  "xp_reward": 15,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-substitution",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Cận trên"
+              },
+              "parameter": {
+                "min": 0,
+                "max": 2.5,
+                "initial": 0
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -0.5,
+                  "xMax": 3,
+                  "yMin": -2.5,
+                  "yMax": 3
+                },
+                "curves": [
+                  {
+                    "expr": "2*x*cos(x*x)",
+                    "color": "#3498db",
+                    "label": "2x·cos(x²)",
+                    "style": "solid",
+                    "width": 2
+                  },
+                  {
+                    "expr": "sin(x*x)",
+                    "color": "#e67e22",
+                    "label": "F(x) = sin(x²)",
+                    "style": "solid",
+                    "width": 2
+                  }
+                ],
+                "shading": {
+                  "curveIndex": 0,
+                  "from": 0,
+                  "to": "p",
+                  "color": "#3498db",
+                  "opacity": 0.25
+                }
+              },
+              "reflections": [
+                {
+                  "id": "at-one",
+                  "trigger": "state.currentValue > 0.9 && state.currentValue < 1.1",
+                  "text": "Diện tích tô $\\approx 0{,}84$. Đường cam tại $x = 1$: $\\sin(1) \\approx 0{,}84$. Nguyên hàm đúng — nhưng tại sao $\\sin(x^2)$?"
+                },
+                {
+                  "id": "at-peak",
+                  "trigger": "state.currentValue > 1.2 && state.currentValue < 1.35",
+                  "text": "Diện tích gần cực đại. Nhận dạng: $2x$ chính là đạo hàm của $x^2$. Đặt $u = x^2$, $du = 2x\\,dx$ — tích phân thành $\\int \\cos(u)\\,du = \\sin(u)$."
+                },
+                {
+                  "id": "at-sign-change",
+                  "trigger": "state.currentValue > 1.7 && state.currentValue < 1.9",
+                  "text": "Diện tích giảm vì $\\cos(x^2)$ đổi dấu. Công thức vẫn đúng: $\\int_0^p 2x\\cos(x^2)\\,dx = \\sin(p^2)$."
+                },
+                {
+                  "id": "at-large",
+                  "trigger": "state.currentValue > 2.2",
+                  "text": "Phép thế $u = g(x)$ luôn biến $\\int f(g(x))\\,g'(x)\\,dx$ thành $\\int f(u)\\,du$ — đảo ngược quy tắc dây chuyền."
+                }
+              ],
+              "prompt": "Kéo cận trên $p$. Diện tích tô dưới $2x\\cos(x^2)$ luôn bằng giá trị $\\sin(x^2)$ trên đường cam. Tại sao hàm hợp này có nguyên hàm $\\sin(x^2)$?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-doi-bien-lien-he",
+          "type": "text",
+          "content": {
+            "heading": "Phép thế — quy tắc dây chuyền đảo ngược",
+            "paragraphs": [
+              "Quy tắc dây chuyền nói: $\\frac{d}{dx}[F(g(x))] = F'(g(x)) \\cdot g'(x)$. Đọc ngược: nếu thấy tích phân có dạng $\\int f(g(x))\\cdot g'(x)\\,dx$, ta đặt $u = g(x)$, $du = g'(x)\\,dx$ và thu được $\\int f(u)\\,du$ — dạng đơn giản hơn.",
+              "Ví dụ vừa rồi: $\\int 2x\\cos(x^2)\\,dx$. Nhận ra $2x = \\frac{d}{dx}[x^2]$, đặt $u = x^2$, $du = 2x\\,dx$. Tích phân thành $\\int \\cos(u)\\,du = \\sin(u) + C = \\sin(x^2) + C$."
+            ]
+          }
+        },
+        {
+          "id": "math-substitution-rule",
+          "type": "math",
+          "content": {
+            "latex": "\\int f(g(x))\\cdot g'(x)\\,dx = \\int f(u)\\,du, \\quad u = g(x)"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-doi-bien-xac-dinh",
+          "type": "text",
+          "content": {
+            "heading": "Đổi biến trong tích phân xác định",
+            "paragraphs": [
+              "Khi đổi biến trong tích phân xác định, **cận cũng đổi**: $\\int_a^b f(g(x))\\,g'(x)\\,dx = \\int_{g(a)}^{g(b)} f(u)\\,du$. Ví dụ: $\\int_0^1 2x\\cos(x^2)\\,dx$. Đặt $u = x^2$: khi $x = 0 \\Rightarrow u = 0$, khi $x = 1 \\Rightarrow u = 1$.",
+              "Tích phân trở thành $\\int_0^1 \\cos(u)\\,du = \\sin(1) - \\sin(0) = \\sin(1)$. Diện tích dưới hàm hợp phức tạp bằng diện tích dưới hàm đơn giản — chỉ cần đổi cận."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l10-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, tại sao $\\sin(x^2)$ là nguyên hàm đúng của $2x\\cos(x^2)$?",
+            "options": [
+              { "value": "a", "label": "Vì $\\sin$ luôn là nguyên hàm của $\\cos$" },
+              { "value": "b", "label": "Vì quy tắc dây chuyền: $\\frac{d}{dx}[\\sin(x^2)] = \\cos(x^2) \\cdot 2x = 2x\\cos(x^2)$" },
+              { "value": "c", "label": "Vì $2x$ triệt tiêu khi tích phân" },
+              { "value": "d", "label": "Vì $x^2$ là nguyên hàm của $2x$" }
+            ],
+            "correct": "b",
+            "explanation": "Đạo hàm $\\frac{d}{dx}[\\sin(x^2)]$ dùng quy tắc dây chuyền: đạo hàm ngoài $\\cos(x^2)$ nhân đạo hàm trong $2x$. Kết quả đúng bằng hàm dưới dấu tích phân. Phép thế chỉ là cách nhận ra pattern này."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l10-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int 3x^2 \\cdot e^{x^3}\\,dx$ bằng phép đổi biến.",
+            "options": [
+              { "value": "a", "label": "$e^{x^3} + C$" },
+              { "value": "b", "label": "$3x^2 \\cdot e^{x^3} + C$" },
+              { "value": "c", "label": "$\\frac{e^{x^3}}{3x^2} + C$" },
+              { "value": "d", "label": "$x^3 \\cdot e^{x^3} + C$" }
+            ],
+            "correct": "a",
+            "explanation": "Đặt $u = x^3$, $du = 3x^2\\,dx$. Tích phân thành $\\int e^u\\,du = e^u + C = e^{x^3} + C$. Nhận dạng: $3x^2$ là đạo hàm của hàm trong $x^3$ — dấu hiệu phép thế."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l10-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Khi đổi biến tích phân xác định $\\int_0^2 x \\cdot e^{x^2}\\,dx$ với $u = x^2$, cận mới là gì?",
+            "options": [
+              { "value": "a", "label": "Cận giữ nguyên: $u$ từ $0$ đến $2$" },
+              { "value": "b", "label": "$u$ từ $0$ đến $4$" },
+              { "value": "c", "label": "$u$ từ $0$ đến $2$" },
+              { "value": "d", "label": "$u$ từ $1$ đến $4$" }
+            ],
+            "correct": "b",
+            "explanation": "Khi $x = 0$: $u = 0^2 = 0$. Khi $x = 2$: $u = 2^2 = 4$. Cận biến đổi theo $u = g(x)$ — đây là bước nhiều người quên. Tích phân trở thành $\\frac{1}{2}\\int_0^4 e^u\\,du$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l10-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Phép đổi biến trong tích phân tương ứng với quy tắc nào trong đạo hàm?",
+            "options": [
+              { "value": "a", "label": "Quy tắc lũy thừa" },
+              { "value": "b", "label": "Quy tắc tích" },
+              { "value": "c", "label": "Quy tắc dây chuyền (chain rule)" },
+              { "value": "d", "label": "Quy tắc thương" }
+            ],
+            "correct": "c",
+            "explanation": "Phép thế đảo ngược quy tắc dây chuyền: $\\frac{d}{dx}[F(g(x))] = F'(g(x))\\cdot g'(x)$ đọc ngược cho $\\int F'(g(x))\\cdot g'(x)\\,dx = F(g(x)) + C$. Mỗi quy tắc đạo hàm sinh ra một kỹ thuật tích phân tương ứng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l10-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Trong $\\int 2x\\cos(x^2)\\,dx$, vai trò của thừa số $2x$ là gì?",
+            "options": [
+              { "value": "a", "label": "Hàm chính cần tích phân" },
+              { "value": "b", "label": "Đạo hàm của hàm trong $g(x) = x^2$, cho phép đổi $dx$ thành $du$" },
+              { "value": "c", "label": "Hệ số tỷ lệ không ảnh hưởng kết quả" },
+              { "value": "d", "label": "Giới hạn của tích phân" }
+            ],
+            "correct": "b",
+            "explanation": "$2x = g'(x)$ với $g(x) = x^2$. Khi đặt $u = x^2$, ta cần $du = 2x\\,dx$ — thừa số $2x$ chính là \"giá\" phải trả để chuyển biến. Nếu thiếu $2x$, phép thế trực tiếp sẽ không thực hiện được."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l10-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int_0^{\\pi/2} \\cos(x) \\cdot e^{\\sin(x)}\\,dx$.",
+            "options": [
+              { "value": "a", "label": "$e - 1$" },
+              { "value": "b", "label": "$e$" },
+              { "value": "c", "label": "$1$" },
+              { "value": "d", "label": "$e + 1$" }
+            ],
+            "correct": "a",
+            "explanation": "Đặt $u = \\sin(x)$, $du = \\cos(x)\\,dx$. Cận: $x=0 \\Rightarrow u=0$, $x=\\pi/2 \\Rightarrow u=1$. Tích phân: $\\int_0^1 e^u\\,du = e^1 - e^0 = e - 1$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l10-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $\\int \\frac{2x}{x^2 + 1}\\,dx$. Đặt $u = x^2 + 1$. Kết quả là gì?",
+            "options": [
+              { "value": "a", "label": "$\\frac{1}{x^2+1} + C$" },
+              { "value": "b", "label": "$\\ln(x^2 + 1) + C$" },
+              { "value": "c", "label": "$\\ln(2x) + C$" },
+              { "value": "d", "label": "$(x^2+1)^2 + C$" }
+            ],
+            "correct": "b",
+            "explanation": "$u = x^2+1$, $du = 2x\\,dx$. Tích phân thành $\\int \\frac{1}{u}\\,du = \\ln|u| + C = \\ln(x^2+1) + C$. Vì $x^2+1 > 0$ nên bỏ trị tuyệt đối."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l10-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Nước chảy vào bể với tốc độ $r(t) = 2t \\cdot e^{t^2}$ lít/phút. Lượng nước vào bể từ $t=0$ đến $t=1$ phút là bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$(e - 1)$ lít" },
+              { "value": "b", "label": "$e$ lít" },
+              { "value": "c", "label": "$2e$ lít" },
+              { "value": "d", "label": "$(e + 1)$ lít" }
+            ],
+            "correct": "a",
+            "explanation": "$\\int_0^1 2t\\,e^{t^2}\\,dt$. Đặt $u = t^2$, $du = 2t\\,dt$. Cận: $t=0 \\to u=0$, $t=1 \\to u=1$. Kết quả: $\\int_0^1 e^u\\,du = e - 1 \\approx 1{,}72$ lít. Phép thế biến bài toán thực tế thành tích phân cơ bản."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l10-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int \\sin(3x)\\,dx$. Gợi ý: đặt $u = 3x$.",
+            "options": [
+              { "value": "a", "label": "$-\\cos(3x) + C$" },
+              { "value": "b", "label": "$-\\frac{1}{3}\\cos(3x) + C$" },
+              { "value": "c", "label": "$3\\cos(3x) + C$" },
+              { "value": "d", "label": "$\\frac{1}{3}\\sin(3x) + C$" }
+            ],
+            "correct": "b",
+            "explanation": "$u = 3x$, $du = 3\\,dx$, suy ra $dx = \\frac{du}{3}$. Tích phân: $\\int \\sin(u)\\cdot\\frac{du}{3} = -\\frac{1}{3}\\cos(u) + C = -\\frac{1}{3}\\cos(3x) + C$. Hệ số $\\frac{1}{3}$ xuất hiện vì $g'(x) = 3$."
+          }
+        }
+      ]
+    }
+  ]
+}

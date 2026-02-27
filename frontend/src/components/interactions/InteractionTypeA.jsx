@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import { MathText } from './MathText'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -60,6 +61,116 @@ function recompute(interaction, state) {
         p1: { x: anchor, y: y0 },
         p2: { x: anchor + h, y: f(anchor + h) }
       }
+    }
+  }
+}
+
+// ─── RIEMANN MODE LOGIC ─────────────────────────────────────────────────────
+
+function recomputeRiemann(interaction, state) {
+  const { function: fnExpr, integral, sumType, domain } = interaction.systemSpec
+  const n = state.resolution
+
+  const mathHelpers = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
+  const f = interaction.systemSpec._f || new Function("x", `${mathHelpers} return ${fnExpr}`)
+
+  const graph = []
+  const dxGraph = (domain[1] - domain[0]) / 300
+  for (let x = domain[0]; x <= domain[1]; x += dxGraph) {
+    graph.push({ x, y: f(x) })
+  }
+
+  const dx = (domain[1] - domain[0]) / n
+  let sum = 0
+  const rectangles = []
+  for (let i = 0; i < n; i++) {
+    const xLeft = domain[0] + i * dx
+    let sampleX
+    if (sumType === "right") sampleX = xLeft + dx
+    else if (sumType === "midpoint") sampleX = xLeft + dx / 2
+    else sampleX = xLeft  // default: left
+
+    const height = f(sampleX)
+    sum += height * dx
+    rectangles.push({ x: xLeft, width: dx, height, sampleX })
+  }
+
+  const error = Math.abs(sum - integral)
+
+  return {
+    newState: { resolution: n },
+    systemState: { graph, rectangles, sum, integral, error, n, dx, sumType }
+  }
+}
+
+function renderCanvasRiemann(systemState, interaction, ctx, canvas) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  const { domain: rawDomain, range: rawRange } = interaction.systemSpec
+  const w = canvas.clientWidth
+  const h = canvas.clientHeight
+
+  const padX = (rawDomain[1] - rawDomain[0]) * 0.1
+  const padY = (rawRange[1] - rawRange[0]) * 0.15
+  const domain = [rawDomain[0] - padX, rawDomain[1] + padX]
+  const range = [rawRange[0] - padY, rawRange[1] + padY]
+
+  const mapX = x => (x - domain[0]) / (domain[1] - domain[0]) * w
+  const mapY = y => h - (y - range[0]) / (range[1] - range[0]) * h
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)'
+  ctx.lineWidth = 1
+  for (let gx = Math.ceil(domain[0]); gx <= domain[1]; gx++) {
+    ctx.beginPath(); ctx.moveTo(mapX(gx), 0); ctx.lineTo(mapX(gx), h); ctx.stroke()
+  }
+  for (let gy = Math.ceil(range[0]); gy <= range[1]; gy++) {
+    ctx.beginPath(); ctx.moveTo(0, mapY(gy)); ctx.lineTo(w, mapY(gy)); ctx.stroke()
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)'
+  ctx.lineWidth = 1.5
+  if (domain[0] <= 0 && domain[1] >= 0) {
+    ctx.beginPath(); ctx.moveTo(mapX(0), 0); ctx.lineTo(mapX(0), h); ctx.stroke()
+  }
+  if (range[0] <= 0 && range[1] >= 0) {
+    ctx.beginPath(); ctx.moveTo(0, mapY(0)); ctx.lineTo(w, mapY(0)); ctx.stroke()
+  }
+
+  // Rectangles
+  const { rectangles } = systemState
+  const y0px = mapY(0)
+  for (const rect of rectangles) {
+    const px = mapX(rect.x)
+    const pw = mapX(rect.x + rect.width) - px
+    const pyH = mapY(rect.height)
+    const top = Math.min(y0px, pyH)
+    const rh = Math.abs(pyH - y0px)
+
+    ctx.fillStyle = rect.height >= 0 ? 'rgba(59, 130, 246, 0.25)' : 'rgba(239, 68, 68, 0.25)'
+    ctx.fillRect(px, top, pw, rh)
+    ctx.strokeStyle = rect.height >= 0 ? 'rgba(59, 130, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(px, top, pw, rh)
+  }
+
+  // Function curve on top
+  ctx.strokeStyle = '#374151'
+  ctx.lineWidth = 2.5
+  ctx.beginPath()
+  systemState.graph.forEach((pt, i) => {
+    const px = mapX(pt.x); const py = mapY(pt.y)
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
+  })
+  ctx.stroke()
+
+  // Sample points on rectangles
+  if (rectangles.length <= 64) {
+    ctx.fillStyle = '#3b82f6'
+    for (const rect of rectangles) {
+      ctx.beginPath()
+      ctx.arc(mapX(rect.sampleX), mapY(rect.height), 3, 0, Math.PI * 2)
+      ctx.fill()
     }
   }
 }
@@ -193,6 +304,7 @@ function evaluateReflection(interaction, state) {
 
 export default function InteractionTypeA({ lesson: lessonProp }) {
   const LESSON = lessonProp || DEFAULT_LESSON
+  const isRiemann = LESSON.mode === 'riemann'
 
   const [resolution, setResolution] = useState(LESSON.parameterSpec.resolutionLevels[0])
   const canvasRef = useRef(null)
@@ -201,9 +313,11 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
     const mh = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
     return {
       f: new Function("x", `${mh} return ${LESSON.systemSpec.function}`),
-      df: new Function("x", `${mh} return ${LESSON.systemSpec.derivative}`)
+      df: !isRiemann && LESSON.systemSpec.derivative
+        ? new Function("x", `${mh} return ${LESSON.systemSpec.derivative}`)
+        : () => 0
     }
-  }, [LESSON])
+  }, [LESSON, isRiemann])
 
   const interaction = useMemo(() => ({
     ...LESSON,
@@ -217,8 +331,8 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   const state = { resolution }
 
   const computationResult = useMemo(() => {
-    return recompute(interaction, state)
-  }, [resolution, interaction])
+    return isRiemann ? recomputeRiemann(interaction, state) : recompute(interaction, state)
+  }, [resolution, interaction, isRiemann])
 
   const pendingResolutionRef = useRef(LESSON.parameterSpec.resolutionLevels[0])
   const containerRef = useRef(null)
@@ -234,8 +348,11 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
     canvas.width = rect.width * dpr
     canvas.height = rect.height * dpr
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    renderCanvas((result || computationResult).systemState, inter || interaction, ctx, canvas)
-  }, [computationResult, interaction])
+    const sys = (result || computationResult).systemState
+    const inter2 = inter || interaction
+    if (isRiemann) renderCanvasRiemann(sys, inter2, ctx, canvas)
+    else renderCanvas(sys, inter2, ctx, canvas)
+  }, [computationResult, interaction, isRiemann])
 
   // Re-draw when data changes
   useEffect(() => { draw() }, [draw])
@@ -257,6 +374,11 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
     .replace(/\*/g, '·')
     .replace(/x·x/g, 'x²')
 
+  // Sum type label for riemann mode
+  const sumTypeLabel = isRiemann
+    ? (LESSON.systemSpec.sumType === 'right' ? 'phải' : LESSON.systemSpec.sumType === 'midpoint' ? 'trung điểm' : 'trái')
+    : null
+
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative',
@@ -271,7 +393,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
           fontSize: 13, color: '#0c4a6e', lineHeight: 1.4,
           flexShrink: 0
         }}>
-          {LESSON.prompt}
+          <MathText text={LESSON.prompt} />
         </div>
       )}
 
@@ -305,18 +427,29 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
               <span style={{ width: 14, height: 2, background: '#374151', display: 'inline-block', borderRadius: 1 }} />
               f(x) = {fnDisplay}
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 14, height: 2, background: '#3b82f6', display: 'inline-block', borderRadius: 1 }} />
-              Cát tuyến
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 14, height: 2, background: '#ef4444', display: 'inline-block', borderRadius: 1, borderTop: '1px dashed #ef4444' }} />
-              Tiếp tuyến
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, background: '#10b981', display: 'inline-block', borderRadius: '50%' }} />
-              x = {LESSON.systemSpec.anchor}
-            </span>
+            {isRiemann ? (
+              <>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 10, height: 10, background: 'rgba(59,130,246,0.25)', border: '1px solid rgba(59,130,246,0.6)', display: 'inline-block' }} />
+                  HCN ({sumTypeLabel})
+                </span>
+              </>
+            ) : (
+              <>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 14, height: 2, background: '#3b82f6', display: 'inline-block', borderRadius: 1 }} />
+                  Cát tuyến
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 14, height: 2, background: '#ef4444', display: 'inline-block', borderRadius: 1, borderTop: '1px dashed #ef4444' }} />
+                  Tiếp tuyến
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 8, height: 8, background: '#10b981', display: 'inline-block', borderRadius: '50%' }} />
+                  x = {LESSON.systemSpec.anchor}
+                </span>
+              </>
+            )}
           </div>
         </div>
 
@@ -331,21 +464,43 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
             borderRadius: 8, padding: '10px 12px',
             fontSize: 13, lineHeight: 1.6
           }}>
-            <div style={{ fontWeight: 600, color: '#334155', marginBottom: 4, fontSize: 12 }}>
-              Tại x = {LESSON.systemSpec.anchor}, h = {sys.h.toFixed(3)}
-            </div>
-            <div style={{ color: '#3b82f6', fontFamily: 'monospace' }}>
-              Δf/Δx ≈ <b>{sys.approxSlope.toFixed(4)}</b>
-            </div>
-            <div style={{ color: '#ef4444', fontFamily: 'monospace' }}>
-              f'({LESSON.systemSpec.anchor}) = <b>{sys.trueSlope.toFixed(4)}</b>
-            </div>
-            <div style={{
-              color: sys.error < 0.01 ? '#10b981' : '#f59e0b',
-              fontFamily: 'monospace', fontSize: 12, marginTop: 2
-            }}>
-              Sai số: {sys.error.toFixed(6)}
-            </div>
+            {isRiemann ? (
+              <>
+                <div style={{ fontWeight: 600, color: '#334155', marginBottom: 4, fontSize: 12 }}>
+                  n = {sys.n}, Δx = {sys.dx.toFixed(4)}
+                </div>
+                <div style={{ color: '#3b82f6', fontFamily: 'monospace' }}>
+                  Tổng ≈ <b>{sys.sum.toFixed(4)}</b>
+                </div>
+                <div style={{ color: '#374151', fontFamily: 'monospace' }}>
+                  ∫ = <b>{sys.integral.toFixed(4)}</b>
+                </div>
+                <div style={{
+                  color: sys.error < 0.01 ? '#10b981' : '#f59e0b',
+                  fontFamily: 'monospace', fontSize: 12, marginTop: 2
+                }}>
+                  Sai số: {sys.error.toFixed(6)}
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontWeight: 600, color: '#334155', marginBottom: 4, fontSize: 12 }}>
+                  Tại x = {LESSON.systemSpec.anchor}, h = {sys.h.toFixed(3)}
+                </div>
+                <div style={{ color: '#3b82f6', fontFamily: 'monospace' }}>
+                  Δf/Δx ≈ <b>{sys.approxSlope.toFixed(4)}</b>
+                </div>
+                <div style={{ color: '#ef4444', fontFamily: 'monospace' }}>
+                  f'({LESSON.systemSpec.anchor}) = <b>{sys.trueSlope.toFixed(4)}</b>
+                </div>
+                <div style={{
+                  color: sys.error < 0.01 ? '#10b981' : '#f59e0b',
+                  fontFamily: 'monospace', fontSize: 12, marginTop: 2
+                }}>
+                  Sai số: {sys.error.toFixed(6)}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Reflection card */}
@@ -358,7 +513,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
               lineHeight: 1.5, color: '#1e293b',
               animation: 'slideIn 0.4s ease-out'
             }}>
-              {reflection}
+              <MathText text={reflection} />
             </div>
           )}
 

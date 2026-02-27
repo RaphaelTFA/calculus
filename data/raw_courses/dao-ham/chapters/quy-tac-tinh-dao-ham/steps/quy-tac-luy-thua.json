@@ -3,7 +3,7 @@
     "title": "Quy tắc lũy thừa",
     "description": "Đạo hàm của $x^n$ tuân theo quy tắc lũy thừa: nhân hệ số $n$ và giảm số mũ đi một.",
     "xp_reward": 10,
-    "order_index": 4,
+    "order_index": 0,
     "slides": [
         {
             "order_index": 0,

@@ -1,0 +1,297 @@
+{
+  "id": "ung-dung-tich-luy",
+  "title": "Ứng Dụng Tích Lũy",
+  "description": "Bài tổng hợp: quan sát đại lượng tích lũy theo thời gian — nối tích phân, FTC và thay đổi ròng.",
+  "xp_reward": 15,
+  "order_index": 3,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-accumulation-app",
+          "type": "interaction",
+          "content": {
+            "interactionType": "C",
+            "lesson": {
+              "interactionType": "C",
+              "parameterSpec": {
+                "time": {
+                  "start": 0,
+                  "end": 6,
+                  "step": 0.05
+                }
+              },
+              "systemSpec": {
+                "initialState": {
+                  "x": 0,
+                  "y": 0
+                },
+                "evolutionRule": {
+                  "type": "expression",
+                  "expression": "[1, 3 - t]",
+                  "variables": ["t", "x", "y"]
+                }
+              },
+              "representationSpec": {
+                "encoding": "positionTime",
+                "viewBox": {
+                  "xMin": 0,
+                  "xMax": 6.5,
+                  "yMin": -1,
+                  "yMax": 6
+                },
+                "xLabel": "Thời gian (phút)",
+                "yLabel": "Lượng nước (lít)"
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "type": "timeReached",
+                    "value": 1.5,
+                    "message": "Tốc độ $r = 1{,}5 > 0$ — nước vẫn vào bể. Đường cong dốc lên: $Q(t) = \\int_0^t (3-s)\\,ds$ đang tăng."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 3.0,
+                    "message": "Tốc độ $r(3) = 0$: dòng chảy dừng. $Q(3) = 4{,}5$ lít — lượng nước cực đại. Sau đây $r < 0$: nước chảy ra."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 5.0,
+                    "message": "Đường cong đi xuống: tốc độ âm $\\Rightarrow$ lượng nước giảm. $Q(5) = 2{,}5$ lít — bể chưa cạn."
+                  },
+                  {
+                    "type": "timeReached",
+                    "value": 5.9,
+                    "message": "$Q(6) = 18 - 18 = 0$. Thay đổi ròng bằng $0$ — nước vào bằng nước ra. Tích phân, FTC, thay đổi ròng — tất cả hội tụ tại đây."
+                  }
+                ]
+              },
+              "prompt": "Nhấn phát. Lượng nước $Q(t) = \\int_0^t (3-s)\\,ds$ tăng rồi giảm theo tốc độ $r(t) = 3 - t$. Khi nào bể đầy nhất? Tại sao $Q(6) = 0$?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-tich-luy-tong-hop",
+          "type": "text",
+          "content": {
+            "heading": "Tích phân là tích lũy",
+            "paragraphs": [
+              "Bạn vừa thấy toàn bộ câu chuyện của Module 4 trong một hình ảnh. Tốc độ $r(t) = 3 - t$ là hàm dưới dấu tích phân. Lượng nước $Q(t) = \\int_0^t r(s)\\,ds$ là **hàm tích lũy** — FTC I nói $Q'(t) = r(t)$. Khi $r > 0$, $Q$ tăng; khi $r < 0$, $Q$ giảm.",
+              "FTC II cho kết quả: $Q(6) = F(6) - F(0)$ với $F(t) = 3t - t^2/2$. Thay đổi ròng $= 0$ vì giai đoạn tăng và giảm triệt tiêu. Đây là **định lý thay đổi ròng** trong bối cảnh thực tế."
+            ]
+          }
+        },
+        {
+          "id": "math-accumulation",
+          "type": "math",
+          "content": {
+            "latex": "Q(t) = \\int_0^t r(s)\\,ds, \\quad Q'(t) = r(t), \\quad Q(b) - Q(a) = \\int_a^b r(s)\\,ds"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-tong-ket-module",
+          "type": "text",
+          "content": {
+            "heading": "Bức tranh toàn cảnh",
+            "paragraphs": [
+              "Bốn phần của Module 4 giờ kết nối: (1) Tích phân xác định $= $ giới hạn tổng Riemann. (2) FTC: đạo hàm và tích phân là nghịch đảo. (3) Nguyên hàm: tìm $F$ để tính $\\int_a^b f = F(b) - F(a)$. (4) Thay đổi ròng: tích phân cho biến thiên tổng thể.",
+              "Từ bài toán diện tích (L1) đến ứng dụng thực tiễn (L12), tích phân luôn đo **tích lũy**. Dù là diện tích, quãng đường, lượng nước, hay dân số — chỉ cần tốc độ biến thiên, tích phân cho tổng thay đổi."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l12-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, tại thời điểm nào lượng nước cực đại? Tại sao?",
+            "options": [
+              { "value": "a", "label": "$t = 0$, vì tốc độ ban đầu cao nhất" },
+              { "value": "b", "label": "$t = 3$, vì $r(3) = 0$ — tốc độ đổi dấu từ dương sang âm" },
+              { "value": "c", "label": "$t = 6$, vì quá trình kết thúc" },
+              { "value": "d", "label": "$t = 1.5$, vì lượng nước tăng nhanh nhất" }
+            ],
+            "correct": "b",
+            "explanation": "$Q'(t) = r(t) = 3 - t = 0$ tại $t = 3$. Trước $t = 3$: $Q' > 0$ (tăng). Sau $t = 3$: $Q' < 0$ (giảm). Đây là bài toán cực trị: hàm tích lũy đạt cực đại khi tốc độ biến thiên đổi dấu."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l12-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Lượng nước cực đại $Q(3)$ bằng bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$3$ lít" },
+              { "value": "b", "label": "$4{,}5$ lít" },
+              { "value": "c", "label": "$9$ lít" },
+              { "value": "d", "label": "$6$ lít" }
+            ],
+            "correct": "b",
+            "explanation": "$Q(3) = \\int_0^3 (3-t)\\,dt = [3t - t^2/2]_0^3 = 9 - 9/2 = 9/2 = 4{,}5$ lít. Đây cũng là diện tích tam giác vuông có đáy $3$ và chiều cao $3$: $A = \\frac{1}{2} \\cdot 3 \\cdot 3 = 4{,}5$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l12-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Tại sao $Q(6) = 0$?",
+            "options": [
+              { "value": "a", "label": "Vì $r(6) = -3$, tốc độ âm" },
+              { "value": "b", "label": "Vì nước vào ($0 \\to 3$) bằng nước ra ($3 \\to 6$) — thay đổi ròng bằng $0$" },
+              { "value": "c", "label": "Vì $F(6) = 0$" },
+              { "value": "d", "label": "Vì tích phân luôn kết thúc tại $0$" }
+            ],
+            "correct": "b",
+            "explanation": "$\\int_0^3 (3-t)\\,dt = 4{,}5$ và $\\int_3^6 (3-t)\\,dt = -4{,}5$. Tổng: $4{,}5 + (-4{,}5) = 0$. Hàm $r(t) = 3-t$ đối xứng qua $t = 3$: lượng nước vào đúng bằng lượng nước ra."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l12-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Mối liên hệ $Q'(t) = r(t)$ tương ứng với định lý nào?",
+            "options": [
+              { "value": "a", "label": "Định lý giá trị trung bình" },
+              { "value": "b", "label": "FTC Phần I: đạo hàm hàm tích lũy bằng hàm dưới dấu tích phân" },
+              { "value": "c", "label": "FTC Phần II: tích phân bằng hiệu nguyên hàm" },
+              { "value": "d", "label": "Định lý thay đổi ròng" }
+            ],
+            "correct": "b",
+            "explanation": "FTC I: nếu $Q(t) = \\int_a^t r(s)\\,ds$ thì $Q'(t) = r(t)$. Đạo hàm của lượng tích lũy bằng tốc độ tích lũy tại thời điểm đó. FTC II cho $Q(b) = F(b) - F(a)$ — đó là công cụ tính, không phải mô tả quan hệ."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l12-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Xe chạy với vận tốc $v(t) = 3 - t$ m/s trên $[0, 6]$ (cùng dạng tương tác). Tổng **độ dịch chuyển** $\\int_0^6 v\\,dt$ và tổng **quãng đường** $\\int_0^6 |v|\\,dt$ lần lượt bằng?",
+            "options": [
+              { "value": "a", "label": "Dịch chuyển $= 0$ m, quãng đường $= 9$ m" },
+              { "value": "b", "label": "Dịch chuyển $= 0$ m, quãng đường $= 0$ m" },
+              { "value": "c", "label": "Dịch chuyển $= 9$ m, quãng đường $= 9$ m" },
+              { "value": "d", "label": "Dịch chuyển $= 4{,}5$ m, quãng đường $= 4{,}5$ m" }
+            ],
+            "correct": "a",
+            "explanation": "Dịch chuyển: $\\int_0^6(3-t)\\,dt = [3t-t^2/2]_0^6 = 0$. Quãng đường: $\\int_0^3(3-t)\\,dt + \\int_3^6(t-3)\\,dt = 4{,}5 + 4{,}5 = 9$ m. Dịch chuyển $= 0$ (xe về vị trí ban đầu) nhưng quãng đường $= 9$ (xe đã di chuyển thực sự). Hai đại lượng hoàn toàn khác nhau."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l12-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu tốc độ bơm nước đổi thành $r(t) = 4 - t$ trên $[0, 6]$, tại thời điểm nào lượng nước trong bể cực đại?",
+            "options": [
+              { "value": "a", "label": "$t = 3$" },
+              { "value": "b", "label": "$t = 4$" },
+              { "value": "c", "label": "$t = 2$" },
+              { "value": "d", "label": "$t = 6$" }
+            ],
+            "correct": "b",
+            "explanation": "$r(t) = 4 - t = 0$ khi $t = 4$. Trước $t = 4$: $r > 0$ (nước vào). Sau $t = 4$: $r < 0$ (nước ra). Cực đại khi tốc độ biến thiên bằng $0$ và đổi từ dương sang âm — chính là $Q'(t) = 0$ theo FTC I."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l12-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Khối lượng chất lỏng chảy qua ống với tốc độ $r(t) = 2t$ kg/s. Tổng khối lượng từ $t = 0$ đến $t = 5$ là bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$10$ kg" },
+              { "value": "b", "label": "$25$ kg" },
+              { "value": "c", "label": "$50$ kg" },
+              { "value": "d", "label": "$5$ kg" }
+            ],
+            "correct": "b",
+            "explanation": "$Q = \\int_0^5 2t\\,dt = [t^2]_0^5 = 25$ kg. Vì $r(t) > 0$ trên toàn bộ khoảng, tích phân ròng bằng tổng diện tích — giải thích đơn giản."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l12-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Hàm tích lũy $Q(t) = \\int_0^t r(s)\\,ds$ đạt cực đại khi nào?",
+            "options": [
+              { "value": "a", "label": "Khi $r(t)$ lớn nhất" },
+              { "value": "b", "label": "Khi $r(t) = 0$ và $r$ đổi từ dương sang âm" },
+              { "value": "c", "label": "Khi $t$ lớn nhất" },
+              { "value": "d", "label": "Khi $Q(t) = 0$" }
+            ],
+            "correct": "b",
+            "explanation": "$Q'(t) = r(t)$ (FTC I). Cực đại xảy ra khi $Q' = 0$ và $Q'$ đổi dấu từ $+$ sang $-$. Đó là khi $r(t) = 0$ và $r$ chuyển từ dương (tăng) sang âm (giảm) — bài toán cực trị quen thuộc từ Module 3."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l12-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Module 4 bắt đầu từ diện tích dưới đường cong (L1) và kết thúc tại ứng dụng tích lũy (L12). Đâu là mạch nối cốt lõi?",
+            "options": [
+              { "value": "a", "label": "Tích phân là công cụ tính diện tích — không hơn" },
+              { "value": "b", "label": "Tích phân đo sự tích lũy: từ diện tích → tổng Riemann → FTC → nguyên hàm → thay đổi ròng → ứng dụng thực tiễn" },
+              { "value": "c", "label": "FTC là nội dung quan trọng nhất, các bài khác chỉ bổ trợ" },
+              { "value": "d", "label": "Nguyên hàm và đạo hàm là cùng một thứ" }
+            ],
+            "correct": "b",
+            "explanation": "Tích phân bắt đầu là câu hỏi hình học (diện tích) nhưng bản chất là **tích lũy**: gộp vô số đóng góp vô cùng bé. FTC nối tích lũy với đạo hàm. Nguyên hàm cho công cụ tính. Thay đổi ròng mở rộng ra mọi ngữ cảnh thực tiễn. Đó là hành trình từ cụ thể đến trừu tượng."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@
     "title": "Quy tắc tích",
     "description": "Đạo hàm của tích hai hàm là tổng hai đóng góp chéo: $f'g + fg'$, không phải $f'g'$.",
     "xp_reward": 15,
-    "order_index": 5,
+    "order_index": 1,
     "slides": [
         {
             "order_index": 0,

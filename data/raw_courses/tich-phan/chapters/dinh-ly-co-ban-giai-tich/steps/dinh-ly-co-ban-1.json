@@ -1,0 +1,301 @@
+{
+  "id": "dinh-ly-co-ban-1",
+  "title": "Định Lý Cơ Bản Phần I",
+  "description": "Đạo hàm của hàm tích lũy bằng chính hàm dưới dấu tích phân: F′(x) = f(x).",
+  "xp_reward": 15,
+  "order_index": 2,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-ftc1",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Cận trên x"
+              },
+              "parameter": {
+                "min": 0,
+                "max": 6,
+                "initial": 1
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -0.5,
+                  "xMax": 6.5,
+                  "yMin": -3,
+                  "yMax": 5
+                },
+                "curves": [
+                  {
+                    "expr": "3 - x",
+                    "color": "#3498db",
+                    "label": "f(t) = 3 − t",
+                    "style": "solid",
+                    "width": 2
+                  },
+                  {
+                    "expr": "3*x - x*x/2",
+                    "color": "#e67e22",
+                    "label": "F(x) = 3x − x²/2",
+                    "style": "solid",
+                    "width": 2
+                  }
+                ],
+                "shading": {
+                  "curveIndex": 0,
+                  "from": 0,
+                  "to": "p",
+                  "color": "#3498db",
+                  "opacity": 0.25
+                }
+              },
+              "reflections": [
+                {
+                  "id": "increasing",
+                  "trigger": "state.currentValue > 0.5 && state.currentValue < 2",
+                  "text": "$f(x) > 0$ nên diện tích tăng. Đường $F$ dốc lên — độ dốc dương."
+                },
+                {
+                  "id": "peak",
+                  "trigger": "state.currentValue > 2.8 && state.currentValue < 3.2",
+                  "text": "$f(3) = 0$: đường $F$ nằm ngang tại đây. Khi $f = 0$, tốc độ tích lũy bằng $0$ — $F'(x) = 0$."
+                },
+                {
+                  "id": "decreasing",
+                  "trigger": "state.currentValue > 4",
+                  "text": "$f(x) < 0$: diện tích bắt đầu bị trừ. $F$ nghịch biến — độ dốc âm, đúng bằng $f(x)$."
+                }
+              ],
+              "prompt": "Kéo $x$ qua $[0, 6]$. Khi $f(x) > 0$, $F$ tăng hay giảm? Khi $f(x) = 0$, điều gì xảy ra với $F$? Khi $f(x) < 0$ thì sao?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-ftc1-insight",
+          "type": "text",
+          "content": {
+            "heading": "Định lý cơ bản giải tích — Phần I",
+            "paragraphs": [
+              "Bạn vừa quan sát: khi $f(x) > 0$ thì $F$ tăng, khi $f(x) < 0$ thì $F$ giảm, khi $f(x) = 0$ thì $F$ nằm ngang. Giá trị $f(x)$ chính là **độ dốc** (đạo hàm) của $F$ tại $x$. Đây không phải trùng hợp — đây là định lý.",
+              "Nếu $f$ liên tục trên $[a, b]$ và $F(x) = \\int_a^x f(t)\\,dt$, thì $F$ khả vi trên $(a, b)$ và $F'(x) = f(x)$. Phép tích phân và phép đạo hàm là phép toán **ngược nhau**: đạo hàm của tích phân tích lũy trả lại hàm ban đầu."
+            ]
+          }
+        },
+        {
+          "id": "math-ftc1",
+          "type": "math",
+          "content": {
+            "latex": "\\frac{d}{dx} \\int_a^x f(t)\\,dt = f(x)"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-ftc1-meaning",
+          "type": "text",
+          "content": {
+            "heading": "Ý nghĩa sâu hơn",
+            "paragraphs": [
+              "Định lý nói: tốc độ thay đổi diện tích tại $x$ bằng chính chiều cao đường cong tại $x$. Điều này trực giác: khi dịch cận trên thêm $\\Delta x$ nhỏ, diện tích thêm vào xấp xỉ $f(x) \\cdot \\Delta x$, nên $\\frac{\\Delta F}{\\Delta x} \\approx f(x)$.",
+              "Hệ quả quan trọng: mọi hàm liên tục đều có nguyên hàm. Cụ thể, $F(x) = \\int_a^x f(t)\\,dt$ là một nguyên hàm của $f$ — ta không cần đoán công thức, tích phân tự xây dựng nguyên hàm."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l7-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi $x$ đi qua điểm $x = 3$ (nơi $f(3) = 0$), đường $F$ có đặc điểm gì?",
+            "options": [
+              { "value": "a", "label": "$F$ cắt trục hoành" },
+              { "value": "b", "label": "$F$ đạt cực đại — tiếp tuyến nằm ngang" },
+              { "value": "c", "label": "$F$ không xác định" },
+              { "value": "d", "label": "$F$ có điểm uốn" }
+            ],
+            "correct": "b",
+            "explanation": "Tại $x = 3$: $F'(3) = f(3) = 0$, nên tiếp tuyến nằm ngang. Trước $x = 3$, $f > 0$ nên $F$ tăng; sau $x = 3$, $f < 0$ nên $F$ giảm. Đây là cực đại — đúng theo tiêu chuẩn đạo hàm bậc nhất."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l7-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $G(x) = \\int_0^x t^2\\,dt$. Tính $G'(x)$.",
+            "options": [
+              { "value": "a", "label": "$2x$" },
+              { "value": "b", "label": "$x^2$" },
+              { "value": "c", "label": "$\\frac{x^3}{3}$" },
+              { "value": "d", "label": "$x^3$" }
+            ],
+            "correct": "b",
+            "explanation": "Áp dụng FTC I trực tiếp: $G'(x) = \\frac{d}{dx} \\int_0^x t^2\\,dt = x^2$. Đạo hàm của hàm tích lũy bằng hàm dưới dấu tích phân, thay biến câm $t$ bằng cận trên $x$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l7-q3",
+          "type": "quiz",
+          "content": {
+            "question": "FTC I phát biểu rằng $\\frac{d}{dx} \\int_a^x f(t)\\,dt = f(x)$. Điều này cho thấy mối liên hệ gì giữa tích phân và đạo hàm?",
+            "options": [
+              { "value": "a", "label": "Chúng là hai phép toán không liên quan" },
+              { "value": "b", "label": "Chúng là phép toán ngược nhau — đạo hàm \"hủy\" tích phân" },
+              { "value": "c", "label": "Tích phân luôn bằng đạo hàm" },
+              { "value": "d", "label": "Đạo hàm luôn bằng $0$ khi có tích phân" }
+            ],
+            "correct": "b",
+            "explanation": "FTC I cho thấy phép đạo hàm \"hủy\" phép tích phân: lấy tích phân rồi đạo hàm trả lại hàm ban đầu. Giống như phép cộng và trừ, hay bình phương và căn bậc hai — đạo hàm và tích phân là cặp phép toán ngược."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l7-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $H(x) = \\int_2^x \\sin(t)\\,dt$. Tính $H'(\\pi)$.",
+            "options": [
+              { "value": "a", "label": "$\\sin(2)$" },
+              { "value": "b", "label": "$0$" },
+              { "value": "c", "label": "$\\cos(\\pi) = -1$" },
+              { "value": "d", "label": "$1$" }
+            ],
+            "correct": "b",
+            "explanation": "FTC I: $H'(x) = \\sin(x)$. Tại $x = \\pi$: $H'(\\pi) = \\sin(\\pi) = 0$. Cận dưới $a = 2$ không ảnh hưởng đến đạo hàm — nó chỉ dịch $H$ lên/xuống, không thay đổi độ dốc."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l7-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu đổi cận dưới từ $a = 0$ sang $a = 5$ trong $F(x) = \\int_a^x f(t)\\,dt$, đạo hàm $F'(x)$ thay đổi thế nào?",
+            "options": [
+              { "value": "a", "label": "$F'(x)$ tăng thêm $5$" },
+              { "value": "b", "label": "$F'(x)$ giảm đi $f(5)$" },
+              { "value": "c", "label": "$F'(x)$ không đổi — vẫn bằng $f(x)$" },
+              { "value": "d", "label": "$F'(x)$ đổi dấu" }
+            ],
+            "correct": "c",
+            "explanation": "Đổi cận dưới từ $0$ sang $5$ chỉ thay đổi $F$ bằng một hằng số cộng thêm $-\\int_0^5 f(t)\\,dt$. Đạo hàm của hằng số bằng $0$, nên $F'(x) = f(x)$ bất kể $a$. Cận dưới chỉ dịch đồ thị $F$ mà không đổi hình dạng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l7-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi $x > 3$ thì $f(x) < 0$. Điều gì xảy ra với diện tích tô màu?",
+            "options": [
+              { "value": "a", "label": "Diện tích tiếp tục tăng" },
+              { "value": "b", "label": "Diện tích bắt đầu giảm — vùng dưới trục $Ox$ bù trừ vùng dương phía trước" },
+              { "value": "c", "label": "Diện tích giữ nguyên" },
+              { "value": "d", "label": "Diện tích trở thành âm ngay lập tức" }
+            ],
+            "correct": "b",
+            "explanation": "Khi $f(x) < 0$, đường cong nằm dưới trục hoành. Tích phân tích lũy phần âm, làm giảm tổng tích lũy trước đó. $F$ giảm vì $F'(x) = f(x) < 0$. Diện tích \"ròng\" (có dấu) giảm dù diện tích hình học vùng mới vẫn dương."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l7-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Tổng lượng mưa từ $6$h đến $t$ giờ là $R(t) = \\int_6^t r(s)\\,ds$, với $r(s)$ là cường độ mưa (mm/giờ). $R'(t)$ có ý nghĩa gì?",
+            "options": [
+              { "value": "a", "label": "Tổng lượng mưa đến thời điểm $t$" },
+              { "value": "b", "label": "Cường độ mưa tại thời điểm $t$: $R'(t) = r(t)$" },
+              { "value": "c", "label": "Lượng mưa trung bình" },
+              { "value": "d", "label": "Thời gian mưa còn lại" }
+            ],
+            "correct": "b",
+            "explanation": "FTC I: $R'(t) = r(t)$. Đạo hàm của hàm tích lũy cho tốc độ tích lũy — tức cường độ mưa tại thời điểm $t$. Tích phân biến cường độ thành tổng lượng; đạo hàm biến tổng lượng trở lại cường độ."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l7-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $F(x) = \\int_0^x f(t)\\,dt$ với $f$ liên tục. Nếu $f(2) = 5$ và $f(4) = -3$, phát biểu nào đúng?",
+            "options": [
+              { "value": "a", "label": "$F'(2) = 5$ và $F'(4) = -3$" },
+              { "value": "b", "label": "$F(2) = 5$ và $F(4) = -3$" },
+              { "value": "c", "label": "$F'(2) = -3$ và $F'(4) = 5$" },
+              { "value": "d", "label": "$F(2) = 0$ và $F(4) = 0$" }
+            ],
+            "correct": "a",
+            "explanation": "FTC I: $F'(x) = f(x)$. Vậy $F'(2) = f(2) = 5$ (dương — $F$ tăng tại $x = 2$) và $F'(4) = f(4) = -3$ (âm — $F$ giảm tại $x = 4$). Chú ý $F'$ cho biết đạo hàm tại điểm, không phải giá trị $F$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l7-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Cho $P(x) = \\int_1^x (t^3 + 1)\\,dt$. Tại $x$ nào $P$ đạt cực tiểu?",
+            "options": [
+              { "value": "a", "label": "$x = 0$" },
+              { "value": "b", "label": "$x = -1$" },
+              { "value": "c", "label": "$x = 1$" },
+              { "value": "d", "label": "Không có cực tiểu" }
+            ],
+            "correct": "b",
+            "explanation": "$P'(x) = x^3 + 1 = 0$ khi $x = -1$. Kiểm tra: $P''(x) = 3x^2$, $P''(-1) = 3 > 0$ — cực tiểu. Tại $x = -1$: $f(-1) = 0$, $F$ chuyển từ giảm ($f < 0$ khi $x < -1$) sang tăng ($f > 0$ khi $x > -1$)."
+          }
+        }
+      ]
+    }
+  ]
+}

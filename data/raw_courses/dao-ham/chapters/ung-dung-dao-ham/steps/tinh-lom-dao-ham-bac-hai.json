@@ -3,7 +3,7 @@
     "title": "Tính lõm và đạo hàm bậc hai",
     "description": "Dấu của $f''$ xác định tính lõm — một thuộc tính của hình dạng đường cong, không phụ thuộc vào vị trí thẳng đứng.",
     "xp_reward": 15,
-    "order_index": 10,
+    "order_index": 2,
     "slides": [
         {
             "order_index": 0,

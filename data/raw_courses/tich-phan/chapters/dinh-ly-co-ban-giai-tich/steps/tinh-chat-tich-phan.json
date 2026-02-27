@@ -1,0 +1,298 @@
+{
+  "id": "tinh-chat-tich-phan",
+  "title": "Tính Chất Tích Phân",
+  "description": "Tích phân xác định bảo toàn khi chia khoảng: tổng các phần luôn bằng tổng thể.",
+  "xp_reward": 10,
+  "order_index": 0,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-interval-additivity",
+          "type": "interaction",
+          "content": {
+            "interactionType": "E",
+            "lesson": {
+              "interactionType": "E",
+              "parameterSpec": {
+                "structure": {
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "initial": 0.5,
+                  "label": "Điểm chia c"
+                }
+              },
+              "systemSpec": {
+                "baseValues": {},
+                "conservedObject": {
+                  "type": "expression",
+                  "expression": "16/3",
+                  "variables": []
+                }
+              },
+              "representationSpec": {
+                "mode": "geometricSplit",
+                "geometryBase": {
+                  "type": "areaUnderCurve",
+                  "function": "4 - x*x",
+                  "domain": [0, 2]
+                },
+                "splitSpec": {
+                  "type": "domainSplit"
+                },
+                "viewBox": {
+                  "xMin": -0.5,
+                  "xMax": 2.5,
+                  "yMin": -0.5,
+                  "yMax": 5.0
+                }
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "type": "structureBelow",
+                    "value": 0.1,
+                    "message": "Phần trái gần bằng $0$, phần phải gần bằng tổng. Tổng hai phần vẫn không đổi."
+                  },
+                  {
+                    "type": "structureNear",
+                    "value": 0.5,
+                    "tolerance": 0.05,
+                    "message": "Điểm chia ở giữa. Hai phần không bằng nhau — nhưng tổng vẫn bảo toàn."
+                  },
+                  {
+                    "type": "structureAbove",
+                    "value": 0.9,
+                    "message": "Phần trái chiếm gần hết. Dù chia ở đâu, $\\int_0^c + \\int_c^2$ luôn bằng $\\int_0^2$."
+                  }
+                ]
+              },
+              "prompt": "Kéo điểm chia $c$ dọc khoảng $[0, 2]$. Ba thẻ hiển thị $\\int_0^c$, $\\int_c^2$ và tổng. Tổng có bao giờ thay đổi không?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-cong-khoang",
+          "type": "text",
+          "content": {
+            "heading": "Tính cộng theo khoảng",
+            "paragraphs": [
+              "Bạn vừa kéo điểm chia $c$ qua toàn bộ khoảng $[0, 2]$. Dù $c$ ở đâu, tổng $\\int_0^c f(x)\\,dx + \\int_c^2 f(x)\\,dx$ luôn bằng $\\int_0^2 f(x)\\,dx$. Đây không phải trùng hợp — nó là tính chất cơ bản của tích phân xác định.",
+              "Với $f$ liên tục trên $[a, b]$ và $a \\leq c \\leq b$: tích phân trên toàn khoảng bằng tổng tích phân trên hai phần. Tính chất này gọi là **tính cộng theo khoảng**."
+            ]
+          }
+        },
+        {
+          "id": "math-interval-additivity",
+          "type": "math",
+          "content": {
+            "latex": "\\int_a^b f(x)\\,dx = \\int_a^c f(x)\\,dx + \\int_c^b f(x)\\,dx"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-tinh-chat-khac",
+          "type": "text",
+          "content": {
+            "heading": "Tính tuyến tính của tích phân",
+            "paragraphs": [
+              "Ngoài tính cộng khoảng, tích phân còn tuyến tính: $\\int_a^b [f(x) + g(x)]\\,dx = \\int_a^b f(x)\\,dx + \\int_a^b g(x)\\,dx$ và $\\int_a^b k \\cdot f(x)\\,dx = k \\cdot \\int_a^b f(x)\\,dx$ với $k$ là hằng số.",
+              "Thêm hai quy ước quan trọng: $\\int_a^a f(x)\\,dx = 0$ (khoảng rộng bằng $0$ thì diện tích bằng $0$) và $\\int_b^a f(x)\\,dx = -\\int_a^b f(x)\\,dx$ (đảo cận đổi dấu)."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l5-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi bạn kéo điểm chia $c$ từ $0$ đến $2$, đại lượng nào luôn không đổi?",
+            "options": [
+              { "value": "a", "label": "$\\int_0^c f(x)\\,dx$" },
+              { "value": "b", "label": "$\\int_c^2 f(x)\\,dx$" },
+              { "value": "c", "label": "$\\int_0^c f(x)\\,dx + \\int_c^2 f(x)\\,dx$" },
+              { "value": "d", "label": "$\\int_0^c f(x)\\,dx - \\int_c^2 f(x)\\,dx$" }
+            ],
+            "correct": "c",
+            "explanation": "Mỗi phần thay đổi khi $c$ di chuyển, nhưng tổng hai phần luôn bằng $\\int_0^2 f(x)\\,dx = \\frac{16}{3}$. Đây chính là tính cộng theo khoảng: chia khoảng lấy tích phân không làm thay đổi tổng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l5-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Biết $\\int_0^3 f(x)\\,dx = 10$ và $\\int_0^1 f(x)\\,dx = 3$. Tính $\\int_1^3 f(x)\\,dx$.",
+            "options": [
+              { "value": "a", "label": "$13$" },
+              { "value": "b", "label": "$7$" },
+              { "value": "c", "label": "$3$" },
+              { "value": "d", "label": "$30$" }
+            ],
+            "correct": "b",
+            "explanation": "Tính cộng khoảng: $\\int_0^3 = \\int_0^1 + \\int_1^3$, suy ra $\\int_1^3 = 10 - 3 = 7$. Điểm chia $c = 1$ chia khoảng $[0, 3]$ thành $[0, 1]$ và $[1, 3]$, tổng hai phần luôn bằng toàn khoảng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l5-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Tại sao $\\int_a^a f(x)\\,dx = 0$?",
+            "options": [
+              { "value": "a", "label": "Vì $f(a) = 0$" },
+              { "value": "b", "label": "Vì khoảng $[a, a]$ có chiều rộng bằng $0$ — không có vùng nào để tích lũy diện tích" },
+              { "value": "c", "label": "Vì tích phân luôn dương" },
+              { "value": "d", "label": "Vì cận trên bằng cận dưới nên phép tính vô nghĩa" }
+            ],
+            "correct": "b",
+            "explanation": "Tích phân $\\int_a^b f(x)\\,dx$ đo diện tích (có dấu) trên khoảng từ $a$ đến $b$. Khi $b = a$, khoảng có chiều rộng $0$ — trong tổng Riemann, $\\Delta x = 0$ nên tổng bằng $0$. Hàm $f$ không cần bằng $0$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l5-q4",
+          "type": "quiz",
+          "content": {
+            "question": "$\\int_a^b f(x)\\,dx = -\\int_b^a f(x)\\,dx$. Phát biểu nào giải thích đúng quy ước đảo cận?",
+            "options": [
+              { "value": "a", "label": "Đảo cận làm hàm đổi dấu" },
+              { "value": "b", "label": "Đảo cận đổi hướng tích lũy — $\\Delta x$ trở thành âm, nên tổng đổi dấu" },
+              { "value": "c", "label": "Diện tích âm không tồn tại" },
+              { "value": "d", "label": "Đảo cận chỉ áp dụng cho hàm lẻ" }
+            ],
+            "correct": "b",
+            "explanation": "Trong tổng Riemann, $\\Delta x = \\frac{b - a}{n}$. Khi đảo thành $\\frac{a - b}{n}$, $\\Delta x$ đổi dấu, kéo theo toàn bộ tổng đổi dấu. Quy ước này giữ tính cộng khoảng hoạt động nhất quán trong mọi trường hợp."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l5-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Biết $\\int_0^2 f(x)\\,dx = 5$. Tính $\\int_0^2 3f(x)\\,dx$.",
+            "options": [
+              { "value": "a", "label": "$8$" },
+              { "value": "b", "label": "$15$" },
+              { "value": "c", "label": "$5$" },
+              { "value": "d", "label": "$\\frac{5}{3}$" }
+            ],
+            "correct": "b",
+            "explanation": "Tính tuyến tính: $\\int_0^2 3f(x)\\,dx = 3 \\int_0^2 f(x)\\,dx = 3 \\times 5 = 15$. Hằng số nhân được rút ra ngoài dấu tích phân vì trong tổng Riemann, $k$ là thừa số chung của mọi số hạng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l5-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Biết $\\int_0^4 f(x)\\,dx = 12$ và $\\int_0^4 g(x)\\,dx = 5$. Tính $\\int_0^4 [f(x) + g(x)]\\,dx$.",
+            "options": [
+              { "value": "a", "label": "$17$" },
+              { "value": "b", "label": "$60$" },
+              { "value": "c", "label": "$7$" },
+              { "value": "d", "label": "Không đủ dữ kiện" }
+            ],
+            "correct": "a",
+            "explanation": "Tính cộng hàm: $\\int_0^4 [f(x) + g(x)]\\,dx = \\int_0^4 f(x)\\,dx + \\int_0^4 g(x)\\,dx = 12 + 5 = 17$. Tích phân của tổng bằng tổng các tích phân — tính chất này đến từ tính tuyến tính của phép cộng trong tổng Riemann."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l5-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu $f(x) \\geq 0$ trên $[a, b]$ và $a < c < b$, khi $c$ dịch sang phải, $\\int_a^c f(x)\\,dx$ sẽ:",
+            "options": [
+              { "value": "a", "label": "Tăng, vì phần trái mở rộng nên tích lũy thêm diện tích dương" },
+              { "value": "b", "label": "Giảm, vì phần phải thu hẹp" },
+              { "value": "c", "label": "Không đổi, vì tổng bảo toàn" },
+              { "value": "d", "label": "Tùy thuộc hàm cụ thể" }
+            ],
+            "correct": "a",
+            "explanation": "Khi $c$ tăng, khoảng $[a, c]$ rộng hơn. Vì $f(x) \\geq 0$, mỗi khoảng con mới đóng góp diện tích dương, nên $\\int_a^c$ tăng. Đồng thời $\\int_c^b$ giảm đúng bằng phần tăng — tổng bảo toàn."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l5-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Một nhà máy hoạt động từ 6h đến 18h. Biết tổng sản lượng cả ngày là $\\int_6^{18} r(t)\\,dt = 500$ đơn vị và sản lượng buổi sáng $\\int_6^{12} r(t)\\,dt = 320$. Sản lượng buổi chiều là bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$180$ đơn vị" },
+              { "value": "b", "label": "$820$ đơn vị" },
+              { "value": "c", "label": "$500$ đơn vị" },
+              { "value": "d", "label": "Không đủ dữ kiện" }
+            ],
+            "correct": "a",
+            "explanation": "Tính cộng khoảng: $\\int_6^{18} = \\int_6^{12} + \\int_{12}^{18}$, nên $\\int_{12}^{18} = 500 - 320 = 180$. Đây là ứng dụng trực tiếp: chia khoảng thời gian thành hai phần, tổng sản lượng không đổi."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l5-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Biết $\\int_1^5 f(x)\\,dx = 8$, $\\int_1^3 f(x)\\,dx = 3$ và $\\int_3^5 g(x)\\,dx = 2$. Tính $\\int_3^5 [f(x) + g(x)]\\,dx$.",
+            "options": [
+              { "value": "a", "label": "$13$" },
+              { "value": "b", "label": "$7$" },
+              { "value": "c", "label": "$10$" },
+              { "value": "d", "label": "$5$" }
+            ],
+            "correct": "b",
+            "explanation": "Trước tiên: $\\int_3^5 f(x)\\,dx = \\int_1^5 f - \\int_1^3 f = 8 - 3 = 5$. Sau đó dùng tính cộng hàm: $\\int_3^5 [f + g]\\,dx = 5 + 2 = 7$. Bài này kết hợp cả tính cộng khoảng lẫn tính tuyến tính."
+          }
+        }
+      ]
+    }
+  ]
+}

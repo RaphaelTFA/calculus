@@ -3,7 +3,7 @@
     "title": "Quy tắc thương",
     "description": "Đạo hàm của thương $f/g$ bằng $(f'g - fg')/g^2$ — dấu trừ ở tử số là hậu quả của đạo hàm đảo nghịch.",
     "xp_reward": 15,
-    "order_index": 6,
+    "order_index": 2,
     "slides": [
         {
             "order_index": 0,

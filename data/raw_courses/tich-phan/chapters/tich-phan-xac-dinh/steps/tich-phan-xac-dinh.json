@@ -1,0 +1,283 @@
+{
+  "id": "tich-phan-xac-dinh",
+  "title": "Tích Phân Xác Định",
+  "description": "Định nghĩa tích phân xác định là giới hạn của tổng Riemann khi n tiến đến vô cùng.",
+  "xp_reward": 10,
+  "order_index": 3,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-definite-integral",
+          "type": "interaction",
+          "content": {
+            "interactionType": "A",
+            "lesson": {
+              "interactionType": "A",
+              "mode": "riemann",
+              "parameterSpec": {
+                "resolutionLevels": [4, 8, 16, 32, 64, 128, 256]
+              },
+              "systemSpec": {
+                "function": "4 - x*x",
+                "integral": 5.3333,
+                "sumType": "left",
+                "domain": [0, 2],
+                "range": [-0.5, 4.8]
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "condition": "state.resolution === 4",
+                    "message": "4 hình chữ nhật. Khe hở giữa đỉnh và đường cong rõ ràng. Sai số còn lớn."
+                  },
+                  {
+                    "condition": "state.resolution === 32",
+                    "message": "32 hình chữ nhật. Khớp chặt hơn nhiều. Bạn còn thấy từng hình chữ nhật riêng lẻ không?"
+                  },
+                  {
+                    "condition": "state.resolution === 128",
+                    "message": "128 hình chữ nhật. Tổng và giá trị chính xác gần như đồng nhất. Nếu $n$ tiến đến vô cùng thì sao?"
+                  },
+                  {
+                    "condition": "state.resolution === 256",
+                    "message": "Bạn còn nhìn thấy từng hình chữ nhật không? Tổng Riemann đã trở thành diện tích. Giới hạn này có một tên gọi."
+                  }
+                ]
+              },
+              "prompt": "Đẩy $n$ lên tối đa. Quan sát hình chữ nhật, tổng và sai số. Khi nào tổng ngừng là xấp xỉ và trở thành diện tích chính xác?",
+              "sliderLabel": "Số hình chữ nhật (n)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-dinh-nghia-tich-phan",
+          "type": "text",
+          "content": {
+            "heading": "Định nghĩa tích phân xác định",
+            "paragraphs": [
+              "Bạn đẩy $n$ lên $256$ và tổng Riemann không còn phân biệt được với diện tích thực. Tại $n = \\infty$, sai số bằng $0$. Giới hạn tồn tại. Giờ ta đặt cho nó một tên chính thức.",
+              "Cho $f$ liên tục trên $[a, b]$. **Tích phân xác định** của $f$ từ $a$ đến $b$ là giới hạn của tổng Riemann khi $n \\to \\infty$. Ký hiệu $\\int$ (chữ S kéo dài) nghĩa là \"tổng\". $a$, $b$ là **cận tích phân**. $f(x)$ là **hàm dưới dấu tích phân**. $dx$ nhắc về $\\Delta x$ — chiều rộng thu nhỏ về $0$."
+            ]
+          }
+        },
+        {
+          "id": "math-dinh-nghia",
+          "type": "math",
+          "content": {
+            "latex": "\\int_a^b f(x)\\,dx = \\lim_{n \\to \\infty} \\sum_{i=0}^{n-1} f(x_i^*) \\cdot \\Delta x"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-doc-ky-hieu",
+          "type": "text",
+          "content": {
+            "heading": "Đọc ký hiệu tích phân",
+            "paragraphs": [
+              "$\\int_0^2 (4 - x^2)\\,dx$ đọc: \"tích phân của $(4 - x^2)$ theo $x$, từ $0$ đến $2$\". Kết quả bằng diện tích vùng giới hạn bởi $y = 4 - x^2$, trục $Ox$, $x = 0$ và $x = 2$ — khi $f(x) \\geq 0$ trên $[a, b]$.",
+              "Tích phân xác định là **một số**, không phải hàm. Nó phụ thuộc $f$, $a$, $b$ — không phụ thuộc $x$. Biến $x$ là \"biến câm\": $\\int_0^2 (4 - t^2)\\,dt = \\int_0^2 (4 - x^2)\\,dx$."
+            ]
+          }
+        },
+        {
+          "id": "math-vi-du",
+          "type": "math",
+          "content": {
+            "latex": "\\int_0^2 (4 - x^2)\\,dx = \\frac{16}{3}"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l4-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Tại $n = 256$, tổng Riemann cho $f(x) = 4 - x^2$ trên $[0, 2]$ gần bằng $5{,}333$. Điều gì xảy ra với khe hở giữa đỉnh hình chữ nhật và đường cong?",
+            "options": [
+              { "value": "a", "label": "Khe hở giữ nguyên kích thước" },
+              { "value": "b", "label": "Khe hở lớn hơn" },
+              { "value": "c", "label": "Khe hở nhỏ đến mức không còn phân biệt được với $0$" },
+              { "value": "d", "label": "Khe hở biến mất hoàn toàn từ $n = 32$" }
+            ],
+            "correct": "c",
+            "explanation": "Tại $n = 256$, mỗi hình chữ nhật chỉ rộng $\\frac{2}{256} \\approx 0{,}008$. Trên khoảng cực hẹp, đường cong gần như thẳng, nên đỉnh hình chữ nhật gần khớp. Khe hở vẫn tồn tại nhưng nhỏ đến mức mắt không thấy — và sai số số học cũng gần $0$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l4-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Tích phân xác định $\\int_a^b f(x)\\,dx$ được định nghĩa là một giới hạn. Đại lượng nào được lấy giới hạn?",
+            "options": [
+              { "value": "a", "label": "Hàm $f(x)$ khi $x \\to \\infty$" },
+              { "value": "b", "label": "Tổng $\\sum f(x_i^*) \\Delta x$ khi số khoảng con $n \\to \\infty$" },
+              { "value": "c", "label": "Diện tích khi miền $[a, b]$ mở rộng" },
+              { "value": "d", "label": "Đạo hàm $f'(x)$ khi $h \\to 0$" }
+            ],
+            "correct": "b",
+            "explanation": "Tích phân xác định là giới hạn của tổng Riemann $\\sum_{i=0}^{n-1} f(x_i^*) \\Delta x$ khi $n \\to \\infty$ (tương đương $\\Delta x \\to 0$). Đây không phải giới hạn của hàm $f$ hay đạo hàm — mà là giới hạn của một **dãy tổng**."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l4-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int_0^1 2x\\,dx$ bằng diễn giải hình học. (Gợi ý: vùng dưới $f(x) = 2x$ từ $0$ đến $1$ là tam giác có đáy $1$ và chiều cao $2$.)",
+            "options": [
+              { "value": "a", "label": "$1$" },
+              { "value": "b", "label": "$2$" },
+              { "value": "c", "label": "$0{,}5$" },
+              { "value": "d", "label": "$3$" }
+            ],
+            "correct": "a",
+            "explanation": "Vùng dưới $f(x) = 2x$ trên $[0, 1]$ là tam giác vuông có đáy $1$ (trên trục $Ox$) và chiều cao $f(1) = 2$. Diện tích = $\\frac{1}{2} \\times 1 \\times 2 = 1$. Đây là trường hợp hiếm hoi tích phân tính được bằng hình học sơ cấp vì biên là đường thẳng."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l4-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Cách đọc nào đúng cho $\\int_1^3 x^2\\,dx$?",
+            "options": [
+              { "value": "a", "label": "\"Tích phân của $x^2$ theo $x$, từ $1$ đến $3$\"" },
+              { "value": "b", "label": "\"Đạo hàm của $x^2$ từ $1$ đến $3$\"" },
+              { "value": "c", "label": "\"Giới hạn của $x^2$ khi $x$ tiến đến $3$\"" },
+              { "value": "d", "label": "\"$x^2$ tính tại $1$ và $3$\"" }
+            ],
+            "correct": "a",
+            "explanation": "Ký hiệu $\\int_1^3 x^2\\,dx$ đọc đúng là \"tích phân của $x^2$ theo $x$, từ $1$ đến $3$\". Nó biểu thị giới hạn của tổng Riemann — không phải đạo hàm, không phải giới hạn hàm, và không phải phép tính giá trị."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l4-q5",
+          "type": "quiz",
+          "content": {
+            "question": "$\\int_0^2 (4 - x^2)\\,dx = \\frac{16}{3}$. Nếu đổi cận trên thành $1$, kết quả $\\int_0^1 (4 - x^2)\\,dx$ sẽ lớn hơn hay nhỏ hơn $\\frac{16}{3}$?",
+            "options": [
+              { "value": "a", "label": "Lớn hơn, vì hàm tăng" },
+              { "value": "b", "label": "Nhỏ hơn, vì $[0, 1] \\subset [0, 2]$ và $f \\geq 0$ — nên vùng là tập con" },
+              { "value": "c", "label": "Bằng nhau, vì hàm không đổi" },
+              { "value": "d", "label": "Không xác định được nếu không tính" }
+            ],
+            "correct": "b",
+            "explanation": "Khi $f(x) \\geq 0$, tích phân bằng diện tích dưới đường cong. Thu hẹp khoảng từ $[0, 2]$ về $[0, 1]$ loại bỏ phần diện tích trên $[1, 2]$, nên kết quả nhỏ hơn. Diện tích vùng con không thể vượt diện tích vùng chứa."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l4-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Ký hiệu $dx$ trong tích phân tương ứng với đại lượng nào trong tổng Riemann?",
+            "options": [
+              { "value": "a", "label": "Đạo hàm của $x$" },
+              { "value": "b", "label": "Giới hạn của $\\Delta x = \\frac{b-a}{n}$ khi $n \\to \\infty$ — đại diện chiều rộng vô cùng nhỏ mỗi khoảng con" },
+              { "value": "c", "label": "Hằng số nhân bằng $1$" },
+              { "value": "d", "label": "Biến độc lập" }
+            ],
+            "correct": "b",
+            "explanation": "Trong tổng Riemann, $\\Delta x = \\frac{b-a}{n}$ là chiều rộng mỗi hình chữ nhật. Khi $n \\to \\infty$, $\\Delta x \\to 0$ và trở thành $dx$ — ký hiệu cho \"chiều rộng vô cùng nhỏ\". Mỗi số hạng $f(x_i^*) \\Delta x$ trở thành $f(x)\\,dx$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l4-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Mặt cắt ngang đập nước giới hạn bởi đường cong $y = h(x)$ phía trên và trục $Ox$ phía dưới, từ $x = 0$ đến $x = 30$ mét. Diện tích mặt cắt bằng:",
+            "options": [
+              { "value": "a", "label": "$h(30) - h(0)$" },
+              { "value": "b", "label": "$\\int_0^{30} h(x)\\,dx$" },
+              { "value": "c", "label": "$30 \\times h(15)$" },
+              { "value": "d", "label": "$\\lim_{x \\to 30} h(x)$" }
+            ],
+            "correct": "b",
+            "explanation": "Diện tích vùng dưới đường cong $y = h(x)$, trên trục $Ox$, từ $x = 0$ đến $x = 30$ chính là định nghĩa tích phân xác định $\\int_0^{30} h(x)\\,dx$. Các đáp án khác dùng phép tính sai: hiệu giá trị hàm, tích điểm giữa, hay giới hạn — không đại lượng nào cho diện tích."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l4-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $\\int_0^2 3\\,dx$ bằng diễn giải hình học (vùng dưới $f(x) = 3$ là hình chữ nhật rộng $2$, cao $3$).",
+            "options": [
+              { "value": "a", "label": "$5$" },
+              { "value": "b", "label": "$6$" },
+              { "value": "c", "label": "$3$" },
+              { "value": "d", "label": "$1{,}5$" }
+            ],
+            "correct": "b",
+            "explanation": "Hàm hằng $f(x) = 3$ trên $[0, 2]$ tạo hình chữ nhật có chiều rộng $2$ và chiều cao $3$. Diện tích = $2 \\times 3 = 6$. Đây là trường hợp đơn giản nhất: khi $f$ là hằng số, tích phân chính là diện tích hình chữ nhật."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l4-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Bài học nói $x$ trong $\\int_a^b f(x)\\,dx$ là \"biến câm\". Điều này nghĩa là gì?",
+            "options": [
+              { "value": "a", "label": "$x$ phải luôn được dùng; không được thay bằng chữ khác" },
+              { "value": "b", "label": "Giá trị tích phân không phụ thuộc ký hiệu biến — $\\int_0^2 (4 - t^2)\\,dt = \\int_0^2 (4 - x^2)\\,dx$" },
+              { "value": "c", "label": "$x$ bằng $0$ bên trong tích phân" },
+              { "value": "d", "label": "Biến $x$ không xác định" }
+            ],
+            "correct": "b",
+            "explanation": "\"Biến câm\" nghĩa là ký hiệu biến chỉ là nhãn tạm — thay $x$ bằng $t$, $u$ hay bất kỳ chữ nào khác đều cho cùng kết quả. Tích phân xác định là một **số** phụ thuộc $f$, $a$, $b$ — không phụ thuộc tên biến tích phân."
+          }
+        }
+      ]
+    }
+  ]
+}

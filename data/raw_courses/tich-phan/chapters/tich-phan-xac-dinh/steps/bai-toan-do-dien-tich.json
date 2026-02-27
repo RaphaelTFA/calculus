@@ -1,0 +1,291 @@
+{
+  "id": "bai-toan-do-dien-tich",
+  "title": "Bài Toán Đo Diện Tích",
+  "description": "Diện tích dưới đường cong là đại lượng xác định nhưng không thể tính bằng hình học sơ cấp.",
+  "xp_reward": 10,
+  "order_index": 0,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-area-split",
+          "type": "interaction",
+          "content": {
+            "interactionType": "E",
+            "lesson": {
+              "interactionType": "E",
+              "parameterSpec": {
+                "structure": {
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "initial": 0.5,
+                  "label": "Điểm chia"
+                }
+              },
+              "systemSpec": {
+                "baseValues": {},
+                "conservedObject": {
+                  "type": "expression",
+                  "expression": "8/3",
+                  "variables": []
+                }
+              },
+              "representationSpec": {
+                "mode": "geometricSplit",
+                "geometryBase": {
+                  "type": "areaUnderCurve",
+                  "function": "x*x",
+                  "domain": [0, 2]
+                },
+                "splitSpec": {
+                  "type": "domainSplit"
+                },
+                "viewBox": {
+                  "xMin": -0.5,
+                  "xMax": 2.5,
+                  "yMin": -0.5,
+                  "yMax": 5.0
+                }
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "type": "structureBelow",
+                    "value": 0.05,
+                    "message": "Toàn bộ diện tích nằm ở phần bên phải — nhưng nó vẫn có biên cong. Bạn có thể tính bằng công thức đơn giản không?"
+                  },
+                  {
+                    "type": "structureNear",
+                    "value": 0.5,
+                    "tolerance": 0.05,
+                    "message": "Hai phần trông đều nhau — nhưng không phần nào là hình hình học cơ bản. Làm sao tính diện tích?"
+                  },
+                  {
+                    "type": "structureAbove",
+                    "value": 0.95,
+                    "message": "Toàn bộ diện tích nằm ở phần bên trái. Đây là tam giác? Hình chữ nhật? Hình gì?"
+                  }
+                ]
+              },
+              "prompt": "Kéo đường chia sang trái và phải. Bạn có thể chia vùng này thành các phần mà bạn đã biết cách tính diện tích không?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-bai-toan-dien-tich",
+          "type": "text",
+          "content": {
+            "heading": "Bài toán diện tích",
+            "paragraphs": [
+              "Bạn vừa thử chia vùng tô màu thành các phần đơn giản hơn. Dù đặt đường chia ở đâu, biên cong phía trên luôn còn đó. Tam giác có cạnh thẳng. Hình chữ nhật có cạnh thẳng. Vùng dưới $f(x) = x^2$ thì không — nhưng diện tích của nó là một con số cố định, duy nhất.",
+              "Cho hàm liên tục $f(x) \\geq 0$ trên $[a, b]$, vùng giới hạn bởi $y = f(x)$, trục $Ox$, $x = a$ và $x = b$ có **diện tích xác định**. Chúng ta chưa có phương pháp tính nó — các bài tiếp theo sẽ xây dựng phương pháp đó."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-can-cong-cu-moi",
+          "type": "text",
+          "content": {
+            "heading": "Tại sao cần công cụ mới?",
+            "paragraphs": [
+              "Tổng diện tích luôn giữ nguyên ở khoảng $2{,}667$ dù bạn chia thế nào. Con số đó là thực và chính xác. Nhưng bạn không thể suy ra nó từ công thức hình học nào đã biết.",
+              "Chiến lược duy nhất: phủ vùng cong bằng các **hình chữ nhật** (dễ tính diện tích), chấp nhận sai số, rồi tăng dần số hình chữ nhật và xem sai số có triệt tiêu không. Đây là chương trình của ba bài tiếp theo."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l1-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi bạn kéo đường chia từ trái sang phải, diện tích phần trái tăng và phần phải giảm. Đại lượng nào không đổi?",
+            "options": [
+              { "value": "a", "label": "Diện tích phần bên trái" },
+              { "value": "b", "label": "Diện tích phần bên phải" },
+              { "value": "c", "label": "Tổng diện tích hai phần" },
+              { "value": "d", "label": "Hiệu diện tích hai phần" }
+            ],
+            "correct": "c",
+            "explanation": "Khi di chuyển đường chia, diện tích được chuyển từ phần này sang phần kia nhưng tổng luôn bảo toàn. Bạn không tạo ra hay mất đi diện tích, chỉ phân phối lại giữa hai phần."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l1-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Tại sao không thể tính diện tích dưới $f(x) = x^2$ từ $x = 0$ đến $x = 2$ bằng công thức tam giác ($\\frac{1}{2} \\cdot \\text{đáy} \\cdot \\text{cao}$)?",
+            "options": [
+              { "value": "a", "label": "Vì $f(x) = x^2$ không xác định tại $x = 0$" },
+              { "value": "b", "label": "Vì biên trên của vùng là đường cong, không phải đường thẳng" },
+              { "value": "c", "label": "Vì vùng có nhiều hơn ba cạnh" },
+              { "value": "d", "label": "Vì diện tích là số vô tỉ" }
+            ],
+            "correct": "b",
+            "explanation": "Công thức tam giác yêu cầu ba cạnh thẳng. Vùng dưới $f(x) = x^2$ có biên trên là parabol — không thẳng. Dù có đáy trên trục $Ox$ và hai cạnh đứng, biên cong phía trên khiến mọi công thức hình học sơ cấp đều thất bại."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l1-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Hình chữ nhật đáy $[0, 2]$, chiều cao $f(2) = 4$ bao trùm toàn bộ vùng dưới $f(x) = x^2$. Diện tích hình chữ nhật là $8$. Diện tích thực xấp xỉ $2{,}667$. Vùng cong chiếm bao nhiêu phần hình chữ nhật?",
+            "options": [
+              { "value": "a", "label": "Đúng $\\frac{1}{2}$" },
+              { "value": "b", "label": "Đúng $\\frac{1}{3}$" },
+              { "value": "c", "label": "Xấp xỉ $\\frac{1}{4}$" },
+              { "value": "d", "label": "Xấp xỉ $\\frac{2}{3}$" }
+            ],
+            "correct": "b",
+            "explanation": "Diện tích chính xác dưới đường cong là $\\frac{8}{3}$. Chia cho diện tích hình chữ nhật: $\\frac{8/3}{8} = \\frac{1}{3}$. Vùng dưới parabol $x^2$ trên $[0, 2]$ chiếm đúng một phần ba hình chữ nhật bao quanh."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l1-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Phát biểu nào mô tả đúng nhất lý do bài toán \"diện tích dưới đường cong\" đòi hỏi công cụ toán học mới?",
+            "options": [
+              { "value": "a", "label": "Biên cong ngăn cản việc phân chia chính xác thành hữu hạn hình hình học cơ bản" },
+              { "value": "b", "label": "Hàm $f(x) = x^2$ tăng quá nhanh nên diện tích là vô hạn" },
+              { "value": "c", "label": "Diện tích chỉ được định nghĩa cho đa giác" },
+              { "value": "d", "label": "Trục $Oy$ cản trở việc đo vùng" }
+            ],
+            "correct": "a",
+            "explanation": "Vùng dưới đường cong liên tục có biên không thẳng. Không có cách chia hữu hạn nào tạo ra các mảnh toàn cạnh thẳng ghép khít vùng cong. Đây là lý do ta cần phương pháp xấp xỉ bằng giới hạn — vượt ra ngoài hình học sơ cấp."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l1-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu đổi hàm từ $f(x) = x^2$ sang $f(x) = 3$ (hằng số), bài toán diện tích có còn cần công cụ mới không?",
+            "options": [
+              { "value": "a", "label": "Có, vì bất kỳ hàm nào cũng tạo biên cong" },
+              { "value": "b", "label": "Không, vì $f(x) = 3$ trên $[0, 2]$ tạo hình chữ nhật diện tích $6$ — tính được ngay" },
+              { "value": "c", "label": "Có, vì luôn cần ký hiệu tích phân" },
+              { "value": "d", "label": "Không, vì hàm hằng có diện tích bằng $0$" }
+            ],
+            "correct": "b",
+            "explanation": "Hàm hằng $f(x) = 3$ có đồ thị là đường nằm ngang. Vùng bên dưới trên $[0, 2]$ là hình chữ nhật $2 \\times 3 = 6$. Không có biên cong nên hình học sơ cấp đủ dùng. Công cụ mới chỉ cần khi biên là đường cong."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l1-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Một công viên có đường biên là đường cong trơn. Kiến trúc sư muốn biết diện tích chính xác. Phát biểu nào phù hợp nhất với bài học?",
+            "options": [
+              { "value": "a", "label": "Kiến trúc sư nên xấp xỉ biên bằng đa giác và chấp nhận kết quả" },
+              { "value": "b", "label": "Diện tích không tồn tại vì đường biên cong" },
+              { "value": "c", "label": "Diện tích xác định nhưng không thể tính bằng công thức hình học đơn giản — cần chiến lược xấp xỉ" },
+              { "value": "d", "label": "Đo cạnh dài nhất nhân cạnh ngắn nhất" }
+            ],
+            "correct": "c",
+            "explanation": "Giống vùng dưới $f(x) = x^2$, công viên có biên cong nên diện tích tồn tại nhưng không tính được bằng tam giác hay hình chữ nhật đơn lẻ. Phương pháp đúng là xấp xỉ có hệ thống rồi lấy giới hạn — chính xác như chiến lược bài học đề ra."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l1-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi đường chia gần $x = 0$, gần như toàn bộ diện tích nằm ở phần phải. Phần bên phải lúc đó có phải hình hình học quen thuộc không?",
+            "options": [
+              { "value": "a", "label": "Có, gần giống tam giác" },
+              { "value": "b", "label": "Có, gần giống hình chữ nhật" },
+              { "value": "c", "label": "Không, nó vẫn có biên cong phía trên từ $f(x) = x^2$" },
+              { "value": "d", "label": "Không, nhưng nó quá nhỏ nên hình dạng không quan trọng" }
+            ],
+            "correct": "c",
+            "explanation": "Dù phần bên phải chiếm gần toàn bộ vùng, biên trên vẫn là đường cong $y = x^2$. Không có vị trí nào của đường chia biến các phần thành hình có tất cả cạnh thẳng. Biên cong luôn tồn tại."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l1-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Tương tác cho thấy tổng diện tích dưới $f(x) = x^2$ trên $[0, 2]$ xấp xỉ $2{,}667$. \"Xác định\" nghĩa là gì trong ngữ cảnh này?",
+            "options": [
+              { "value": "a", "label": "Ta thấy vùng trên đồ thị nên diện tích phải là một số" },
+              { "value": "b", "label": "Diện tích tồn tại như giá trị hữu hạn duy nhất, được xác định bởi $f$, $a$, $b$ — dù chưa có công thức" },
+              { "value": "c", "label": "Diện tích chỉ xác định vì $x^2$ là đa thức" },
+              { "value": "d", "label": "\"Xác định\" nghĩa là tính được chính xác ngay bây giờ" }
+            ],
+            "correct": "b",
+            "explanation": "\"Xác định\" nghĩa là giá trị diện tích tồn tại, là duy nhất, và được quy định hoàn toàn bởi hàm $f$ cùng khoảng $[a, b]$. Điều này đúng ngay cả khi ta chưa biết cách tính — giống như độ dài đường cong tồn tại dù chưa có thước đo phù hợp."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l1-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Đặt $4$ hình chữ nhật cùng rộng trong vùng dưới $f(x) = x^2$ trên $[0, 2]$, chiều cao lấy tại cạnh trái. Chiều rộng mỗi hình $0{,}5$. Chiều cao: $f(0) = 0$, $f(0{,}5) = 0{,}25$, $f(1) = 1$, $f(1{,}5) = 2{,}25$. Tổng diện tích là bao nhiêu?",
+            "options": [
+              { "value": "a", "label": "$1{,}75$" },
+              { "value": "b", "label": "$2{,}667$" },
+              { "value": "c", "label": "$3{,}5$" },
+              { "value": "d", "label": "$1{,}5$" }
+            ],
+            "correct": "a",
+            "explanation": "Tổng = $0{,}5 \\times (0 + 0{,}25 + 1 + 2{,}25) = 0{,}5 \\times 3{,}5 = 1{,}75$. Con số này nhỏ hơn diện tích thực ($\\approx 2{,}667$) vì $x^2$ đồng biến trên $[0, 2]$, nên chiều cao cạnh trái luôn thấp hơn đường cong."
+          }
+        }
+      ]
+    }
+  ]
+}

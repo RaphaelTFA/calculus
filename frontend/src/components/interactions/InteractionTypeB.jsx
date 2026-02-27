@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { MathText } from './MathText'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -171,6 +172,46 @@ function recomputeSystem(config, p) {
     })
   }
 
+  /* ── Shading (area under curve from → to) ──────────────────────────────── */
+  let shadingData = null
+  if (config.system.shading) {
+    const sh = config.system.shading
+    const fromX = typeof sh.from === 'string' && sh.from === 'p' ? p : Number(sh.from)
+    const toX = typeof sh.to === 'string' && sh.to === 'p' ? p : Number(sh.to)
+    const curveIdx = sh.curveIndex || 0
+    const curveFn = curvesData[curveIdx] ? curvesData[curveIdx]._fn : null
+
+    if (curveFn && fromX !== toX) {
+      const lo = Math.min(fromX, toX)
+      const hi = Math.max(fromX, toX)
+      const steps = 200
+      const sDx = (hi - lo) / steps
+      const pts = []
+      for (let i = 0; i <= steps; i++) {
+        const x = lo + i * sDx
+        let y = 0
+        try { y = curveFn(x, p) } catch { y = 0 }
+        pts.push({ x, y })
+      }
+      // Dots on every curve at paramX
+      const paramX = toX
+      const curveDots = curvesData.map(c => {
+        let y = 0
+        try { y = c._fn(paramX, p) } catch { y = 0 }
+        return { y, color: c.color }
+      })
+      shadingData = {
+        points: pts,
+        from: lo,
+        to: hi,
+        paramX,
+        color: sh.color || '#3498db',
+        opacity: sh.opacity != null ? sh.opacity : 0.25,
+        curveDots,
+      }
+    }
+  }
+
   /* ── Legacy markers ────────────────────────────────────────────────────── */
   const markers = {}
   if (config.system.point) {
@@ -186,7 +227,7 @@ function recomputeSystem(config, p) {
     markers.hole = { x: hx, y: hy }
   }
 
-  return { curvesData, bounds: view, markers, approachData, annotationsData }
+  return { curvesData, bounds: view, markers, approachData, annotationsData, shadingData }
 }
 
 // ─── CANVAS RENDERING ────────────────────────────────────────────────────────
@@ -199,7 +240,7 @@ function setDash(ctx, style) {
 
 function renderCanvas(canvas, data) {
   const ctx = canvas.getContext('2d')
-  const { curvesData, bounds, markers, approachData, annotationsData } = data
+  const { curvesData, bounds, markers, approachData, annotationsData, shadingData } = data
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.save()
@@ -243,6 +284,40 @@ function renderCanvas(canvas, data) {
   for (let ty = Math.ceil(bounds.yMin); ty <= Math.floor(bounds.yMax); ty++) {
     if (ty === 0) continue
     ctx.fillText(ty, mapX(0) - 6, mapY(ty))
+  }
+
+  /* ── Shading (area under curve) ──────────────────────────────────────── */
+  if (shadingData && shadingData.points.length > 1) {
+    ctx.save()
+    ctx.globalAlpha = shadingData.opacity
+    ctx.fillStyle = shadingData.color
+    ctx.beginPath()
+    ctx.moveTo(mapX(shadingData.from), mapY(0))
+    shadingData.points.forEach(pt => {
+      ctx.lineTo(mapX(pt.x), mapY(pt.y))
+    })
+    ctx.lineTo(mapX(shadingData.to), mapY(0))
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+
+    // Vertical indicator line at paramX
+    const px = mapX(shadingData.paramX)
+    ctx.strokeStyle = '#94a3b8'
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([6, 4])
+    ctx.beginPath()
+    ctx.moveTo(px, 0)
+    ctx.lineTo(px, h)
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    // Label at bottom
+    ctx.fillStyle = '#475569'
+    ctx.font = 'bold 11px Inter, system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'bottom'
+    ctx.fillText('x = ' + shadingData.paramX.toFixed(2), px, h - 6)
   }
 
   /* ── Horizontal annotation lines ───────────────────────────────────────── */
@@ -323,6 +398,24 @@ function renderCanvas(canvas, data) {
       ctx.fillStyle = '#e74c3c'; ctx.fill()
       ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke()
     }
+  }
+
+  /* ── Shading curve dots (at paramX) ────────────────────────────────────── */
+  if (shadingData && shadingData.curveDots) {
+    const px = mapX(shadingData.paramX)
+    shadingData.curveDots.forEach(dot => {
+      if (!Number.isFinite(dot.y)) return
+      const dy = mapY(dot.y)
+      if (dy < -10 || dy > h + 10) return
+      ctx.beginPath()
+      ctx.arc(px, dy, 5, 0, Math.PI * 2)
+      ctx.fillStyle = '#fff'
+      ctx.fill()
+      ctx.beginPath()
+      ctx.arc(px, dy, 4, 0, Math.PI * 2)
+      ctx.fillStyle = dot.color
+      ctx.fill()
+    })
   }
 
   /* ── Legend (top-right) ────────────────────────────────────────────────── */
@@ -512,7 +605,7 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
                 transition: 'all 0.4s ease-out'
               }}
             >
-              {card.text}
+              <MathText text={card.text} />
             </div>
           ))}
         </div>
@@ -530,7 +623,7 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
           <p style={{
             margin: '0 0 10px', fontSize: 12, color: '#64748b',
             lineHeight: 1.4, fontStyle: 'italic'
-          }}>{config.prompt}</p>
+          }}><MathText text={config.prompt} /></p>
         )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <label style={{ fontWeight: 600, minWidth: 120, fontSize: 13, color: '#2c3e50' }}>

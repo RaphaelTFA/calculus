@@ -1,0 +1,265 @@
+{
+  "id": "chia-nho-phan-hoach",
+  "title": "Chia Nhỏ Phân Hoạch",
+  "description": "Mọi tổng Riemann hội tụ về cùng một giới hạn khi số hình chữ nhật tăng vô hạn.",
+  "xp_reward": 10,
+  "order_index": 2,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-partition-refine",
+          "type": "interaction",
+          "content": {
+            "interactionType": "A",
+            "lesson": {
+              "interactionType": "A",
+              "mode": "riemann",
+              "parameterSpec": {
+                "resolutionLevels": [4, 8, 16, 32, 64, 128]
+              },
+              "systemSpec": {
+                "function": "sin(x)",
+                "integral": 2,
+                "sumType": "midpoint",
+                "domain": [0, 3.141592653589793],
+                "range": [0, 1.3]
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "condition": "state.resolution === 4",
+                    "message": "4 hình chữ nhật trung điểm dưới $\\sin(x)$. Tổng đã khá gần $2$. Tại sao lấy mẫu trung điểm có thể chính xác hơn?"
+                  },
+                  {
+                    "condition": "state.resolution === 32",
+                    "message": "Sai số rất nhỏ. So với bài trước tại cùng $n$, hội tụ nhanh hơn. Đại lượng nào đang tiến về $0$?"
+                  },
+                  {
+                    "condition": "state.resolution >= 128",
+                    "message": "128 hình chữ nhật. Sai số gần bằng $0$. Tổng đã hội tụ. Việc dùng trung điểm thay cạnh trái có quan trọng không?"
+                  }
+                ]
+              },
+              "prompt": "Lần này hàm là $\\sin(x)$ trên $[0, \\pi]$, chiều cao lấy tại trung điểm. Đẩy $n$ lên tối đa. Tổng tiến đến giá trị nào? Cách chọn điểm lấy mẫu có ảnh hưởng không?",
+              "sliderLabel": "Số hình chữ nhật (n)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-hoi-tu-riemann",
+          "type": "text",
+          "content": {
+            "heading": "Sự hội tụ của tổng Riemann",
+            "paragraphs": [
+              "Ở bài trước, $L_n$ tiến đến $\\frac{8}{3}$ cho $f(x) = x^2$. Bây giờ $M_n$ tiến đến $2$ cho $f(x) = \\sin(x)$. Hàm khác, quy tắc lấy mẫu khác, nhưng cùng hiện tượng: khi $n \\to \\infty$, tổng ổn định về một con số duy nhất.",
+              "Nếu $f$ liên tục trên $[a, b]$, thì $\\lim_{n \\to \\infty} \\sum_{i=0}^{n-1} f(x_i^*) \\cdot \\Delta x$ tồn tại và **không phụ thuộc** cách chọn điểm lấy mẫu $x_i^*$. Giới hạn này chính là tích phân xác định — sẽ được đặt tên ở bài sau."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-do-rong-luoi",
+          "type": "text",
+          "content": {
+            "heading": "Vai trò của độ rộng lưới",
+            "paragraphs": [
+              "Tại $n = 128$, mỗi hình chữ nhật chỉ rộng $\\frac{\\pi}{128} \\approx 0{,}0245$. Trên khoảng hẹp như vậy, $f$ hầu như không đổi — nên đỉnh phẳng gần khớp đường cong. Đây là lý do sai số triệt tiêu.",
+              "**Độ rộng lưới** $\\|P\\| = \\max \\Delta x_i$. Với phân hoạch đều: $\\|P\\| = \\frac{b-a}{n}$. Hội tụ của tổng Riemann tương đương $\\|P\\| \\to 0$. Tính liên tục đảm bảo biến thiên của $f$ trên mỗi khoảng con nhỏ tùy ý khi $\\Delta x$ đủ nhỏ."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l3-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Bạn dùng tổng trung điểm cho $\\sin(x)$ trên $[0, \\pi]$. Ở bài 2, bạn dùng tổng trái cho $x^2$ trên $[0, 2]$. Cả hai thí nghiệm có điểm chung gì?",
+            "options": [
+              { "value": "a", "label": "Cả hai hàm đều là đa thức" },
+              { "value": "b", "label": "Cả hai dùng cùng số hình chữ nhật" },
+              { "value": "c", "label": "Trong cả hai, tăng $n$ đẩy sai số về $0$ — gợi ý tổng tiến đến một giới hạn" },
+              { "value": "d", "label": "Cả hai dùng cạnh trái" }
+            ],
+            "correct": "c",
+            "explanation": "Dù hàm khác nhau ($x^2$ so với $\\sin(x)$) và quy tắc lấy mẫu khác nhau (trái so với trung điểm), cả hai đều cho thấy sai số giảm khi $n$ tăng. Điểm chung cốt lõi là sự hội tụ — tổng Riemann tiến đến một giới hạn xác định."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l3-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Tại sao cách chọn điểm lấy mẫu (trái, phải, trung điểm) trở nên không quan trọng khi $n \\to \\infty$?",
+            "options": [
+              { "value": "a", "label": "Vì hàm ngừng thay đổi" },
+              { "value": "b", "label": "Vì $\\Delta x \\to 0$ nên giá trị hàm biến thiên không đáng kể trên mỗi khoảng con — mọi điểm lấy mẫu cho chiều cao gần như nhau" },
+              { "value": "c", "label": "Vì trung điểm luôn tốt nhất" },
+              { "value": "d", "label": "Vì các hình chữ nhật biến mất" }
+            ],
+            "correct": "b",
+            "explanation": "Khi $\\Delta x \\to 0$, mỗi khoảng con vô cùng hẹp. Trên khoảng hẹp, hàm liên tục gần như hằng — nên dù lấy mẫu ở trái, phải hay trung điểm, chiều cao hình chữ nhật chênh nhau không đáng kể. Sự khác biệt triệt tiêu trong giới hạn."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l3-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Với $f(x) = \\sin(x)$ trên $[0, \\pi]$, $n = 2$, hai khoảng: $[0, \\frac{\\pi}{2}]$ và $[\\frac{\\pi}{2}, \\pi]$. Dùng cạnh trái ($x_0 = 0$, $x_1 = \\frac{\\pi}{2}$), tính $L_2$.",
+            "options": [
+              { "value": "a", "label": "$\\frac{\\pi}{2}(\\sin 0 + \\sin \\frac{\\pi}{2}) = \\frac{\\pi}{2}$" },
+              { "value": "b", "label": "$\\frac{\\pi}{2}(\\sin \\frac{\\pi}{2} + \\sin \\pi) = \\frac{\\pi}{2}$" },
+              { "value": "c", "label": "$\\frac{\\pi}{2}(\\sin 0 + \\sin \\pi) = 0$" },
+              { "value": "d", "label": "$\\pi \\cdot \\sin \\frac{\\pi}{2} = \\pi$" }
+            ],
+            "correct": "a",
+            "explanation": "$\\Delta x = \\frac{\\pi}{2}$. Cạnh trái: $x_0 = 0$, $x_1 = \\frac{\\pi}{2}$. $L_2 = \\frac{\\pi}{2}[\\sin(0) + \\sin(\\frac{\\pi}{2})] = \\frac{\\pi}{2}(0 + 1) = \\frac{\\pi}{2} \\approx 1{,}571$. Đáp án B dùng cạnh phải, không phải cạnh trái."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l3-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Dùng cạnh phải cho cùng phân hoạch ($x_1 = \\frac{\\pi}{2}$, $x_2 = \\pi$), tính $R_2$ cho $\\sin(x)$ trên $[0, \\pi]$.",
+            "options": [
+              { "value": "a", "label": "$\\frac{\\pi}{2}$" },
+              { "value": "b", "label": "$\\pi$" },
+              { "value": "c", "label": "$0$" },
+              { "value": "d", "label": "$2$" }
+            ],
+            "correct": "a",
+            "explanation": "$R_2 = \\frac{\\pi}{2}[\\sin(\\frac{\\pi}{2}) + \\sin(\\pi)] = \\frac{\\pi}{2}(1 + 0) = \\frac{\\pi}{2}$. Đáng ngạc nhiên, $R_2 = L_2$. Nguyên nhân nằm ở tính đối xứng của $\\sin(x)$ trên $[0, \\pi]$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l3-q5",
+          "type": "quiz",
+          "content": {
+            "question": "$L_2 = R_2 = \\frac{\\pi}{2}$ cho $\\sin(x)$ trên $[0, \\pi]$. Tại sao?",
+            "options": [
+              { "value": "a", "label": "Tổng trái và phải luôn bằng nhau" },
+              { "value": "b", "label": "$\\sin(x)$ đối xứng quanh $x = \\frac{\\pi}{2}$ trên $[0, \\pi]$, nên phần đánh giá cao ở khoảng này bù chính xác phần đánh giá thấp ở khoảng kia" },
+              { "value": "c", "label": "$n = 2$ là số đặc biệt" },
+              { "value": "d", "label": "Hàm bằng $0$ tại hai đầu mút" }
+            ],
+            "correct": "b",
+            "explanation": "$\\sin(x)$ đối xứng quanh $x = \\frac{\\pi}{2}$: $\\sin(x) = \\sin(\\pi - x)$. Trên $[0, \\frac{\\pi}{2}]$, tổng trái dùng $\\sin(0) = 0$ (thấp) trong khi tổng phải dùng $\\sin(\\frac{\\pi}{2}) = 1$ (cao). Trên $[\\frac{\\pi}{2}, \\pi]$, ngược lại. Hai sai lệch triệt tiêu nhau."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l3-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu đổi sang hàm tăng mạnh trên $[0, \\pi]$ (không đối xứng), $L_2$ và $R_2$ có còn bằng nhau không?",
+            "options": [
+              { "value": "a", "label": "Có, $L_2 = R_2$ cho mọi hàm liên tục" },
+              { "value": "b", "label": "Không, với hàm không đối xứng, tổng trái và phải thường khác nhau khi $n$ hữu hạn" },
+              { "value": "c", "label": "Chỉ bằng khi $n$ chẵn" },
+              { "value": "d", "label": "Chỉ khi hàm là đa thức" }
+            ],
+            "correct": "b",
+            "explanation": "Sự bằng nhau $L_2 = R_2$ trong bài này là do tính đối xứng đặc biệt của $\\sin(x)$. Với hàm không đối xứng (ví dụ hàm đồng biến thuần), cạnh trái và phải cho chiều cao khác nhau một cách hệ thống, nên $L_n \\neq R_n$ khi $n$ hữu hạn."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l3-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Nhà khoa học đo nhiệt độ mỗi giờ trong 24 giờ, xấp xỉ nhiệt độ trung bình bằng trung bình 24 số đo. Nếu đo mỗi 30 phút (48 số đo), xấp xỉ chính xác hơn. Điều này tương tự:",
+            "options": [
+              { "value": "a", "label": "Đổi hàm từ $\\sin$ sang $\\cos$" },
+              { "value": "b", "label": "Tăng $n$ trong tổng Riemann, làm $\\Delta x$ nhỏ hơn và xấp xỉ chính xác hơn" },
+              { "value": "c", "label": "Chuyển từ cạnh trái sang cạnh phải" },
+              { "value": "d", "label": "Dùng miền khác" }
+            ],
+            "correct": "b",
+            "explanation": "Đo thường xuyên hơn giống tăng $n$: khoảng thời gian giữa các lần đo ($\\Delta x$) nhỏ hơn, nên trung bình các giá trị lấy mẫu xấp xỉ tốt hơn giá trị trung bình thực. Đây chính là nguyên lý chia nhỏ phân hoạch."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l3-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Bài học khẳng định với $f$ liên tục trên $[a, b]$, $\\lim_{n \\to \\infty} S_n$ tồn tại. Tính chất nào của hàm liên tục đảm bảo điều này?",
+            "options": [
+              { "value": "a", "label": "Hàm liên tục luôn dương" },
+              { "value": "b", "label": "Hàm liên tục luôn khả vi" },
+              { "value": "c", "label": "Trên khoảng đủ nhỏ, giá trị hàm liên tục nằm trong phạm vi nhỏ tùy ý — nên hình chữ nhật xấp xỉ đường cong với sai số triệt tiêu" },
+              { "value": "d", "label": "Hàm liên tục có giá trị nguyên" }
+            ],
+            "correct": "c",
+            "explanation": "Tính liên tục đảm bảo: cho trước sai số nhỏ tùy ý, tồn tại $\\delta$ sao cho $|x - y| < \\delta$ thì $|f(x) - f(y)|$ nhỏ hơn sai số. Khi $\\Delta x < \\delta$, mỗi hình chữ nhật xấp xỉ hàm với sai số nhỏ tùy ý, nên tổng sai số triệt tiêu."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l3-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Với $f(x) = \\sin(x)$ trên $[0, \\pi]$, $n = 4$, trung điểm tại $\\frac{\\pi}{8},\\, \\frac{3\\pi}{8},\\, \\frac{5\\pi}{8},\\, \\frac{7\\pi}{8}$. Tính $M_4$. (Dùng $\\sin\\frac{\\pi}{8} \\approx 0{,}383$, $\\sin\\frac{3\\pi}{8} \\approx 0{,}924$, $\\sin\\frac{5\\pi}{8} \\approx 0{,}924$, $\\sin\\frac{7\\pi}{8} \\approx 0{,}383$.)",
+            "options": [
+              { "value": "a", "label": "$\\frac{\\pi}{4}(0{,}383 + 0{,}924 + 0{,}924 + 0{,}383) \\approx 2{,}052$" },
+              { "value": "b", "label": "$\\pi \\times 0{,}924 \\approx 2{,}903$" },
+              { "value": "c", "label": "$2{,}000$ chính xác" },
+              { "value": "d", "label": "$\\frac{\\pi}{4}(0{,}383 + 0{,}383) \\approx 0{,}602$" }
+            ],
+            "correct": "a",
+            "explanation": "$\\Delta x = \\frac{\\pi}{4}$. $M_4 = \\frac{\\pi}{4}(0{,}383 + 0{,}924 + 0{,}924 + 0{,}383) = \\frac{\\pi}{4} \\times 2{,}614 \\approx 2{,}052$. Rất gần giá trị chính xác $2$, cho thấy tổng trung điểm hội tụ nhanh."
+          }
+        }
+      ]
+    }
+  ]
+}

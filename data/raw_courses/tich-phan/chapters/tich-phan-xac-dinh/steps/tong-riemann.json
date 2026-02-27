@@ -1,0 +1,272 @@
+{
+  "id": "tong-riemann",
+  "title": "Tổng Riemann",
+  "description": "Xấp xỉ diện tích dưới đường cong bằng tổng diện tích các hình chữ nhật với chiều cao lấy mẫu từ hàm.",
+  "xp_reward": 10,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-riemann-sum",
+          "type": "interaction",
+          "content": {
+            "interactionType": "A",
+            "lesson": {
+              "interactionType": "A",
+              "mode": "riemann",
+              "parameterSpec": {
+                "resolutionLevels": [2, 4, 6, 8, 12, 16, 24, 32]
+              },
+              "systemSpec": {
+                "function": "x*x",
+                "integral": 2.6667,
+                "sumType": "left",
+                "domain": [0, 2],
+                "range": [0, 4.5]
+              },
+              "reflectionSpec": {
+                "triggers": [
+                  {
+                    "condition": "state.resolution === 2",
+                    "message": "Chỉ 2 hình chữ nhật. Hình đầu có chiều cao $f(0) = 0$ — không đóng góp gì! Xấp xỉ này có chính xác không?"
+                  },
+                  {
+                    "condition": "state.resolution === 8",
+                    "message": "8 hình chữ nhật. Tổng tiến gần hơn. Chú ý các khe hở giữa đỉnh hình chữ nhật và đường cong."
+                  },
+                  {
+                    "condition": "state.resolution >= 24",
+                    "message": "Các hình chữ nhật mỏng dần. Tổng đang tiến đến một con số cụ thể — con số nào?"
+                  }
+                ]
+              },
+              "prompt": "Các hình chữ nhật lấy chiều cao tại cạnh trái. Tăng $n$ và quan sát tổng. Phép xấp xỉ thay đổi thế nào?",
+              "sliderLabel": "Số hình chữ nhật (n)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-tong-riemann-trai",
+          "type": "text",
+          "content": {
+            "heading": "Tổng Riemann trái",
+            "paragraphs": [
+              "Bạn vừa kéo thanh trượt và quan sát hình chữ nhật nhân lên. Mỗi hình có chiều rộng $\\Delta x = \\frac{b - a}{n}$ và chiều cao $f(x_i)$, trong đó $x_i$ là cạnh trái của khoảng con thứ $i$. Tổng diện tích tất cả hình chữ nhật — đó là **tổng Riemann trái**.",
+              "Với $f(x) = x^2$ trên $[0, 2]$: $L_2 = 1{,}0$, $L_8 \\approx 1{,}938$, $L_{32} \\approx 2{,}490$. Mỗi giá trị là một phép xấp xỉ cho diện tích thực $\\frac{8}{3} \\approx 2{,}667$."
+            ]
+          }
+        },
+        {
+          "id": "math-left-riemann",
+          "type": "math",
+          "content": {
+            "latex": "L_n = \\sum_{i=0}^{n-1} f(x_i) \\cdot \\Delta x, \\quad x_i = a + i\\Delta x, \\quad \\Delta x = \\frac{b-a}{n}"
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 2,
+      "blocks": [
+        {
+          "id": "text-cac-bien-the",
+          "type": "text",
+          "content": {
+            "heading": "Biến thể: trái, phải, trung điểm",
+            "paragraphs": [
+              "Tương tác dùng cạnh trái. Nhưng nếu chiều cao mỗi hình chữ nhật lấy từ cạnh phải thì sao? Hoặc từ trung điểm?",
+              "**Tổng phải:** $R_n = \\sum_{i=1}^{n} f(x_i) \\cdot \\Delta x$. **Tổng trung điểm:** $M_n = \\sum_{i=0}^{n-1} f\\!\\left(\\frac{x_i + x_{i+1}}{2}\\right) \\cdot \\Delta x$. Cả ba đều là tổng Riemann hợp lệ — chúng khác nhau khi $n$ hữu hạn nhưng hội tụ về cùng giá trị khi $n \\to \\infty$."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 3,
+      "blocks": [
+        {
+          "id": "quiz-l2-q1",
+          "type": "quiz",
+          "content": {
+            "question": "Với $f(x) = x^2$ trên $[0, 2]$ và cạnh trái, tổng Riemann tại $n = 2$ là $1{,}0$ trong khi diện tích thực xấp xỉ $2{,}667$. Giải thích nào đúng nhất cho sai số lớn?",
+            "options": [
+              { "value": "a", "label": "Hai hình chữ nhật không bao giờ đủ cho bất kỳ hàm nào" },
+              { "value": "b", "label": "Chiều cao cạnh trái luôn thấp hơn đường cong vì $f(x) = x^2$ đồng biến trên $[0, 2]$" },
+              { "value": "c", "label": "Các hình chữ nhật quá cao" },
+              { "value": "d", "label": "Hàm không có diện tích vì đường cong" }
+            ],
+            "correct": "b",
+            "explanation": "Vì $f(x) = x^2$ đồng biến trên $[0, 2]$, giá trị tại cạnh trái mỗi khoảng con luôn là giá trị nhỏ nhất trên khoảng đó. Do đó mỗi hình chữ nhật đều thấp hơn đường cong, và tổng trái luôn đánh giá thấp diện tích thực."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 4,
+      "blocks": [
+        {
+          "id": "quiz-l2-q2",
+          "type": "quiz",
+          "content": {
+            "question": "Tính tổng Riemann trái $L_4$ cho $f(x) = x^2$ trên $[0, 2]$. Bốn cạnh trái: $x = 0;\\, 0{,}5;\\, 1;\\, 1{,}5$, mỗi khoảng rộng $0{,}5$.",
+            "options": [
+              { "value": "a", "label": "$1{,}75$" },
+              { "value": "b", "label": "$2{,}75$" },
+              { "value": "c", "label": "$2{,}667$" },
+              { "value": "d", "label": "$3{,}5$" }
+            ],
+            "correct": "a",
+            "explanation": "$L_4 = 0{,}5 \\times [f(0) + f(0{,}5) + f(1) + f(1{,}5)] = 0{,}5 \\times [0 + 0{,}25 + 1 + 2{,}25] = 0{,}5 \\times 3{,}5 = 1{,}75$. Giá trị này thấp hơn diện tích thực vì cạnh trái đánh giá thấp hàm đồng biến."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 5,
+      "blocks": [
+        {
+          "id": "quiz-l2-q3",
+          "type": "quiz",
+          "content": {
+            "question": "Tại sao tổng Riemann được gọi là \"xấp xỉ\" chứ không phải \"tính chính xác\"?",
+            "options": [
+              { "value": "a", "label": "Vì $f(x)$ có thể không xác định tại điểm lấy mẫu" },
+              { "value": "b", "label": "Vì đỉnh hình chữ nhật phẳng trong khi đường cong thì không — với $n$ hữu hạn luôn còn khe hở hoặc phần thừa" },
+              { "value": "c", "label": "Vì không dùng đủ chữ số thập phân" },
+              { "value": "d", "label": "Vì diện tích dưới đường cong không tồn tại" }
+            ],
+            "correct": "b",
+            "explanation": "Mỗi hình chữ nhật có đỉnh phẳng ngang, còn đường cong thì uốn. Với $n$ hữu hạn, luôn có khoảng cách giữa đỉnh hình chữ nhật và đường cong — tạo ra sai số. Chỉ khi $n \\to \\infty$ sai số mới triệt tiêu."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 6,
+      "blocks": [
+        {
+          "id": "quiz-l2-q4",
+          "type": "quiz",
+          "content": {
+            "question": "Nếu chuyển từ cạnh trái sang cạnh phải cho $f(x) = x^2$ trên $[0, 2]$, $R_4$ sẽ lớn hơn hay nhỏ hơn $L_4$?",
+            "options": [
+              { "value": "a", "label": "Lớn hơn, vì $f$ đồng biến nên chiều cao cạnh phải luôn lớn hơn cạnh trái trên mỗi khoảng" },
+              { "value": "b", "label": "Nhỏ hơn, vì cạnh phải xa gốc hơn" },
+              { "value": "c", "label": "Bằng nhau, vì số hình chữ nhật không đổi" },
+              { "value": "d", "label": "Tùy $n$ chẵn hay lẻ" }
+            ],
+            "correct": "a",
+            "explanation": "Với hàm đồng biến, giá trị tại cạnh phải mỗi khoảng con luôn lớn hơn giá trị tại cạnh trái. Do đó mỗi hình chữ nhật trong $R_4$ cao hơn hình tương ứng trong $L_4$, nên $R_4 > L_4$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 7,
+      "blocks": [
+        {
+          "id": "quiz-l2-q5",
+          "type": "quiz",
+          "content": {
+            "question": "Tính $R_4$ cho $f(x) = x^2$ trên $[0, 2]$. Bốn cạnh phải: $x = 0{,}5;\\, 1;\\, 1{,}5;\\, 2$, mỗi khoảng rộng $0{,}5$.",
+            "options": [
+              { "value": "a", "label": "$1{,}75$" },
+              { "value": "b", "label": "$3{,}75$" },
+              { "value": "c", "label": "$2{,}667$" },
+              { "value": "d", "label": "$2{,}5$" }
+            ],
+            "correct": "b",
+            "explanation": "$R_4 = 0{,}5 \\times [f(0{,}5) + f(1) + f(1{,}5) + f(2)] = 0{,}5 \\times [0{,}25 + 1 + 2{,}25 + 4] = 0{,}5 \\times 7{,}5 = 3{,}75$. Tổng phải lớn hơn diện tích thực vì cạnh phải đánh giá cao hàm đồng biến."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 8,
+      "blocks": [
+        {
+          "id": "quiz-l2-q6",
+          "type": "quiz",
+          "content": {
+            "question": "Với $f(x) = x^2$ trên $[0, 2]$: $L_4 = 1{,}75$ và $R_4 = 3{,}75$. Diện tích thực $\\frac{8}{3} \\approx 2{,}667$. Mối quan hệ giữa diện tích thực với $L_4$ và $R_4$?",
+            "options": [
+              { "value": "a", "label": "Diện tích thực luôn bằng $\\frac{L_n + R_n}{2}$" },
+              { "value": "b", "label": "Diện tích thực nằm giữa $L_n$ và $R_n$ vì $L_n$ đánh giá thấp còn $R_n$ đánh giá cao" },
+              { "value": "c", "label": "Diện tích thực không liên quan đến $L_n$ và $R_n$" },
+              { "value": "d", "label": "$R_n$ luôn gần diện tích thực hơn $L_n$" }
+            ],
+            "correct": "b",
+            "explanation": "Với hàm đồng biến, $L_n$ dùng giá trị nhỏ nhất mỗi khoảng (đánh giá thấp) còn $R_n$ dùng giá trị lớn nhất (đánh giá cao). Diện tích thực bị kẹp giữa: $L_n \\leq \\int_a^b f(x)\\,dx \\leq R_n$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 9,
+      "blocks": [
+        {
+          "id": "quiz-l2-q7",
+          "type": "quiz",
+          "content": {
+            "question": "Giả sử $g(x)$ liên tục và nghịch biến trên $[1, 5]$. Tổng Riemann trái $L_n$ sẽ đánh giá cao hay thấp diện tích?",
+            "options": [
+              { "value": "a", "label": "Đánh giá thấp, vì cạnh trái của hàm nghịch biến cho chiều cao thấp hơn" },
+              { "value": "b", "label": "Đánh giá cao, vì cạnh trái của hàm nghịch biến cho chiều cao lớn hơn phần còn lại khoảng" },
+              { "value": "c", "label": "Chính xác, vì hàm nghịch biến đơn giản hơn" },
+              { "value": "d", "label": "Tùy thuộc hàm cụ thể" }
+            ],
+            "correct": "b",
+            "explanation": "Với hàm nghịch biến, giá trị tại cạnh trái là giá trị lớn nhất trên mỗi khoảng con. Do đó mỗi hình chữ nhật cao hơn đường cong trên phần còn lại, và tổng trái đánh giá cao diện tích — ngược với hàm đồng biến."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 10,
+      "blocks": [
+        {
+          "id": "quiz-l2-q8",
+          "type": "quiz",
+          "content": {
+            "question": "Trong tương tác, khi tăng $n$ từ $2$ đến $32$, sai số $|S_n - \\text{thực}|$ giảm dần. Sai số có bao giờ bằng $0$ không?",
+            "options": [
+              { "value": "a", "label": "Có, tại $n = 32$" },
+              { "value": "b", "label": "Có, tại $n = 16$" },
+              { "value": "c", "label": "Không, nhưng nó liên tục giảm khi tăng $n$" },
+              { "value": "d", "label": "Không, và nó ngừng giảm sau $n = 8$" }
+            ],
+            "correct": "c",
+            "explanation": "Với mọi $n$ hữu hạn, hình chữ nhật không khớp hoàn hảo đường cong nên sai số luôn dương. Nhưng mỗi lần tăng $n$, hình chữ nhật hẹp hơn và khớp tốt hơn, nên sai số giảm liên tục mà không bao giờ chạm $0$."
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 11,
+      "blocks": [
+        {
+          "id": "quiz-l2-q9",
+          "type": "quiz",
+          "content": {
+            "question": "Với $f(x) = x^2$ trên $[0, 2]$, $\\Delta x = \\frac{2}{n}$. Tổng Riemann trái $L_n = \\sum_{i=0}^{n-1} \\left(\\frac{2i}{n}\\right)^2 \\cdot \\frac{2}{n}$. Biểu thức đại số nào bằng $L_n$?",
+            "options": [
+              { "value": "a", "label": "$\\frac{8}{n^3} \\sum_{i=0}^{n-1} i^2$" },
+              { "value": "b", "label": "$\\frac{2}{n} \\sum_{i=0}^{n-1} i$" },
+              { "value": "c", "label": "$\\frac{4}{n^2} \\sum_{i=1}^{n} i^2$" },
+              { "value": "d", "label": "$n^2 \\sum_{i=0}^{n-1} 2i$" }
+            ],
+            "correct": "a",
+            "explanation": "$f(2i/n) = (2i/n)^2 = 4i^2/n^2$. Nhân với $\\Delta x = 2/n$: mỗi số hạng là $8i^2/n^3$. Tổng toàn bộ: $L_n = \\frac{8}{n^3} \\sum_{i=0}^{n-1} i^2$. Biểu thức này cho phép tính $L_n$ bằng công thức tổng bình phương."
+          }
+        }
+      ]
+    }
+  ]
+}
