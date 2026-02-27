@@ -24,22 +24,37 @@ class Settings(BaseSettings):
 
     @field_validator("database_url", mode="before")
     def _normalize_database_url(cls, v):
-        # Allow explicit env vars set by Render or other platforms.
+        import os
+
         if not v:
-            v = os.environ.get("DATABASE_URL") or os.environ.get("RENDER_DATABASE_URL") or os.environ.get("database_url")
+            v = (
+                os.environ.get("DATABASE_URL")
+                or os.environ.get("RENDER_DATABASE_URL")
+                or os.environ.get("database_url")
+            )
 
         if not v:
             return "sqlite+aiosqlite:///./calculus.db"
 
-        # Convert common Heroku/Render short scheme to asyncpg driver for SQLAlchemy async
-        if isinstance(v, str) and v.startswith("postgres://"):
-            v = v.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif isinstance(v, str) and v.startswith("postgresql://") and "+asyncpg" not in v:
-            v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        if isinstance(v, str):
 
-        # If a bare .db filename is given, coerce to sqlite+aiosqlite URL
-        if isinstance(v, str) and v.endswith(".db") and not v.startswith("sqlite"):
-            v = f"sqlite+aiosqlite:///{v}"
+            # Convert to asyncpg
+            if v.startswith("postgres://"):
+                v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+
+            elif v.startswith("postgresql://") and "+asyncpg" not in v:
+                v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+            # 🔥 BẮT BUỘC SSL CHO SUPABASE
+            if "postgresql+asyncpg://" in v and "sslmode" not in v:
+                if "?" in v:
+                    v += "&sslmode=require"
+                else:
+                    v += "?sslmode=require"
+
+            # SQLite fallback
+            if v.endswith(".db") and not v.startswith("sqlite"):
+                v = f"sqlite+aiosqlite:///{v}"
 
         return v
 
