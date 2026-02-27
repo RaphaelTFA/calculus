@@ -1,21 +1,38 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from datetime import datetime, date, timedelta
 from app.database import get_db
-from app.models import Step, Slide, StepProgress, Chapter, Story, User, Enrollment, SlideProgress
+from app.models import Step, Slide, StepProgress, Chapter, Story, User, Enrollment, SlideProgress, StreakWeek
 from app.schemas import StepDetailResponse, SlideResponse, StepCompleteRequest, SlideCompleteRequest
 from app.auth import get_current_user
 
 router = APIRouter(prefix="/steps", tags=["steps"])
 
 
-def update_streak(user: User) -> dict:
+def update_streak(user: User, tz_offset_minutes: int | None = None) -> dict:
     """Update user's streak based on activity dates.
     Returns dict with streak info."""
-    today = date.today()
-    last_activity = user.last_activity_date.date() if user.last_activity_date else None
+    # compute user-local today using tz offset (minutes) if provided, otherwise server local date
+    if tz_offset_minutes is not None:
+        now = datetime.utcnow() + timedelta(minutes=tz_offset_minutes)
+        today = now.date()
+    else:
+        today = date.today()
+
+    last_activity = None
+    if user.last_activity_date:
+        try:
+            # store last_activity_date in UTC; convert to user-local date for comparison
+            lad = user.last_activity_date
+            if tz_offset_minutes is not None:
+                lad_local = lad + timedelta(minutes=tz_offset_minutes)
+                last_activity = lad_local.date()
+            else:
+                last_activity = lad.date()
+        except Exception:
+            last_activity = user.last_activity_date.date()
     
     streak_increased = False
     streak_reset = False
@@ -40,8 +57,8 @@ def update_streak(user: User) -> dict:
     if user.current_streak > user.longest_streak:
         user.longest_streak = user.current_streak
     
-    # Update last activity date
-    user.last_activity_date = datetime.now()
+    # Update last activity date (store in UTC)
+    user.last_activity_date = datetime.utcnow()
     
     return {
         "current_streak": user.current_streak,
@@ -86,6 +103,7 @@ async def get_slides(step_id: int, db: AsyncSession = Depends(get_db)):
 async def complete_step(
     step_id: int,
     data: StepCompleteRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -140,10 +158,47 @@ async def complete_step(
         progress.completed_at = datetime.utcnow()
         xp_earned = step.xp_reward
         current_user.xp += xp_earned
-    
-    # Update streak
-    streak_info = update_streak(current_user)
-    
+    # Update streak (in-memory fields)
+    # read tz offset header if present (minutes offset from UTC)
+    tz_offset = None
+    try:
+        hdr = request.headers.get('x-user-tz-offset') or request.headers.get('x-tz-offset')
+        if hdr is not None:
+            tz_offset = int(hdr)
+    except Exception:
+        tz_offset = None
+
+    streak_info = update_streak(current_user, tz_offset)
+
+    # Persist today's completion into StreakWeek for the current week using user-local date
+    try:
+        if tz_offset is not None:
+            now = datetime.utcnow() + timedelta(minutes=tz_offset)
+            today_local = now.date()
+        else:
+            today_local = date.today()
+
+        monday = today_local - timedelta(days=today_local.weekday())
+        week_start = monday.isoformat()
+        today_idx = today_local.weekday()
+
+        sw_res = await db.execute(select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == week_start))
+        sw_entry = sw_res.scalar_one_or_none()
+        if sw_entry:
+            days = sw_entry.days or [False]*7
+            if 0 <= today_idx < 7:
+                days[today_idx] = True
+            sw_entry.days = days
+        else:
+            days = [False]*7
+            if 0 <= today_idx < 7:
+                days[today_idx] = True
+            sw_entry = StreakWeek(user_id=current_user.id, week_start=week_start, days=days)
+            db.add(sw_entry)
+    except Exception:
+        # don't break step completion on streak persistence errors
+        pass
+
     await db.commit()
     
     return {
@@ -159,6 +214,7 @@ async def complete_slide(
     step_id: int,
     slide_id: int,
     data: SlideCompleteRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -207,8 +263,40 @@ async def complete_slide(
         db.add(sp)
         xp_earned = data.xp or 0
         current_user.xp += xp_earned
-        # update streak as activity
-        streak_info = update_streak(current_user)
+        # Update streak (in-memory) and persist to streak_weeks
+        tz_offset = None
+        try:
+            hdr = request.headers.get('x-user-tz-offset') or request.headers.get('x-tz-offset')
+            if hdr is not None:
+                tz_offset = int(hdr)
+        except Exception:
+            tz_offset = None
+
+        streak_info = update_streak(current_user, tz_offset)
+        try:
+            if tz_offset is not None:
+                now = datetime.utcnow() + timedelta(minutes=tz_offset)
+                today_local = now.date()
+            else:
+                today_local = date.today()
+            monday = today_local - timedelta(days=today_local.weekday())
+            week_start = monday.isoformat()
+            today_idx = today_local.weekday()
+            sw_res = await db.execute(select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == week_start))
+            sw_entry = sw_res.scalar_one_or_none()
+            if sw_entry:
+                days = sw_entry.days or [False]*7
+                if 0 <= today_idx < 7:
+                    days[today_idx] = True
+                sw_entry.days = days
+            else:
+                days = [False]*7
+                if 0 <= today_idx < 7:
+                    days[today_idx] = True
+                sw_entry = StreakWeek(user_id=current_user.id, week_start=week_start, days=days)
+                db.add(sw_entry)
+        except Exception:
+            pass
         await db.commit()
     else:
         # already completed — idempotent

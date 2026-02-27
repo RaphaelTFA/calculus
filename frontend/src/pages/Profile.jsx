@@ -130,11 +130,32 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ================= STATS ================= */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard icon={<Flame />} value={user?.current_streak || 0} label="Streak" color="orange" />
-        <StatCard icon={<Star />} value={xp} label="XP" color="yellow" />
-        <StatCard icon={<Trophy />} value={12} label="Badges" color="purple" />
+      {/* ================= STATS with Tabs (Overview / Streak) ================= */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <button className={`px-4 py-2 rounded-lg ${true ? 'bg-slate-900 text-white' : 'bg-white'}`}>
+            Overview
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="md:col-span-1">
+            <StatCard icon={<Star />} value={xp} label="XP" color="yellow" />
+          </div>
+          <div className="md:col-span-1">
+            <StatCard icon={<Trophy />} value={12} label="Badges" color="purple" />
+          </div>
+          <div className="md:col-span-1">
+            {/* Placeholder: Streak tab will surface a larger streak widget in full tab view. Keep small summary here. */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 text-center">
+              <div className="w-12 h-12 mx-auto bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center mb-2">
+                <Flame />
+              </div>
+              <div className="text-xl font-extrabold text-slate-800">{user?.current_streak || 0}</div>
+              <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Streak</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ================= MENU ================= */}

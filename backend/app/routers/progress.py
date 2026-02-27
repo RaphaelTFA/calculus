@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload, joinedload
@@ -12,6 +12,10 @@ from app.schemas import LeaderboardResponse
 from app.auth import get_current_user
 from app.routers.stories import calculate_story_progress
 import logging
+from datetime import date, timedelta, datetime, time
+from app.models import StreakWeek, SlideProgress
+from app.schemas import StreakWeekRequest, StreakWeekResponse
+from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
 
@@ -205,6 +209,258 @@ async def get_dashboard(
         total_xp=current_user.xp,
         level=level,
         next_level_xp=next_level_xp
+    )
+
+
+@router.get('/streak-week', response_model=StreakWeekResponse)
+async def get_streak_week(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    request: Request = None,
+    week_start: str | None = None,
+    tz_offset_minutes: int | None = None
+):
+    """Return the user's streak days for the requested week (YYYY-MM-DD Monday). If not present, return defaults."""
+    # Determine week_start: if provided use it, otherwise compute current week's Monday
+    # prefer explicit query param, otherwise try header 'x-user-tz-offset'
+    if tz_offset_minutes is None and request is not None:
+        try:
+            hdr = request.headers.get('x-user-tz-offset') or request.headers.get('x-tz-offset')
+            if hdr is not None:
+                tz_offset_minutes = int(hdr)
+        except Exception:
+            tz_offset_minutes = None
+
+    # compute user's local today using tz offset if provided
+    if tz_offset_minutes is not None:
+        today_local = (datetime.utcnow() + timedelta(minutes=tz_offset_minutes)).date()
+    else:
+        today_local = date.today()
+
+    if not week_start:
+        # Python weekday(): Monday==0
+        monday = today_local - timedelta(days=today_local.weekday())
+        week_start = monday.isoformat()
+
+    result = await db.execute(
+        select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == week_start)
+    )
+    entry = result.scalar_one_or_none()
+
+    # helper to compute current streak by looking at this week and previous week(s)
+    def compute_current_streak_from(week_days, week_start_date):
+        # week_days: list[bool] for Mon..Sun
+        # start from today if this is current week, or from last true day otherwise
+        streak_count = 0
+        # determine today's index relative to week_start_date using user-local today
+        monday = today_local - timedelta(days=today_local.weekday())
+        is_current_week = (monday.isoformat() == week_start_date)
+        today_idx = (today_local.weekday()) if is_current_week else 6
+        i = today_idx
+        # count backwards within this week's days
+        while i >= 0 and i < len(week_days) and week_days[i]:
+            streak_count += 1
+            i -= 1
+
+        # if we reached before Monday (i < 0) and still want to continue streak,
+        # check previous week(s) - simple single previous week lookup
+        if i < 0:
+            prev_monday = (date.fromisoformat(week_start_date) - timedelta(days=7)).isoformat()
+            prev_res = db.execute(select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == prev_monday))
+            prev_entry = (prev_res).scalar_one_or_none()
+            if prev_entry and isinstance(prev_entry.days, list):
+                j = 6
+                while j >= 0 and prev_entry.days[j]:
+                    streak_count += 1
+                    j -= 1
+
+        return streak_count, today_idx if is_current_week else None
+
+    # Determine activity-derived days for the week (from StepProgress and SlideProgress)
+    week_start_date = date.fromisoformat(week_start)
+    start_dt = datetime.combine(week_start_date, time.min)
+    end_dt = datetime.combine(week_start_date + timedelta(days=7), time.min)
+
+    activity_days = [False] * 7
+    try:
+        sp_res = await db.execute(
+            select(StepProgress.completed_at).where(
+                StepProgress.user_id == current_user.id,
+                StepProgress.is_completed == True,
+                StepProgress.completed_at >= start_dt,
+                StepProgress.completed_at < end_dt
+            )
+        )
+        for dtval in sp_res.scalars().all():
+            if not dtval:
+                continue
+            d = dtval.date()
+            if week_start_date <= d < week_start_date + timedelta(days=7):
+                activity_days[d.weekday()] = True
+
+        sl_res = await db.execute(
+            select(SlideProgress.completed_at).where(
+                SlideProgress.user_id == current_user.id,
+                SlideProgress.completed_at >= start_dt,
+                SlideProgress.completed_at < end_dt
+            )
+        )
+        for dtval in sl_res.scalars().all():
+            if not dtval:
+                continue
+            d = dtval.date()
+            if week_start_date <= d < week_start_date + timedelta(days=7):
+                activity_days[d.weekday()] = True
+    except Exception:
+        activity_days = [False] * 7
+
+    days_arr = [False] * 7
+    if entry and isinstance(entry.days, list) and len(entry.days) == 7:
+        # merge persisted days with activity-derived days (persisted OR activity)
+        days_arr = [bool(entry.days[i]) or bool(activity_days[i]) for i in range(7)]
+    else:
+        # use activity-derived days if no persisted entry
+        days_arr = activity_days
+
+    # compute today's index (relative to Monday=0..Sunday=6) using user-local today
+    today_idx = today_local.weekday()  # Monday==0
+
+    # determine whether today is completed: prefer persisted days, fallback to last_activity_date
+    today_completed = False
+    if 0 <= today_idx < len(days_arr):
+        today_completed = bool(days_arr[today_idx])
+    # fallback: if user.last_activity_date in user-local date equals today, consider today completed
+    if not today_completed and current_user.last_activity_date:
+        try:
+            lad = current_user.last_activity_date
+            if tz_offset_minutes is not None:
+                lad_local = lad + timedelta(minutes=tz_offset_minutes)
+                if lad_local.date() == today_local:
+                    today_completed = True
+            else:
+                if lad.date() == today_local:
+                    today_completed = True
+        except Exception:
+            pass
+
+    # compute current streak by counting consecutive trues up to today (and previous week)
+    current_streak = 0
+    # Count backwards in this week
+    i = today_idx
+    while i >= 0 and days_arr[i]:
+        current_streak += 1
+        i -= 1
+    # if we went past Monday, check previous week (relative to user-local today)
+    if i < 0:
+        prev_monday = (today_local - timedelta(days=7 + today_local.weekday())).isoformat()
+        prev_result = await db.execute(select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == prev_monday))
+        prev_entry = prev_result.scalar_one_or_none()
+        if prev_entry and isinstance(prev_entry.days, list):
+            j = 6
+            while j >= 0 and prev_entry.days[j]:
+                current_streak += 1
+                j -= 1
+
+    # If persisted/activity days don't indicate a streak but user's scalar counters do, prefer the user's counter
+    if (current_user.current_streak or 0) > current_streak:
+        current_streak = current_user.current_streak or 0
+
+    longest = current_user.longest_streak or 0
+
+    return StreakWeekResponse(
+        week_start=week_start,
+        days=days_arr,
+        current_streak=current_streak,
+        longest_streak=longest,
+        today_index=today_idx,
+        today_completed=today_completed
+    )
+
+
+@router.post('/streak-week', response_model=StreakWeekResponse)
+async def post_streak_week(
+    payload: StreakWeekRequest,
+    request: Request = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    tz_offset_minutes: int | None = None
+):
+    """Create or update the streak days for a user for a given week."""
+    week_start = payload.week_start
+    # prefer explicit query param, otherwise try header
+    if tz_offset_minutes is None and request is not None:
+        try:
+            hdr = request.headers.get('x-user-tz-offset') or request.headers.get('x-tz-offset')
+            if hdr is not None:
+                tz_offset_minutes = int(hdr)
+        except Exception:
+            tz_offset_minutes = None
+
+    if not week_start:
+        if tz_offset_minutes is not None:
+            today_local = (datetime.utcnow() + timedelta(minutes=tz_offset_minutes)).date()
+        else:
+            today_local = date.today()
+        monday = today_local - timedelta(days=today_local.weekday())
+        week_start = monday.isoformat()
+
+    days = payload.days or [False]*7
+
+    result = await db.execute(
+        select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == week_start)
+    )
+    entry = result.scalar_one_or_none()
+    if entry:
+        entry.days = days
+    else:
+        entry = StreakWeek(user_id=current_user.id, week_start=week_start, days=days)
+        db.add(entry)
+
+    # After updating, if this is the current week, recompute current and longest streak
+    today = date.today()
+    current_week_monday = (today - timedelta(days=today.weekday())).isoformat()
+    if week_start == current_week_monday:
+        # compute consecutive days up to today in this week
+        today_idx = today.weekday()
+        current = 0
+        i = today_idx
+        while i >= 0 and i < len(days) and days[i]:
+            current += 1
+            i -= 1
+
+        # continue into previous week if needed
+        if i < 0:
+            prev_monday = (today - timedelta(days=7 + today.weekday())).isoformat()
+            prev_result = await db.execute(select(StreakWeek).where(StreakWeek.user_id == current_user.id, StreakWeek.week_start == prev_monday))
+            prev_entry = prev_result.scalar_one_or_none()
+            if prev_entry and isinstance(prev_entry.days, list):
+                j = 6
+                while j >= 0 and prev_entry.days[j]:
+                    current += 1
+                    j -= 1
+
+        # update user's streak counters
+        current_user.current_streak = current
+        if (current_user.longest_streak or 0) < current:
+            current_user.longest_streak = current
+        db.add(current_user)
+
+    await db.commit()
+
+    # prepare response payload
+    today_idx = date.today().weekday()
+    today_completed = bool(days[today_idx]) if 0 <= today_idx < len(days) else False
+    longest = current_user.longest_streak or 0
+    # compute current streak to return (mirror above)
+    current = current_user.current_streak or 0
+
+    return StreakWeekResponse(
+        week_start=week_start,
+        days=days,
+        current_streak=current,
+        longest_streak=longest,
+        today_index=today_idx,
+        today_completed=today_completed
     )
 
 

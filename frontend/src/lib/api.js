@@ -19,6 +19,11 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    // include user's timezone offset in minutes (minutes to add to UTC to get local time)
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -48,6 +53,10 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -77,6 +86,10 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -100,6 +113,10 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }

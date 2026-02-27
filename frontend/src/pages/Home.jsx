@@ -27,6 +27,7 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Progress } from '../components/ui/progress'
 import { Separator } from '../components/ui/separator'
+import LearningStreakCard from '../components/LearningStreakCard'
 
 export default function Home() {
   const { user, isAuthenticated, fetchUser } = useAuthStore()
@@ -130,17 +131,19 @@ export default function Home() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 lg:gap-8">
         {/* Left Sidebar - Colorful & Minimal */}
         <aside className="order-2 lg:order-1 space-y-6">
+          {/* Learning Streak Card (interactive) */}
+          <LearningStreakCard />
+          
           {/* User Stats Overview - Colorful Card */}
           <Card className="border-2 border-fuchsia-400/40 bg-gradient-to-br from-fuchsia-100 via-pink-100 to-yellow-100 shadow-xl animate-pulse-slow">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 text-fuchsia-700">
-                <TrendingUp className="w-5 h-5 text-fuchsia-500 animate-bounce" />
-                Tiến trình của bạn
+                <TrendingUp className="w-5 h-5 text-fuchsia-500" />
+                Your Progress
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <StatItem icon={Flame} label="Streak" value={`${user?.current_streak || 0}d`} color="text-orange-600" bgColor="bg-orange-100/80" />
                 <StatItem icon={Zap} label="XP" value={user?.xp || 0} color="text-yellow-600" bgColor="bg-yellow-100/80" />
                 <StatItem icon={Trophy} label="Ranking" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100/80" />
               </div>
@@ -593,7 +596,7 @@ function CourseCard({ story }) {
                   '--progress-color': themeColor 
                 }}
               />
-              <style jsx>{`
+              <style>{`
                 :global(.bg-gray-100 > div) {
                   background-color: var(--progress-color) !important;
                 }

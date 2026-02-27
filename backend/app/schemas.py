@@ -157,6 +157,24 @@ class LeaderboardResponse(BaseModel):
     current_user_rank: Optional[int] = None
     total_count: Optional[int] = None
 
+
+class StreakWeekRequest(BaseModel):
+    week_start: Optional[str] = None  # YYYY-MM-DD (optional, default to current week)
+    days: list[bool]
+
+
+class StreakWeekResponse(BaseModel):
+    week_start: str
+    days: list[bool]
+    # computed fields
+    current_streak: int = 0
+    longest_streak: int = 0
+    today_index: int = 0
+    today_completed: bool = False
+
+    class Config:
+        from_attributes = True
+
 # Generic
 class SuccessResponse(BaseModel):
     success: bool = True
