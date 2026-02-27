@@ -179,7 +179,7 @@ export default function Layout() {
             }`}
           >
             <User className={`w-6 h-6 ${location.pathname === '/profile' ? 'stroke-[2.5]' : ''}`} />
-            <span className="text-xs font-semibold">Profile</span>
+            <span className="text-lg font-semibold">Profile</span>
           </Link>
         </div>
       </nav>
