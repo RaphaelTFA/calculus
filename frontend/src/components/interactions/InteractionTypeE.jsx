@@ -73,8 +73,10 @@ function detectRoots(h, a, b, samples = 400) {
 
 function buildBaseGeometry(spec, scope) {
   switch (spec.type) {
-    case "rectangle":
-      return { type: "rectangle", x: spec.origin[0], y: spec.origin[1], width: evalExpr(spec.width, scope), height: evalExpr(spec.height, scope) }
+    case "rectangle": {
+      const origin = spec.origin || [0, 0]
+      return { type: "rectangle", x: origin[0], y: origin[1], width: evalExpr(String(spec.width), scope), height: evalExpr(String(spec.height), scope) }
+    }
     case "areaUnderCurve":
       return { type: "areaUnderCurve", functionSpec: spec.function, domain: spec.domain }
     case "regionBetweenCurves":
@@ -87,10 +89,14 @@ function buildBaseGeometry(spec, scope) {
 function applySplit(splitSpec, base, structure, scope) {
   switch (splitSpec.type) {
     case "rectangleContribution": {
-      const { u, v, du, dv } = scope
+      // structure controls how much of the total change is attributed to each term
+      const W = base.width
+      const H = base.height
+      const du = structure * W * 0.3   // Δu scales with structure
+      const dv = (1 - structure) * H * 0.3  // Δv scales inversely
       return [
-        { type: "rectangle", x: base.x, y: base.y + v, width: u, height: dv, contribution: "u·dv" },
-        { type: "rectangle", x: base.x + u, y: base.y, width: du, height: v, contribution: "v·du" }
+        { type: "rectangle", x: base.x, y: base.y + H, width: W, height: dv, contribution: "u·dv" },
+        { type: "rectangle", x: base.x + W, y: base.y, width: du, height: H, contribution: "v·du" }
       ]
     }
     case "domainSplit": {
@@ -153,15 +159,6 @@ function recompute(lesson, state) {
 
 function evaluateReflection(lesson, state) {
   if (!lesson.reflectionSpec) return ""
-  if (lesson.representationSpec.splitSpec.type === "signPartition") {
-    const system = recompute(lesson, state)
-    if (system.activeIndex != null) {
-      const active = system.parts[system.activeIndex]
-      return active.sign === "positive"
-        ? "Trên khoảng này f(x) > g(x), diện tích có dấu dương."
-        : "Trên khoảng này f(x) < g(x), diện tích có dấu âm."
-    }
-  }
   for (const t of lesson.reflectionSpec.triggers) {
     if (t.type === "structureAbove" && state.structure > t.value) return t.message
     if (t.type === "structureBelow" && state.structure < t.value) return t.message
@@ -263,16 +260,24 @@ function GraphView({ lesson, structure, system, onStructureChange }) {
       const s = (dataX - a) / (b - a)
       return Math.max(0, Math.min(1, s))
     }
+    if (system.base.type === "regionBetweenCurves") {
+      const [a, b] = system.base.domain
+      const s = (dataX - a) / (b - a)
+      return Math.max(0, Math.min(1, s))
+    }
+    if (system.base.type === "rectangle") {
+      const s = (dataX - system.base.x) / (system.base.width * 1.3)
+      return Math.max(0, Math.min(1, s))
+    }
     return null
   }, [system])
 
   const handlePointerDown = useCallback((e) => {
-    if (splitType !== "domainSplit") return
     draggingRef.current = true
     const s = pointerToStructure(e)
     if (s !== null) onStructureChange(s)
     e.preventDefault()
-  }, [splitType, pointerToStructure, onStructureChange])
+  }, [pointerToStructure, onStructureChange])
 
   const handlePointerMove = useCallback((e) => {
     if (!draggingRef.current) return
@@ -341,7 +346,7 @@ function GraphView({ lesson, structure, system, onStructureChange }) {
       viewBox={`0 0 ${W} ${H}`}
       width="100%" height="100%"
       preserveAspectRatio="xMidYMid meet"
-      style={{ display: 'block', cursor: splitType === 'domainSplit' ? 'ew-resize' : 'default', touchAction: 'none' }}
+      style={{ display: 'block', cursor: 'ew-resize', touchAction: 'none' }}
       onMouseDown={handlePointerDown}
       onMouseMove={handlePointerMove}
       onMouseUp={handlePointerUp}
@@ -455,6 +460,50 @@ function GraphView({ lesson, structure, system, onStructureChange }) {
             A₂
           </text>
         )}
+
+        {/* Base rectangle outline + labels for rectangleContribution */}
+        {splitType === "rectangleContribution" && (() => {
+          const b = system.base
+          const uDv = system.parts[0] // horizontal strip (top)
+          const vDu = system.parts[1] // vertical strip (right)
+          return (
+            <>
+              {/* Base rectangle outline */}
+              <rect
+                x={mapX(b.x)} y={mapY(b.y + b.height)}
+                width={mapX(b.x + b.width) - mapX(b.x)}
+                height={mapY(b.y) - mapY(b.y + b.height)}
+                fill="none" stroke={COLORS.curve} strokeWidth="2"
+              />
+              {/* Labels on contribution parts */}
+              {uDv && uDv.height > 0.05 && (
+                <text
+                  x={mapX(b.x + b.width / 2)} y={mapY(b.y + b.height + uDv.height / 2)}
+                  textAnchor="middle" dominantBaseline="central"
+                  fontSize="12" fill={COLORS.left.stroke} fontWeight="600" fontFamily="system-ui"
+                >
+                  f·Δg
+                </text>
+              )}
+              {vDu && vDu.width > 0.05 && (
+                <text
+                  x={mapX(b.x + b.width + vDu.width / 2)} y={mapY(b.y + b.height / 2)}
+                  textAnchor="middle" dominantBaseline="central"
+                  fontSize="12" fill={COLORS.right.stroke} fontWeight="600" fontFamily="system-ui"
+                >
+                  g·Δf
+                </text>
+              )}
+              {/* Dimension labels */}
+              <text x={mapX(b.x + b.width / 2)} y={mapY(b.y) + 14} textAnchor="middle" fontSize="10" fill={COLORS.label} fontFamily="system-ui">
+                f = {b.width}
+              </text>
+              <text x={mapX(b.x) - 8} y={mapY(b.y + b.height / 2)} textAnchor="end" dominantBaseline="central" fontSize="10" fill={COLORS.label} fontFamily="system-ui">
+                g = {b.height}
+              </text>
+            </>
+          )
+        })()}
       </g>
 
       {/* Axes */}
@@ -487,6 +536,23 @@ function GraphView({ lesson, structure, system, onStructureChange }) {
           s={splitX.toFixed(2)}
         </text>
       )}
+
+      {/* Vertical indicator for signPartition */}
+      {splitType === "signPartition" && (() => {
+        const [a, b] = system.base.domain
+        const indicatorX = a + structure * (b - a)
+        return (
+          <>
+            <line
+              x1={mapX(indicatorX)} y1={PAD.top}
+              x2={mapX(indicatorX)} y2={PAD.top + gH}
+              stroke={COLORS.splitLine} strokeWidth="2" strokeDasharray="4 3"
+              opacity="0.7"
+            />
+            <circle cx={mapX(indicatorX)} cy={PAD.top + gH / 2} r="6" fill="#fff" stroke={COLORS.splitLine} strokeWidth="2" />
+          </>
+        )
+      })()}
     </svg>
   )
 }
@@ -579,6 +645,15 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
           flexDirection: 'column',
           gap: 0,
         }}>
+          {/* Prompt */}
+          {lesson.prompt && (
+            <div style={{
+              padding: '6px 8px', fontSize: 14, lineHeight: 1.5,
+              color: '#1e293b', flexShrink: 0,
+            }}>
+              <MathText text={lesson.prompt} />
+            </div>
+          )}
           <div style={{
             flex: 1,
             minHeight: 0,
@@ -608,6 +683,44 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ width: 14, height: 2, background: COLORS.splitLine, display: 'inline-block', borderRadius: 1, borderTop: '1px dashed ' + COLORS.splitLine }} />
                 Kéo để chia
+              </span>
+            </div>
+          )}
+          {splitType === "signPartition" && (
+            <div style={{
+              display: 'flex', gap: 16, padding: '6px 4px 0',
+              fontSize: 11, color: '#6b7280', flexShrink: 0
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, background: COLORS.positive.fill, display: 'inline-block', borderRadius: 2, opacity: 0.75 }} />
+                Dương
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, background: COLORS.negative.fill, display: 'inline-block', borderRadius: 2, opacity: 0.75 }} />
+                Âm
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 14, height: 2, background: COLORS.splitLine, display: 'inline-block', borderRadius: 1 }} />
+                Kéo để khám phá
+              </span>
+            </div>
+          )}
+          {splitType === "rectangleContribution" && (
+            <div style={{
+              display: 'flex', gap: 16, padding: '6px 4px 0',
+              fontSize: 11, color: '#6b7280', flexShrink: 0
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, background: COLORS.left.fill, display: 'inline-block', borderRadius: 2, opacity: 0.75 }} />
+                f·Δg
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, background: COLORS.right.fill, display: 'inline-block', borderRadius: 2, opacity: 0.75 }} />
+                g·Δf
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 14, height: 2, background: COLORS.splitLine, display: 'inline-block', borderRadius: 1 }} />
+                Kéo để phân chia
               </span>
             </div>
           )}

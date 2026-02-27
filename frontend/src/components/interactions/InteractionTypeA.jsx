@@ -306,7 +306,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   const LESSON = lessonProp || DEFAULT_LESSON
   const isRiemann = LESSON.mode === 'riemann'
 
-  const [resolution, setResolution] = useState(LESSON.parameterSpec.resolutionLevels[0])
+  const [levelIndex, setLevelIndex] = useState(0)
   const canvasRef = useRef(null)
 
   const { f, df } = useMemo(() => {
@@ -325,8 +325,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   }), [LESSON, f, df])
 
   const levels = LESSON.parameterSpec.resolutionLevels
-  const minRes = levels[0]
-  const maxRes = levels[levels.length - 1]
+  const resolution = levels[levelIndex] ?? levels[0]
 
   const state = { resolution }
 
@@ -334,7 +333,7 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
     return isRiemann ? recomputeRiemann(interaction, state) : recompute(interaction, state)
   }, [resolution, interaction, isRiemann])
 
-  const pendingResolutionRef = useRef(LESSON.parameterSpec.resolutionLevels[0])
+  const pendingIndexRef = useRef(0)
   const containerRef = useRef(null)
 
   // Draw helper — always reads current canvas CSS size, sets buffer to match
@@ -539,15 +538,15 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
             </div>
             <input
               type="range"
-              min={minRes}
-              max={maxRes}
+              min={0}
+              max={levels.length - 1}
               step="1"
-              value={resolution}
+              value={levelIndex}
               onInput={(e) => {
-                const newRes = parseFloat(e.target.value)
-                if (newRes !== pendingResolutionRef.current) {
-                  pendingResolutionRef.current = newRes
-                  setResolution(newRes)
+                const idx = parseInt(e.target.value, 10)
+                if (idx !== pendingIndexRef.current) {
+                  pendingIndexRef.current = idx
+                  setLevelIndex(idx)
                 }
               }}
               style={{
@@ -559,8 +558,8 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
               display: 'flex', justifyContent: 'space-between',
               fontSize: 11, color: '#9ca3af', marginTop: 2
             }}>
-              <span>{minRes}</span>
-              <span>{maxRes}</span>
+              <span>{levels[0]}</span>
+              <span>{levels[levels.length - 1]}</span>
             </div>
           </div>
         </div>

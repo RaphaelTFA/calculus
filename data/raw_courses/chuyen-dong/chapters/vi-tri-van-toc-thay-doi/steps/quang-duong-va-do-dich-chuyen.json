@@ -44,7 +44,10 @@
                                     "xMax": 6,
                                     "yMin": -1,
                                     "yMax": 5.5
-                                }
+                                },
+                                "xLabel": "Thời gian (giây)",
+                                "yLabel": "Vị trí (m)",
+                                "showArea": true
                             },
                             "reflectionSpec": {
                                 "triggers": [

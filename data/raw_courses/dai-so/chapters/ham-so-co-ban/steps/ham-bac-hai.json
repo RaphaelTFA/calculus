@@ -1,0 +1,77 @@
+{
+  "id": "ham-bac-hai",
+  "title": "Hàm bậc hai",
+  "description": "Parabol y = ax² + bx + c: đỉnh, trục đối xứng, chiều mở.",
+  "xp_reward": 15,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-ham-bac-hai",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Hệ số a"
+              },
+              "parameter": {
+                "min": -3,
+                "max": 3,
+                "initial": 1
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -4,
+                  "xMax": 4,
+                  "yMin": -5,
+                  "yMax": 10
+                },
+                "model": "p * x * x"
+              },
+              "reflections": [
+                {
+                  "id": "open-up",
+                  "trigger": "state.currentValue > 0.5",
+                  "text": "$a > 0$: parabol mở lên — có giá trị nhỏ nhất tại đỉnh."
+                },
+                {
+                  "id": "open-down",
+                  "trigger": "state.currentValue < -0.5",
+                  "text": "$a < 0$: parabol mở xuống — có giá trị lớn nhất tại đỉnh."
+                },
+                {
+                  "id": "flat",
+                  "trigger": "Math.abs(state.currentValue) < 0.2",
+                  "text": "Khi $a \\approx 0$, parabol \"phẳng\" ra và gần giống đường thẳng $y = 0$."
+                }
+              ],
+              "prompt": "Kéo $a$ từ âm sang dương. Parabol lật ngược ở giá trị nào? Khi $|a|$ tăng thì hình dạng thay đổi thế nào?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-ham-bac-hai",
+          "type": "text",
+          "content": {
+            "heading": "Parabol $y = ax^2$",
+            "paragraphs": [
+              "Đồ thị hàm $y = ax^2$ là một parabol với đỉnh tại gốc tọa độ. $a > 0$ thì mở lên (có min), $a < 0$ thì mở xuống (có max).",
+              "$|a|$ càng lớn, parabol càng \"hẹp\" (dốc); $|a|$ càng nhỏ, parabol càng \"rộng\" (thoải).",
+              "Trục đối xứng luôn là đường $x = 0$. Dạng tổng quát $y = a(x-h)^2 + k$ dịch đỉnh đến $(h, k)$."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

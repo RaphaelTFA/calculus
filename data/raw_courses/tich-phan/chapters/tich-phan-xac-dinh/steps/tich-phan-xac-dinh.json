@@ -30,23 +30,23 @@
                 "triggers": [
                   {
                     "condition": "state.resolution === 4",
-                    "message": "4 hình chữ nhật. Khe hở giữa đỉnh và đường cong rõ ràng. Sai số còn lớn."
+                    "message": "4 hình chữ nhật. Khe hở giữa đỉnh và đường cong $4 - x^2$ khá rõ. Tổng còn cách xa giá trị thực $\\frac{16}{3} \\approx 5{,}333$."
                   },
                   {
                     "condition": "state.resolution === 32",
-                    "message": "32 hình chữ nhật. Khớp chặt hơn nhiều. Bạn còn thấy từng hình chữ nhật riêng lẻ không?"
+                    "message": "32 hình chữ nhật. Bạn gần như không thấy khe hở nữa. Tổng đã rất gần $5{,}333$."
                   },
                   {
                     "condition": "state.resolution === 128",
-                    "message": "128 hình chữ nhật. Tổng và giá trị chính xác gần như đồng nhất. Nếu $n$ tiến đến vô cùng thì sao?"
+                    "message": "128 hình chữ nhật. Tổng và diện tích gần như trùng nhau. Sai số tiến về $0$ khi $n$ tăng."
                   },
                   {
                     "condition": "state.resolution === 256",
-                    "message": "Bạn còn nhìn thấy từng hình chữ nhật không? Tổng Riemann đã trở thành diện tích. Giới hạn này có một tên gọi."
+                    "message": "Hình chữ nhật mỏng đến mức không phân biệt được với đường cong. Tổng Riemann đã \textbf{trở thành diện tích}. Giới hạn này có tên: tích phân xác định."
                   }
                 ]
               },
-              "prompt": "Đẩy $n$ lên tối đa. Quan sát hình chữ nhật, tổng và sai số. Khi nào tổng ngừng là xấp xỉ và trở thành diện tích chính xác?",
+              "prompt": "Đẩy $n$ lên tối đa. Khi nào bạn không còn thấy hình chữ nhật riêng lẻ nữa? Lúc đó tổng bằng bao nhiêu?",
               "sliderLabel": "Số hình chữ nhật (n)"
             }
           }

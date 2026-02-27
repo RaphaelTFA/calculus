@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { MathText } from './MathText'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
@@ -22,16 +22,7 @@ const DEFAULT_LESSON = {
   },
   reflectionSpec: {
     triggers: [
-      {
-        type: "timeReached",
-        value: 2 * Math.PI - 0.02,
-        message: "The motion has completed one full cycle."
-      },
-      {
-        type: "timeReached",
-        value: 3.14159,
-        message: "Half a cycle: velocity reverses direction."
-      }
+      { type: "timeReached", value: Math.PI, message: "Half cycle: velocity reverses." }
     ]
   }
 }
@@ -66,7 +57,7 @@ function computeFullTrace(interaction) {
   for (let tau = start; tau <= end; tau += step) {
     const [vx, vy] = evaluator({ t: tau, x: position.x, y: position.y })
     position = { x: position.x + vx * step, y: position.y + vy * step }
-    trace.push({ x: position.x, y: position.y })
+    trace.push({ x: position.x, y: position.y, vy })
   }
   return trace
 }
@@ -77,27 +68,44 @@ function recompute(interaction, state) {
 
   let position = { ...interaction.systemSpec.initialState }
   const trace = []
+  let lastVy = 0
 
   for (let tau = start; tau <= state.t; tau += step) {
     const [vx, vy] = evaluator({ t: tau, x: position.x, y: position.y })
     position = { x: position.x + vx * step, y: position.y + vy * step }
-    trace.push({ x: position.x, y: position.y })
+    lastVy = vy
+    trace.push({ x: position.x, y: position.y, vy })
   }
 
-  return {
-    newState: { t: state.t, position, trace },
-    systemState: {
-      geometry: [
-        { type: "axes" },
-        { type: "trace", data: trace },
-        { type: "point", x: position.x, y: position.y }
-      ]
-    }
-  }
+  return { position, trace, velocity: lastVy }
 }
 
-function renderCanvas(systemState, representationSpec, ctx, canvas) {
-  // Ensure canvas backing store matches CSS size (handles clipping and HiDPI)
+function evaluateReflections(interaction, state) {
+  if (!interaction.reflectionSpec) return null
+  const triggers = [...interaction.reflectionSpec.triggers].sort((a, b) => b.value - a.value)
+  for (const trigger of triggers) {
+    if (trigger.type === "timeReached" && state.t >= trigger.value) return trigger.message
+  }
+  return null
+}
+
+// ─── CANVAS RENDERER ─────────────────────────────────────────────────────────
+
+const COLORS = {
+  rising: '#059669',
+  falling: '#dc2626',
+  neutral: '#6366f1',
+  preview: '#d1d5db',
+  tangent: '#f59e0b',
+  grid: '#f1f5f9',
+  axis: '#64748b',
+  bg: '#ffffff',
+  point: '#1e40af',
+  areaPos: 'rgba(5, 150, 105, 0.12)',
+  areaNeg: 'rgba(220, 38, 38, 0.12)',
+}
+
+function renderCanvas(ctx, canvas, vb, fullTrace, currentTrace, position, velocity, repSpec) {
   const rect = canvas.getBoundingClientRect()
   const dpr = window.devicePixelRatio || 1
   const cssW = Math.max(1, rect.width)
@@ -108,141 +116,213 @@ function renderCanvas(systemState, representationSpec, ctx, canvas) {
     canvas.width = pxW
     canvas.height = pxH
   }
-  // Scale drawing so 1 unit = 1 CSS pixel
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-
-  // White background (use CSS size coordinates)
-  ctx.fillStyle = '#ffffff'
+  ctx.clearRect(0, 0, cssW, cssH)
+  ctx.fillStyle = COLORS.bg
   ctx.fillRect(0, 0, cssW, cssH)
 
-  const vb = representationSpec.viewBox
-  const w = cssW; const h = cssH
+  const pad = { top: 16, right: 16, bottom: 32, left: 40 }
+  const w = cssW - pad.left - pad.right
+  const h = cssH - pad.top - pad.bottom
 
-  // Minimal, precise padding for arrowheads only
-  const pad = 10;
-  const innerW = w - 2 * pad;
-  const innerH = h - 2 * pad;
+  const mapX = x => pad.left + (x - vb.xMin) / (vb.xMax - vb.xMin) * w
+  const mapY = y => pad.top + h - (y - vb.yMin) / (vb.yMax - vb.yMin) * h
 
-  // Centered mapping: ensures (0,0) is visually centered if in viewBox
-  const mapX = x => pad + ((x - vb.xMin) / (vb.xMax - vb.xMin)) * innerW;
-  const mapY = y => pad + innerH - ((y - vb.yMin) / (vb.yMax - vb.yMin)) * innerH;
+  // ── Grid ──
+  ctx.save()
+  ctx.strokeStyle = COLORS.grid
+  ctx.lineWidth = 1
+  const xRange = vb.xMax - vb.xMin
+  const yRange = vb.yMax - vb.yMin
+  const xGridStep = niceStep(xRange)
+  const yGridStep = niceStep(yRange)
+  for (let x = Math.ceil(vb.xMin / xGridStep) * xGridStep; x <= vb.xMax; x += xGridStep) {
+    ctx.beginPath(); ctx.moveTo(mapX(x), pad.top); ctx.lineTo(mapX(x), pad.top + h); ctx.stroke()
+  }
+  for (let y = Math.ceil(vb.yMin / yGridStep) * yGridStep; y <= vb.yMax; y += yGridStep) {
+    ctx.beginPath(); ctx.moveTo(pad.left, mapY(y)); ctx.lineTo(pad.left + w, mapY(y)); ctx.stroke()
+  }
+  ctx.restore()
 
-  // Draw each geometry object with a clean, textbook style
-  systemState.geometry.forEach(obj => {
-    // Bold black axes with arrowheads, axes extended beyond viewBox
-    if (obj.type === 'axes') {
-      ctx.save()
-      ctx.strokeStyle = '#000000'
-      ctx.lineWidth = Math.max(3, Math.min(5, Math.round(w / 120))) // thicker axes
+  // ── Axes ──
+  ctx.save()
+  ctx.strokeStyle = COLORS.axis
+  ctx.lineWidth = 1.5
+  if (vb.yMin <= 0 && vb.yMax >= 0) {
+    ctx.beginPath(); ctx.moveTo(pad.left, mapY(0)); ctx.lineTo(pad.left + w, mapY(0)); ctx.stroke()
+  }
+  if (vb.xMin <= 0 && vb.xMax >= 0) {
+    ctx.beginPath(); ctx.moveTo(mapX(0), pad.top); ctx.lineTo(mapX(0), pad.top + h); ctx.stroke()
+  }
+  ctx.restore()
+
+  // ── Tick labels ──
+  ctx.save()
+  ctx.fillStyle = COLORS.axis
+  ctx.font = '10px system-ui'
+  ctx.textAlign = 'center'
+  for (let x = Math.ceil(vb.xMin / xGridStep) * xGridStep; x <= vb.xMax; x += xGridStep) {
+    if (Math.abs(x) < 0.001) continue
+    ctx.fillText(fmtNum(x), mapX(x), pad.top + h + 14)
+  }
+  ctx.textAlign = 'right'
+  ctx.textBaseline = 'middle'
+  for (let y = Math.ceil(vb.yMin / yGridStep) * yGridStep; y <= vb.yMax; y += yGridStep) {
+    if (Math.abs(y) < 0.001) continue
+    ctx.fillText(fmtNum(y), pad.left - 5, mapY(y))
+  }
+  ctx.restore()
+
+  // ── Axis labels ──
+  if (repSpec.xLabel) {
+    ctx.save()
+    ctx.fillStyle = '#374151'
+    ctx.font = '11px system-ui'
+    ctx.textAlign = 'center'
+    ctx.fillText(repSpec.xLabel, pad.left + w / 2, cssH - 4)
+    ctx.restore()
+  }
+  if (repSpec.yLabel) {
+    ctx.save()
+    ctx.fillStyle = '#374151'
+    ctx.font = '11px system-ui'
+    ctx.translate(12, pad.top + h / 2)
+    ctx.rotate(-Math.PI / 2)
+    ctx.textAlign = 'center'
+    ctx.fillText(repSpec.yLabel, 0, 0)
+    ctx.restore()
+  }
+
+  // ── Full preview trace (light gray) ──
+  if (fullTrace.length > 1) {
+    ctx.save()
+    ctx.strokeStyle = COLORS.preview
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([4, 4])
+    ctx.beginPath()
+    fullTrace.forEach((pt, i) => {
+      const px = mapX(pt.x), py = mapY(pt.y)
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
+    })
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.restore()
+  }
+
+  // ── Area fill under current trace (optional) ──
+  if (repSpec.showArea && currentTrace.length > 1) {
+    let i = 0
+    while (i < currentTrace.length - 1) {
+      const isPos = currentTrace[i].y >= 0
       ctx.beginPath()
-      // x-axis (extend beyond viewBox)
-      const y0 = mapY(0)
-      ctx.moveTo(0, y0); ctx.lineTo(w, y0)
-      // y-axis (extend beyond viewBox)
-      const x0 = mapX(0)
-      ctx.moveTo(x0, 0); ctx.lineTo(x0, h)
-      ctx.stroke()
-
-      // arrowheads (slightly larger, proportional)
-      const ah = Math.max(10, Math.round(Math.min(innerW, innerH) / 60))
-      // x-axis arrow (right)
-      ctx.beginPath()
-      ctx.moveTo(w - ah, y0 - ah / 2)
-      ctx.lineTo(w, y0)
-      ctx.lineTo(w - ah, y0 + ah / 2)
-      ctx.fillStyle = '#000'
+      ctx.moveTo(mapX(currentTrace[i].x), mapY(0))
+      while (i < currentTrace.length && (currentTrace[i].y >= 0) === isPos) {
+        ctx.lineTo(mapX(currentTrace[i].x), mapY(currentTrace[i].y))
+        i++
+      }
+      if (i < currentTrace.length) {
+        ctx.lineTo(mapX(currentTrace[i - 1].x), mapY(0))
+      } else {
+        ctx.lineTo(mapX(currentTrace[currentTrace.length - 1].x), mapY(0))
+      }
+      ctx.closePath()
+      ctx.fillStyle = isPos ? COLORS.areaPos : COLORS.areaNeg
       ctx.fill()
-      // y-axis arrow (top)
-      ctx.beginPath()
-      ctx.moveTo(x0 - ah / 2, ah)
-      ctx.lineTo(x0, 0)
-      ctx.lineTo(x0 + ah / 2, ah)
-      ctx.fill()
-      ctx.restore()
-    }
-
-    // Secondary reference: orange line, thicker
-    if (obj.type === 'fullCurve') {
-      ctx.save()
-      ctx.strokeStyle = '#fb923c' // orange-400
-      ctx.lineWidth = 2.2 // thicker
-      ctx.setLineDash([6, 6])
-      ctx.beginPath()
-      obj.data.forEach((pt, i) => {
-        const px = mapX(pt.x); const py = mapY(pt.y)
-        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
-      })
-      ctx.stroke()
-      ctx.setLineDash([])
-      ctx.restore()
-    }
-
-    // Main trace: strong blue, thicker
-    if (obj.type === 'trace') {
-      ctx.save()
-      ctx.strokeStyle = '#1e40af' // strong indigo-blue
-      ctx.lineWidth = 4.5 // thicker
-      ctx.lineJoin = 'round'
-      ctx.lineCap = 'round'
-      ctx.beginPath()
-      obj.data.forEach((pt, i) => {
-        const px = mapX(pt.x); const py = mapY(pt.y)
-        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
-      })
-      ctx.stroke()
-      ctx.restore()
-    }
-
-    // Highlight points with larger markers and projections
-    if (obj.type === 'point') {
-      const px = mapX(obj.x); const py = mapY(obj.y)
-      // dashed projection to axes
-      ctx.save()
-      ctx.strokeStyle = 'rgba(0,0,0,0.25)'
-      ctx.lineWidth = 1.5
-      ctx.setLineDash([4, 4])
-      ctx.beginPath()
-      // vertical to x-axis
-      ctx.moveTo(px, py); ctx.lineTo(px, mapY(0))
-      // horizontal to y-axis
-      ctx.moveTo(px, py); ctx.lineTo(mapX(0), py)
-      ctx.stroke()
-      ctx.setLineDash([])
-      // filled circular marker with white ring, larger
-      ctx.beginPath()
-      ctx.fillStyle = '#1e40af'
-      ctx.arc(px, py, 8, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.lineWidth = 2.5
-      ctx.strokeStyle = '#ffffff'
-      ctx.stroke()
-      ctx.restore()
-    }
-  })
-}
-
-function evaluateReflections(interaction, state) {
-  if (!interaction.reflectionSpec) return null
-  // Sort by value descending so the HIGHEST reached trigger wins
-  const triggers = [...interaction.reflectionSpec.triggers]
-    .sort((a, b) => b.value - a.value)
-  for (const trigger of triggers) {
-    if (trigger.type === "timeReached" && state.t >= trigger.value) {
-      return trigger.message
     }
   }
-  return null
+
+  // ── Derivative-colored trace ──
+  if (currentTrace.length > 1) {
+    ctx.save()
+    ctx.lineWidth = 3
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    for (let i = 1; i < currentTrace.length; i++) {
+      const prev = currentTrace[i - 1]
+      const cur = currentTrace[i]
+      const vy = cur.vy
+      ctx.strokeStyle = Math.abs(vy) < 0.05 ? COLORS.neutral : vy > 0 ? COLORS.rising : COLORS.falling
+      ctx.beginPath()
+      ctx.moveTo(mapX(prev.x), mapY(prev.y))
+      ctx.lineTo(mapX(cur.x), mapY(cur.y))
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
+
+  // ── Tangent line at current point ──
+  if (currentTrace.length > 0 && position) {
+    const len = 0.4 * Math.min(xRange, yRange)
+    const last = currentTrace[currentTrace.length - 1]
+    const vx = 1
+    const vy = last.vy
+    const mag = Math.sqrt(vx * vx + vy * vy) || 1
+    const dx = (vx / mag) * len / 2
+    const dy = (vy / mag) * len / 2
+
+    ctx.save()
+    ctx.strokeStyle = COLORS.tangent
+    ctx.lineWidth = 2
+    ctx.setLineDash([5, 3])
+    ctx.beginPath()
+    ctx.moveTo(mapX(position.x - dx), mapY(position.y - dy))
+    ctx.lineTo(mapX(position.x + dx), mapY(position.y + dy))
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    // Arrowhead
+    const ax = mapX(position.x + dx)
+    const ay = mapY(position.y + dy)
+    const angle = Math.atan2(-(dy / yRange) * h, (dx / xRange) * w)
+    const aSize = 7
+    ctx.beginPath()
+    ctx.moveTo(ax, ay)
+    ctx.lineTo(ax - aSize * Math.cos(angle - 0.4), ay - aSize * Math.sin(angle - 0.4))
+    ctx.moveTo(ax, ay)
+    ctx.lineTo(ax - aSize * Math.cos(angle + 0.4), ay - aSize * Math.sin(angle + 0.4))
+    ctx.stroke()
+    ctx.restore()
+  }
+
+  // ── Current point ──
+  if (position) {
+    const px = mapX(position.x), py = mapY(position.y)
+    ctx.save()
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)'
+    ctx.lineWidth = 1
+    ctx.setLineDash([3, 3])
+    ctx.beginPath()
+    ctx.moveTo(px, py); ctx.lineTo(px, mapY(0))
+    ctx.moveTo(px, py); ctx.lineTo(mapX(0), py)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.beginPath()
+    ctx.fillStyle = COLORS.point
+    ctx.arc(px, py, 6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = '#fff'
+    ctx.lineWidth = 2
+    ctx.stroke()
+    ctx.restore()
+  }
 }
 
-function validateTypeC(interaction) {
-  if (interaction.interactionType !== "C") throw new Error("Not Type C interaction")
-  const { start, end, step } = interaction.parameterSpec.time
-  if (start >= end) throw new Error("Time start must be < end")
-  if (step <= 0) throw new Error("Time step must be > 0")
+function niceStep(range) {
+  const rough = range / 5
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)))
+  const norm = rough / mag
+  if (norm < 1.5) return mag
+  if (norm < 3.5) return 2 * mag
+  if (norm < 7.5) return 5 * mag
+  return 10 * mag
+}
+
+function fmtNum(n) {
+  if (Number.isInteger(n)) return String(n)
+  return n.toFixed(1)
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
-
 
 export default function InteractionTypeC({ lesson: lessonProp }) {
   const LESSON = lessonProp || DEFAULT_LESSON
@@ -250,221 +330,242 @@ export default function InteractionTypeC({ lesson: lessonProp }) {
   const requestRef = useRef(null)
   const [t, setT] = useState(LESSON.parameterSpec.time.start)
   const [playing, setPlaying] = useState(false)
-  const [reflection, setReflection] = useState("")
 
-  // Layout: canvas fills all available space, controls are compact below
-  const styles = {
-    root: {
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      fontFamily: 'system-ui',
-      background: 'transparent',
-      padding: '12px 16px',
-      boxSizing: 'border-box',
-      gap: 8
-    },
-    canvasWrapper: {
-      flex: '1 1 0',
-      width: '100%',
-      minHeight: 0,
-      position: 'relative'
-    },
-    canvas: {
-      position: 'absolute',
-      inset: 0,
-      width: '100%',
-      height: '100%',
-      background: '#fff',
-      border: '1px solid #e5e7eb',
-      borderRadius: 8,
-      display: 'block'
-    },
-    controls: {
-      width: '100%',
-      flexShrink: 0,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 8
-    },
-    playBtn: {
-      width: 32,
-      height: 32,
-      border: 'none',
-      borderRadius: '50%',
-      background: '#2563eb',
-      color: '#fff',
-      fontSize: 16,
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      outline: 'none',
-      flexShrink: 0
-    },
-    timelineBar: {
-      flex: 1,
-      height: 6,
-      background: '#e5e7eb',
-      borderRadius: 3,
-      position: 'relative',
-      cursor: 'pointer',
-      margin: '0 8px'
-    },
-    progress: {
-      height: '100%',
-      background: '#2563eb',
-      borderRadius: 3,
-      position: 'absolute',
-      left: 0,
-      top: 0
-    },
-    scrubber: {
-      position: 'absolute',
-      top: -4,
-      width: 12,
-      height: 12,
-      borderRadius: '50%',
-      background: '#2563eb',
-      border: '2px solid #fff',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-      cursor: 'pointer',
-      transform: 'translateX(-6px)'
-    },
-    tLabel: {
-      minWidth: 44,
-      textAlign: 'right',
-      color: '#555',
-      fontSize: 12,
-      flexShrink: 0
-    },
-    reflection: {
-      width: '100%',
-      flexShrink: 0,
-      fontSize: 13,
-      color: '#111827',
-      textAlign: 'center',
-      minHeight: 20
-    }
-  }
+  const fullTrace = useMemo(() => computeFullTrace(LESSON), [LESSON])
 
-  // Animation loop
+  const { position, trace: currentTrace, velocity } = useMemo(
+    () => recompute(LESSON, { t }),
+    [LESSON, t]
+  )
+
+  const reflection = useMemo(
+    () => evaluateReflections(LESSON, { t }) || "",
+    [LESSON, t]
+  )
+
+  const timeSpec = LESSON.parameterSpec.time
+  const vb = LESSON.representationSpec.viewBox
+  const percent = Math.max(0, Math.min(1, (t - timeSpec.start) / (timeSpec.end - timeSpec.start)))
+
+  // Draw
   useEffect(() => {
-    try { validateTypeC(LESSON) } catch (e) { console.error(e); return }
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext("2d")
-    const timeSpec = LESSON.parameterSpec.time
-    let running = playing
+    renderCanvas(ctx, canvas, vb, fullTrace, currentTrace, position, velocity, LESSON.representationSpec)
+  }, [t, fullTrace, currentTrace, position, velocity, vb, LESSON.representationSpec])
+
+  // Animation loop — clock-based so speed is independent of frame rate
+  useEffect(() => {
+    if (!playing) return
+    const PLAY_SPEED = 0.8  // units of t per second
     let currentT = t
-    const fullTrace = computeFullTrace(LESSON)
+    let running = true
+    let lastTime = performance.now()
 
-    function drawFrame(timeVal) {
-      const result = recompute(LESSON, { t: timeVal })
-      const sysWithFull = {
-        geometry: [{ type: "fullCurve", data: fullTrace }, ...result.systemState.geometry]
-      }
-      renderCanvas(sysWithFull, LESSON.representationSpec, ctx, canvas)
-      const message = evaluateReflections(LESSON, { t: timeVal })
-      setReflection(message || "")
-    }
-
-    function step() {
+    function tick(now) {
       if (!running) return
+      const dt = Math.min((now - lastTime) / 1000, 0.1)  // cap dt to avoid jumps after tab switch
+      lastTime = now
+      currentT += dt * PLAY_SPEED
       if (currentT >= timeSpec.end) {
+        setT(timeSpec.end)
         setPlaying(false)
         return
       }
-      currentT += timeSpec.step
       setT(currentT)
-      drawFrame(currentT)
-      requestRef.current = requestAnimationFrame(step)
+      requestRef.current = requestAnimationFrame(tick)
     }
+    requestRef.current = requestAnimationFrame(tick)
+    return () => { running = false; if (requestRef.current) cancelAnimationFrame(requestRef.current) }
+  }, [playing]) // eslint-disable-line
 
-    drawFrame(t)
-    if (playing) {
-      running = true
-      requestRef.current = requestAnimationFrame(step)
-    }
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current)
-    }
-    // eslint-disable-next-line
-  }, [playing, t])
-
-  // Timeline scrub handler
-  function handleTimelineClick(e) {
-    const bar = e.currentTarget
+  // Timeline scrub
+  const scrubFromEvent = useCallback((e) => {
+    const bar = document.getElementById('tc-timeline')
+    if (!bar) return
     const rect = bar.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const percent = Math.max(0, Math.min(1, x / rect.width))
-    const timeSpec = LESSON.parameterSpec.time
-    const tVal = timeSpec.start + percent * (timeSpec.end - timeSpec.start)
-    setT(tVal)
-  }
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+    setT(timeSpec.start + pct * (timeSpec.end - timeSpec.start))
+  }, [timeSpec])
 
-  // Scrubber drag
-  function handleScrubberDrag(e) {
-    if (e.type === 'mousedown' || e.type === 'touchstart') {
-      const move = evt => {
-        let clientX = evt.touches ? evt.touches[0].clientX : evt.clientX
-        const bar = document.getElementById('timeline-bar')
-        const rect = bar.getBoundingClientRect()
-        const x = clientX - rect.left
-        const percent = Math.max(0, Math.min(1, x / rect.width))
-        const timeSpec = LESSON.parameterSpec.time
-        const tVal = timeSpec.start + percent * (timeSpec.end - timeSpec.start)
-        setT(tVal)
-      }
-      const up = () => {
-        window.removeEventListener('mousemove', move)
-        window.removeEventListener('mouseup', up)
-        window.removeEventListener('touchmove', move)
-        window.removeEventListener('touchend', up)
-      }
-      window.addEventListener('mousemove', move)
-      window.addEventListener('mouseup', up)
-      window.addEventListener('touchmove', move)
-      window.addEventListener('touchend', up)
+  const handleScrubStart = useCallback((e) => {
+    scrubFromEvent(e)
+    const move = ev => scrubFromEvent(ev)
+    const up = () => {
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseup', up)
+      window.removeEventListener('touchmove', move)
+      window.removeEventListener('touchend', up)
     }
-  }
-
-  // Progress percent
-  const timeSpec = LESSON.parameterSpec.time
-  const percent = Math.max(0, Math.min(1, (t - timeSpec.start) / (timeSpec.end - timeSpec.start)))
-  const progressWidth = `${percent * 100}%`
-  const scrubberLeft = `calc(${percent * 100}% - 6px)`
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup', up)
+    window.addEventListener('touchmove', move)
+    window.addEventListener('touchend', up)
+  }, [scrubFromEvent])
 
   return (
-    <div style={styles.root}>
-      <div style={styles.canvasWrapper}>
-        <canvas ref={canvasRef} style={styles.canvas}></canvas>
-      </div>
-      <div style={styles.controls}>
-        <button style={styles.playBtn} onClick={() => setPlaying(p => !p)}>
-          {playing ? (
-            <span>&#10073;&#10073;</span>
-          ) : (
-            <span>&#9654;</span>
-          )}
-        </button>
-        <div
-          id="timeline-bar"
-          style={styles.timelineBar}
-          onClick={handleTimelineClick}
-        >
-          <div style={{ ...styles.progress, width: progressWidth }} />
-          <div
-            style={{ ...styles.scrubber, left: scrubberLeft }}
-            onMouseDown={handleScrubberDrag}
-            onTouchStart={handleScrubberDrag}
-          />
+    <div style={{
+      width: '100%', height: '100%',
+      display: 'flex', flexDirection: 'column',
+      overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif',
+      userSelect: 'none',
+    }}>
+
+      {/* Prompt */}
+      {LESSON.prompt && (
+        <div style={{
+          padding: '6px 12px', fontSize: 14, lineHeight: 1.5,
+          color: '#1e293b', flexShrink: 0,
+        }}>
+          <MathText text={LESSON.prompt} />
         </div>
-        <span style={styles.tLabel}>t = {t.toFixed(2)}</span>
+      )}
+
+      {/* Main: graph + info panel */}
+      <div style={{
+        flex: 1, display: 'flex', gap: 8, padding: '0 8px',
+        minHeight: 0, overflow: 'hidden'
+      }}>
+        {/* Graph + controls */}
+        <div style={{
+          flex: '1 1 0%', minWidth: 0,
+          display: 'flex', flexDirection: 'column', gap: 6,
+        }}>
+          <div style={{
+            flex: 1, minHeight: 0, position: 'relative',
+            background: '#fff', border: '1.5px solid #e2e8f0',
+            borderRadius: 12, overflow: 'hidden',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          }}>
+            <canvas ref={canvasRef} style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%', display: 'block',
+            }} />
+          </div>
+
+          {/* Controls */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            flexShrink: 0, padding: '2px 0 4px',
+          }}>
+            <button
+              onClick={() => {
+                if (t >= timeSpec.end - timeSpec.step) {
+                  setT(timeSpec.start)
+                  setPlaying(true)
+                } else {
+                  setPlaying(p => !p)
+                }
+              }}
+              style={{
+                width: 32, height: 32, border: 'none', borderRadius: '50%',
+                background: '#2563eb', color: '#fff', fontSize: 14,
+                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', flexShrink: 0,
+              }}
+            >
+              {playing ? '\u275A\u275A' : '\u25B6'}
+            </button>
+
+            <div
+              id="tc-timeline"
+              style={{
+                flex: 1, height: 6, background: '#e5e7eb',
+                borderRadius: 3, position: 'relative', cursor: 'pointer',
+              }}
+              onMouseDown={handleScrubStart}
+              onTouchStart={handleScrubStart}
+            >
+              <div style={{
+                height: '100%', background: '#2563eb', borderRadius: 3,
+                position: 'absolute', left: 0, top: 0,
+                width: `${percent * 100}%`,
+              }} />
+              <div style={{
+                position: 'absolute', top: -5, width: 14, height: 14,
+                borderRadius: '50%', background: '#2563eb',
+                border: '2px solid #fff', boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+                left: `calc(${percent * 100}% - 7px)`,
+              }} />
+            </div>
+
+            <span style={{
+              minWidth: 52, textAlign: 'right', color: '#6b7280',
+              fontSize: 12, fontFamily: 'monospace', flexShrink: 0,
+            }}>
+              t = {t.toFixed(2)}
+            </span>
+          </div>
+
+          {/* Legend */}
+          <div style={{
+            display: 'flex', gap: 14, fontSize: 11, color: '#6b7280',
+            flexShrink: 0, paddingBottom: 2,
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 14, height: 3, background: COLORS.rising, display: 'inline-block', borderRadius: 2 }} />
+              Tăng
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 14, height: 3, background: COLORS.falling, display: 'inline-block', borderRadius: 2 }} />
+              Giảm
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 14, height: 3, background: COLORS.tangent, display: 'inline-block', borderRadius: 2 }} />
+              Tiếp tuyến
+            </span>
+          </div>
+        </div>
+
+        {/* Right info panel */}
+        <div style={{
+          flex: '0 0 180px', display: 'flex', flexDirection: 'column',
+          gap: 8, overflow: 'hidden', justifyContent: 'center',
+        }}>
+          <InfoCard label="Thời gian" value={`t = ${t.toFixed(2)}`} color="#2563eb" />
+          <InfoCard
+            label={LESSON.representationSpec.yLabel || "y(t)"}
+            value={position ? position.y.toFixed(3) : '—'}
+            color={velocity > 0.05 ? COLORS.rising : velocity < -0.05 ? COLORS.falling : COLORS.neutral}
+          />
+          <InfoCard
+            label="Tốc độ thay đổi"
+            value={velocity != null ? velocity.toFixed(3) : '—'}
+            color={velocity > 0.05 ? COLORS.rising : velocity < -0.05 ? COLORS.falling : '#94a3b8'}
+            icon={velocity > 0.05 ? '↗' : velocity < -0.05 ? '↘' : '→'}
+          />
+          <div style={{
+            padding: '8px 10px', borderRadius: 6,
+            background: reflection ? '#fffbeb' : '#f8f9fa',
+            border: '1px solid ' + (reflection ? '#fde68a' : '#e5e7eb'),
+            fontSize: 13, lineHeight: 1.5,
+            color: reflection ? '#78350f' : '#9ca3af',
+          }}>
+            {reflection ? <MathText text={reflection} /> : 'Nhấn ▶ để bắt đầu...'}
+          </div>
+        </div>
       </div>
-      <div style={styles.reflection}><MathText text={reflection} /></div>
+    </div>
+  )
+}
+
+function InfoCard({ label, value, color, icon }) {
+  return (
+    <div style={{
+      background: '#f8f9fa', borderRadius: 6, padding: '8px 10px',
+      borderLeft: `3px solid ${color}`,
+    }}>
+      <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>{label}</div>
+      <div style={{
+        fontSize: 17, fontWeight: 600, color,
+        fontVariantNumeric: 'tabular-nums',
+        display: 'flex', alignItems: 'center', gap: 4,
+      }}>
+        {icon && <span style={{ fontSize: 14 }}>{icon}</span>}
+        {value}
+      </div>
     </div>
   )
 }

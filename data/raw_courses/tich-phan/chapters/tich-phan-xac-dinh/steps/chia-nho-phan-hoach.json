@@ -42,7 +42,7 @@
                   }
                 ]
               },
-              "prompt": "Lần này hàm là $\\sin(x)$ trên $[0, \\pi]$, chiều cao lấy tại trung điểm. Đẩy $n$ lên tối đa. Tổng tiến đến giá trị nào? Cách chọn điểm lấy mẫu có ảnh hưởng không?",
+              "prompt": "Tăng $n$ lên tối đa. Tổng tiến đến giá trị nào? So với bài trước, cách lấy chiều cao có khác gì?",
               "sliderLabel": "Số hình chữ nhật (n)"
             }
           }

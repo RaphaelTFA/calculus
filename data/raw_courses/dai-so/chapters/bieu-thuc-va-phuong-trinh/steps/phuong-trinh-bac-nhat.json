@@ -1,0 +1,77 @@
+{
+  "id": "phuong-trinh-bac-nhat",
+  "title": "Phương trình bậc nhất",
+  "description": "Giải phương trình dạng ax + b = 0 và ý nghĩa hình học trên trục số.",
+  "xp_reward": 10,
+  "order_index": 1,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-pt-bac-nhat",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Hệ số a"
+              },
+              "parameter": {
+                "min": -3,
+                "max": 3,
+                "initial": 1
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -5,
+                  "xMax": 5,
+                  "yMin": -6,
+                  "yMax": 6
+                },
+                "model": "p * x + 2"
+              },
+              "reflections": [
+                {
+                  "id": "zero",
+                  "trigger": "Math.abs(state.currentValue) < 0.15",
+                  "text": "Khi $a = 0$ thì $y = 2$ — đường nằm ngang, không có nghiệm cho $ax + 2 = 0$."
+                },
+                {
+                  "id": "positive",
+                  "trigger": "state.currentValue > 1",
+                  "text": "Đường dốc lên — nghiệm $x = -2/a$ nằm bên trái trục $y$."
+                },
+                {
+                  "id": "negative",
+                  "trigger": "state.currentValue < -1",
+                  "text": "Đường dốc xuống — nghiệm $x = -2/a$ nằm bên phải trục $y$."
+                }
+              ],
+              "prompt": "Kéo $a$ và quan sát đường thẳng $y = ax + 2$. Đường cắt trục $x$ ở đâu khi $a$ thay đổi dấu?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-pt-bac-nhat",
+          "type": "text",
+          "content": {
+            "heading": "Giải $ax + b = 0$",
+            "paragraphs": [
+              "Nếu $a \\neq 0$: nghiệm duy nhất $x = -b/a$.",
+              "Nếu $a = 0$ và $b \\neq 0$: vô nghiệm. Nếu $a = 0$ và $b = 0$: vô số nghiệm.",
+              "Trên đồ thị, nghiệm là giao điểm của $y = ax + b$ với trục $x$."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

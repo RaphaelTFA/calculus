@@ -54,22 +54,22 @@
                   {
                     "type": "structureBelow",
                     "value": 0.05,
-                    "message": "Toàn bộ diện tích nằm ở phần bên phải — nhưng nó vẫn có biên cong. Bạn có thể tính bằng công thức đơn giản không?"
+                    "message": "Gần như toàn bộ diện tích nằm ở A₂. Phần này có cạnh trên là đường cong $y = x^2$ — không phải đường thẳng. Công thức tam giác hay chữ nhật có dùng được không?"
                   },
                   {
                     "type": "structureNear",
                     "value": 0.5,
                     "tolerance": 0.05,
-                    "message": "Hai phần trông đều nhau — nhưng không phần nào là hình hình học cơ bản. Làm sao tính diện tích?"
+                    "message": "A₁ ≈ A₂ — hai phần gần bằng nhau. Nhưng cả hai vẫn có cạnh trên là đường cong. Không có cách chia nào loại bỏ được biên cong này."
                   },
                   {
                     "type": "structureAbove",
                     "value": 0.95,
-                    "message": "Toàn bộ diện tích nằm ở phần bên trái. Đây là tam giác? Hình chữ nhật? Hình gì?"
+                    "message": "Gần như toàn bộ diện tích nằm ở A₁. Trông giống tam giác? Không — cạnh trên cong theo $x^2$, không thẳng. Bạn không thể dùng $\\frac{1}{2}$ đáy × cao."
                   }
                 ]
               },
-              "prompt": "Kéo đường chia sang trái và phải. Bạn có thể chia vùng này thành các phần mà bạn đã biết cách tính diện tích không?"
+              "prompt": "Kéo đường chia dọc qua lại. Bạn có thể tách vùng tô màu thành hình tam giác hoặc hình chữ nhật không?"
             }
           }
         }
@@ -84,8 +84,8 @@
           "content": {
             "heading": "Bài toán diện tích",
             "paragraphs": [
-              "Bạn vừa thử chia vùng tô màu thành các phần đơn giản hơn. Dù đặt đường chia ở đâu, biên cong phía trên luôn còn đó. Tam giác có cạnh thẳng. Hình chữ nhật có cạnh thẳng. Vùng dưới $f(x) = x^2$ thì không — nhưng diện tích của nó là một con số cố định, duy nhất.",
-              "Cho hàm liên tục $f(x) \\geq 0$ trên $[a, b]$, vùng giới hạn bởi $y = f(x)$, trục $Ox$, $x = a$ và $x = b$ có **diện tích xác định**. Chúng ta chưa có phương pháp tính nó — các bài tiếp theo sẽ xây dựng phương pháp đó."
+              "Bạn vừa thử chia vùng dưới đường cong $y = x^2$ thành các phần đơn giản hơn. Kết quả: dù đặt đường chia ở đâu, mỗi phần vẫn có cạnh trên là đường cong — không phải đường thẳng. Tam giác và hình chữ nhật yêu cầu tất cả cạnh thẳng, nên không hình nào khớp vùng cong này.",
+              "Tuy vậy, diện tích vùng này là một con số cố định: A₁ + A₂ luôn bằng khoảng $2{,}667$ dù bạn chia thế nào. Cho hàm liên tục $f(x) \\geq 0$ trên $[a, b]$, vùng dưới $y = f(x)$ có **diện tích xác định** — chỉ là chưa có công thức tính. Bài tiếp theo sẽ xây dựng phương pháp."
             ]
           }
         }
@@ -100,8 +100,8 @@
           "content": {
             "heading": "Tại sao cần công cụ mới?",
             "paragraphs": [
-              "Tổng diện tích luôn giữ nguyên ở khoảng $2{,}667$ dù bạn chia thế nào. Con số đó là thực và chính xác. Nhưng bạn không thể suy ra nó từ công thức hình học nào đã biết.",
-              "Chiến lược duy nhất: phủ vùng cong bằng các **hình chữ nhật** (dễ tính diện tích), chấp nhận sai số, rồi tăng dần số hình chữ nhật và xem sai số có triệt tiêu không. Đây là chương trình của ba bài tiếp theo."
+              "Diện tích dưới $f(x) = x^2$ trên $[0, 2]$ là $\\frac{8}{3} \\approx 2{,}667$ — một con số xác định. Nhưng không có công thức hình học sơ cấp nào cho ra con số này, vì biên trên là đường cong chứ không phải đường thẳng.",
+              "Ý tưởng: thay vì chia thành 2 phần như bạn vừa làm, hãy phủ bằng nhiều **hình chữ nhật** nhỏ. Hình chữ nhật có diện tích dễ tính (đáy × cao). Dù mỗi hình chữ nhật không khớp hoàn hảo đường cong, khi tăng số lượng lên, sai số sẽ nhỏ dần. Ba bài tiếp theo xây dựng chính xác ý tưởng này."
             ]
           }
         }

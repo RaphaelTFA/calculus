@@ -1,0 +1,315 @@
+{
+  "id": "dai-so",
+  "slug": "dai-so",
+  "title": "Đại số & Hàm số",
+  "description": "Biểu thức đại số, phương trình bậc nhất & bậc hai, khái niệm hàm số — nền tảng cho mọi nhánh toán.",
+  "illustration": "/algebra-icon.svg",
+  "icon": "x²",
+  "color": "from-emerald-500 to-teal-700",
+  "category_slug": "dai-so",
+  "difficulty": "beginner",
+  "is_published": true,
+  "is_featured": true,
+  "order_index": 10,
+  "chapters": [
+    {
+      "id": "bieu-thuc-va-phuong-trinh",
+      "title": "Biểu thức & Phương trình",
+      "description": "Cách đọc, rút gọn biểu thức và giải phương trình bậc nhất, bậc hai.",
+      "order_index": 0,
+      "steps": [
+        {
+          "id": "phuong-trinh-bac-nhat",
+          "title": "Phương trình bậc nhất",
+          "description": "Giải phương trình dạng ax + b = 0 và ý nghĩa hình học trên trục số.",
+          "xp_reward": 10,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "ia-pt-bac-nhat",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "B",
+                    "lesson": {
+                      "interactionType": "B",
+                      "meta": {
+                        "parameterLabel": "Hệ số a"
+                      },
+                      "parameter": {
+                        "min": -3,
+                        "max": 3,
+                        "initial": 1
+                      },
+                      "system": {
+                        "resolution": 200,
+                        "view": {
+                          "xMin": -5,
+                          "xMax": 5,
+                          "yMin": -6,
+                          "yMax": 6
+                        },
+                        "model": "p * x + 2"
+                      },
+                      "reflections": [
+                        {
+                          "id": "zero",
+                          "trigger": "Math.abs(state.currentValue) < 0.15",
+                          "text": "Khi $a = 0$ thì $y = 2$ — đường nằm ngang, không có nghiệm cho $ax + 2 = 0$."
+                        },
+                        {
+                          "id": "positive",
+                          "trigger": "state.currentValue > 1",
+                          "text": "Đường dốc lên — nghiệm $x = -2/a$ nằm bên trái trục $y$."
+                        },
+                        {
+                          "id": "negative",
+                          "trigger": "state.currentValue < -1",
+                          "text": "Đường dốc xuống — nghiệm $x = -2/a$ nằm bên phải trục $y$."
+                        }
+                      ],
+                      "prompt": "Kéo $a$ và quan sát đường thẳng $y = ax + 2$. Đường cắt trục $x$ ở đâu khi $a$ thay đổi dấu?"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "text-pt-bac-nhat",
+                  "type": "text",
+                  "content": {
+                    "heading": "Giải $ax + b = 0$",
+                    "paragraphs": [
+                      "Nếu $a \\neq 0$: nghiệm duy nhất $x = -b/a$.",
+                      "Nếu $a = 0$ và $b \\neq 0$: vô nghiệm. Nếu $a = 0$ và $b = 0$: vô số nghiệm.",
+                      "Trên đồ thị, nghiệm là giao điểm của $y = ax + b$ với trục $x$."
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rut-gon-bieu-thuc",
+          "title": "Rút gọn biểu thức",
+          "description": "Gộp các hạng tử đồng dạng, phân phối, rút gọn biểu thức đại số.",
+          "xp_reward": 10,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "text-rut-gon-intro",
+                  "type": "text",
+                  "content": {
+                    "heading": "Hạng tử đồng dạng",
+                    "paragraphs": [
+                      "Hai hạng tử gọi là đồng dạng khi chúng chứa cùng biến với cùng số mũ. Ví dụ $3x^2$ và $-5x^2$ là đồng dạng, còn $3x^2$ và $3x$ thì không.",
+                      "Rút gọn = gộp các hạng tử đồng dạng lại: $3x^2 - 5x^2 = (3-5)x^2 = -2x^2$."
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "text-phan-phoi",
+                  "type": "text",
+                  "content": {
+                    "heading": "Tính chất phân phối",
+                    "paragraphs": [
+                      "Khi nhân một hạng tử với tổng: $a(b+c) = ab + ac$.",
+                      "Ví dụ: $2x(3x - 4) = 6x^2 - 8x$. Sau khi khai triển, gộp các hạng tử đồng dạng để rút gọn."
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 2,
+              "blocks": [
+                {
+                  "id": "text-rut-gon-baitap",
+                  "type": "text",
+                  "content": {
+                    "heading": "Thử rút gọn",
+                    "paragraphs": [
+                      "Rút gọn: $3(x+2) - 2(x-1)$.",
+                      "Bước 1 — khai triển: $3x + 6 - 2x + 2$.",
+                      "Bước 2 — gộp: $(3x - 2x) + (6 + 2) = x + 8$."
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ham-so-co-ban",
+      "title": "Hàm số cơ bản",
+      "description": "Hàm bậc nhất, bậc hai, đồ thị và ý nghĩa hình học.",
+      "order_index": 1,
+      "steps": [
+        {
+          "id": "ham-bac-hai",
+          "title": "Hàm bậc hai",
+          "description": "Parabol y = ax² + bx + c: đỉnh, trục đối xứng, chiều mở.",
+          "xp_reward": 15,
+          "order_index": 1,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "ia-ham-bac-hai",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "B",
+                    "lesson": {
+                      "interactionType": "B",
+                      "meta": {
+                        "parameterLabel": "Hệ số a"
+                      },
+                      "parameter": {
+                        "min": -3,
+                        "max": 3,
+                        "initial": 1
+                      },
+                      "system": {
+                        "resolution": 200,
+                        "view": {
+                          "xMin": -4,
+                          "xMax": 4,
+                          "yMin": -5,
+                          "yMax": 10
+                        },
+                        "model": "p * x * x"
+                      },
+                      "reflections": [
+                        {
+                          "id": "open-up",
+                          "trigger": "state.currentValue > 0.5",
+                          "text": "$a > 0$: parabol mở lên — có giá trị nhỏ nhất tại đỉnh."
+                        },
+                        {
+                          "id": "open-down",
+                          "trigger": "state.currentValue < -0.5",
+                          "text": "$a < 0$: parabol mở xuống — có giá trị lớn nhất tại đỉnh."
+                        },
+                        {
+                          "id": "flat",
+                          "trigger": "Math.abs(state.currentValue) < 0.2",
+                          "text": "Khi $a \\approx 0$, parabol \"phẳng\" ra và gần giống đường thẳng $y = 0$."
+                        }
+                      ],
+                      "prompt": "Kéo $a$ từ âm sang dương. Parabol lật ngược ở giá trị nào? Khi $|a|$ tăng thì hình dạng thay đổi thế nào?"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "text-ham-bac-hai",
+                  "type": "text",
+                  "content": {
+                    "heading": "Parabol $y = ax^2$",
+                    "paragraphs": [
+                      "Đồ thị hàm $y = ax^2$ là một parabol với đỉnh tại gốc tọa độ. $a > 0$ thì mở lên (có min), $a < 0$ thì mở xuống (có max).",
+                      "$|a|$ càng lớn, parabol càng \"hẹp\" (dốc); $|a|$ càng nhỏ, parabol càng \"rộng\" (thoải).",
+                      "Trục đối xứng luôn là đường $x = 0$. Dạng tổng quát $y = a(x-h)^2 + k$ dịch đỉnh đến $(h, k)$."
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ham-bac-nhat",
+          "title": "Hàm bậc nhất",
+          "description": "Đường thẳng y = ax + b: hệ số góc, tung độ gốc, đồ thị.",
+          "xp_reward": 10,
+          "order_index": 0,
+          "slides": [
+            {
+              "order_index": 0,
+              "blocks": [
+                {
+                  "id": "ia-ham-bac-nhat",
+                  "type": "interaction",
+                  "content": {
+                    "interactionType": "B",
+                    "lesson": {
+                      "interactionType": "B",
+                      "meta": {
+                        "parameterLabel": "Hệ số góc a"
+                      },
+                      "parameter": {
+                        "min": -3,
+                        "max": 3,
+                        "initial": 1
+                      },
+                      "system": {
+                        "resolution": 200,
+                        "view": {
+                          "xMin": -5,
+                          "xMax": 5,
+                          "yMin": -6,
+                          "yMax": 6
+                        },
+                        "model": "p * x + 1"
+                      },
+                      "reflections": [
+                        {
+                          "id": "flat",
+                          "trigger": "Math.abs(state.currentValue) < 0.2",
+                          "text": "Khi $a \\approx 0$, đồ thị gần như nằm ngang — hàm hằng."
+                        },
+                        {
+                          "id": "steep",
+                          "trigger": "Math.abs(state.currentValue) > 2",
+                          "text": "$|a|$ lớn → đồ thị dốc. Dấu của $a$ quyết định hướng đi lên hay xuống."
+                        }
+                      ],
+                      "prompt": "Kéo hệ số góc $a$. Khi nào đường thẳng đi lên? Khi nào đi xuống? Khi nào nằm ngang?"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "order_index": 1,
+              "blocks": [
+                {
+                  "id": "text-ham-bac-nhat",
+                  "type": "text",
+                  "content": {
+                    "heading": "Đọc đồ thị đường thẳng",
+                    "paragraphs": [
+                      "Hàm $y = ax + b$ có đồ thị là đường thẳng. Hệ số $a$ (slope) cho biết độ dốc: $a > 0$ đi lên, $a < 0$ đi xuống, $a = 0$ nằm ngang.",
+                      "Hệ số $b$ (y-intercept) là điểm đồ thị cắt trục $y$: khi $x = 0$ thì $y = b$."
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

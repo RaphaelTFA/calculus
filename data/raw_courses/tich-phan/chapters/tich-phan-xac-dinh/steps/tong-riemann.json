@@ -30,19 +30,19 @@
                 "triggers": [
                   {
                     "condition": "state.resolution === 2",
-                    "message": "Chỉ 2 hình chữ nhật. Hình đầu có chiều cao $f(0) = 0$ — không đóng góp gì! Xấp xỉ này có chính xác không?"
+                    "message": "Chỉ 2 hình chữ nhật. Hình đầu có chiều cao $f(0) = 0$ nên diện tích bằng 0! Tổng chỉ tính diện tích hình thứ hai. So sánh với giá trị thực $\\frac{8}{3} \\approx 2{,}667$ — còn rất xa."
                   },
                   {
                     "condition": "state.resolution === 8",
-                    "message": "8 hình chữ nhật. Tổng tiến gần hơn. Chú ý các khe hở giữa đỉnh hình chữ nhật và đường cong."
+                    "message": "8 hình chữ nhật, tổng đã gần hơn. Nhìn các khe hở giữa đỉnh hình chữ nhật và đường cong — đó là sai số. Khe hở có nhỏ đi khi tăng $n$ không?"
                   },
                   {
                     "condition": "state.resolution >= 24",
-                    "message": "Các hình chữ nhật mỏng dần. Tổng đang tiến đến một con số cụ thể — con số nào?"
+                    "message": "Các hình chữ nhật mỏng dần, khe hở thu hẹp. Tổng đang tiến đến $\\frac{8}{3} \\approx 2{,}667$. Nếu tăng $n$ mãi thì sao?"
                   }
                 ]
               },
-              "prompt": "Các hình chữ nhật lấy chiều cao tại cạnh trái. Tăng $n$ và quan sát tổng. Phép xấp xỉ thay đổi thế nào?",
+              "prompt": "Kéo thanh trượt để thêm hình chữ nhật. Tổng diện tích của chúng tiến đến bao nhiêu?",
               "sliderLabel": "Số hình chữ nhật (n)"
             }
           }

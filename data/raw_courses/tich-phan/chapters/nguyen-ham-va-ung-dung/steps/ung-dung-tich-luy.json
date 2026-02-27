@@ -42,7 +42,8 @@
                   "yMax": 6
                 },
                 "xLabel": "Thời gian (phút)",
-                "yLabel": "Lượng nước (lít)"
+                "yLabel": "Lượng nước (lít)",
+                "showArea": true
               },
               "reflectionSpec": {
                 "triggers": [
@@ -68,7 +69,7 @@
                   }
                 ]
               },
-              "prompt": "Nhấn phát. Lượng nước $Q(t) = \\int_0^t (3-s)\\,ds$ tăng rồi giảm theo tốc độ $r(t) = 3 - t$. Khi nào bể đầy nhất? Tại sao $Q(6) = 0$?"
+              "prompt": "Nhấn phát và theo dõi mực nước. Bể đầy nhất lúc nào? Chuyện gì xảy ra ở cuối?"
             }
           }
         }

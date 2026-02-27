@@ -1,0 +1,71 @@
+{
+  "id": "ham-bac-nhat",
+  "title": "Hàm bậc nhất",
+  "description": "Đường thẳng y = ax + b: hệ số góc, tung độ gốc, đồ thị.",
+  "xp_reward": 10,
+  "order_index": 0,
+  "slides": [
+    {
+      "order_index": 0,
+      "blocks": [
+        {
+          "id": "ia-ham-bac-nhat",
+          "type": "interaction",
+          "content": {
+            "interactionType": "B",
+            "lesson": {
+              "interactionType": "B",
+              "meta": {
+                "parameterLabel": "Hệ số góc a"
+              },
+              "parameter": {
+                "min": -3,
+                "max": 3,
+                "initial": 1
+              },
+              "system": {
+                "resolution": 200,
+                "view": {
+                  "xMin": -5,
+                  "xMax": 5,
+                  "yMin": -6,
+                  "yMax": 6
+                },
+                "model": "p * x + 1"
+              },
+              "reflections": [
+                {
+                  "id": "flat",
+                  "trigger": "Math.abs(state.currentValue) < 0.2",
+                  "text": "Khi $a \\approx 0$, đồ thị gần như nằm ngang — hàm hằng."
+                },
+                {
+                  "id": "steep",
+                  "trigger": "Math.abs(state.currentValue) > 2",
+                  "text": "$|a|$ lớn → đồ thị dốc. Dấu của $a$ quyết định hướng đi lên hay xuống."
+                }
+              ],
+              "prompt": "Kéo hệ số góc $a$. Khi nào đường thẳng đi lên? Khi nào đi xuống? Khi nào nằm ngang?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order_index": 1,
+      "blocks": [
+        {
+          "id": "text-ham-bac-nhat",
+          "type": "text",
+          "content": {
+            "heading": "Đọc đồ thị đường thẳng",
+            "paragraphs": [
+              "Hàm $y = ax + b$ có đồ thị là đường thẳng. Hệ số $a$ (slope) cho biết độ dốc: $a > 0$ đi lên, $a < 0$ đi xuống, $a = 0$ nằm ngang.",
+              "Hệ số $b$ (y-intercept) là điểm đồ thị cắt trục $y$: khi $x = 0$ thì $y = b$."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

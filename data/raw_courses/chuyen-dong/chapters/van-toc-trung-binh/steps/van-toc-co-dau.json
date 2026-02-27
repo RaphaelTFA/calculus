@@ -44,7 +44,10 @@
                                     "xMax": 6,
                                     "yMin": -6,
                                     "yMax": 5
-                                }
+                                },
+                                "xLabel": "Thời gian (giây)",
+                                "yLabel": "Vận tốc (m/s)",
+                                "showArea": true
                             },
                             "reflectionSpec": {
                                 "triggers": [

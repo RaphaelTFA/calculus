@@ -72,7 +72,7 @@
                   "text": "Diện tích tăng nhanh vì $f(t) = 2t$ ngày càng lớn. $F$ là hàm bậc hai — tốc độ tích lũy tăng dần."
                 }
               ],
-              "prompt": "Kéo cận trên $x$ từ $0$ đến $4$. Diện tích tô màu dưới $f(t) = 2t$ thay đổi thế nào? So sánh với giá trị $F(x)$ trên đường cong cam."
+              "prompt": "Kéo $x$ từ trái sang phải. Diện tích tô màu thay đổi thế nào? Đường cam cho bạn biết điều gì?"
             }
           }
         }

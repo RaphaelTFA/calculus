@@ -77,7 +77,7 @@
                   "text": "Phép thế $u = g(x)$ luôn biến $\\int f(g(x))\\,g'(x)\\,dx$ thành $\\int f(u)\\,du$ — đảo ngược quy tắc dây chuyền."
                 }
               ],
-              "prompt": "Kéo cận trên $p$. Diện tích tô dưới $2x\\cos(x^2)$ luôn bằng giá trị $\\sin(x^2)$ trên đường cam. Tại sao hàm hợp này có nguyên hàm $\\sin(x^2)$?"
+              "prompt": "Kéo cận trên $p$ và so sánh diện tích tô màu với đường cam. Bạn thấy quy luật gì?"
             }
           }
         }

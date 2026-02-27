@@ -55,34 +55,16 @@
     },
     {
       "id": 2,
-      "slug": "giai-tich-co-ban",
-      "title": "Giải Tích Cơ Bản",
-      "description": "Khám phá các khái niệm nền tảng của giải tích: giới hạn, đạo hàm, tích phân.",
+      "slug": "dai-so-co-ban",
+      "title": "Đại Số Cơ Bản",
+      "description": "Biểu thức, phương trình, hàm số — nền tảng toán học cho mọi nhánh.",
       "iconUrl": "https://ds055uzetaobb.cloudfront.net/category-images/Foundations_of_Algebra-6MUKk8.png",
       "courses": [
         {
-          "slug": "chuyen-dong",
-          "title": "Chuyển động & Thay đổi",
-          "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Proportional_Reasoning-5aofQr.png?width=204",
+          "slug": "dai-so",
+          "title": "Đại số & Hàm số",
+          "illustration": "/algebra-icon.svg",
           "isNew": true
-        },
-        {
-          "slug": "gioi-han",
-          "title": "Giới hạn",
-          "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Arithmetic_Thinking-KaQBTB.png?width=204",
-          "isNew": false
-        },
-        {
-          "slug": "dao-ham",
-          "title": "Đạo hàm",
-          "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Coordinate_Plane-TjmV5y.png?width=204",
-          "isNew": false
-        },
-        {
-          "slug": "tich-phan",
-          "title": "Tích phân",
-          "illustration": "https://ds055uzetaobb.cloudfront.net/brioche/chapter/Visual_Algebra_1-wiJeeI.png?width=204",
-          "isNew": false
         }
       ]
     }

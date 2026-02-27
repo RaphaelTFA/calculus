@@ -1,0 +1,14 @@
+{
+  "id": "dai-so",
+  "slug": "dai-so",
+  "title": "Đại số & Hàm số",
+  "description": "Biểu thức đại số, phương trình bậc nhất & bậc hai, khái niệm hàm số — nền tảng cho mọi nhánh toán.",
+  "illustration": "/algebra-icon.svg",
+  "icon": "x²",
+  "color": "from-emerald-500 to-teal-700",
+  "category_slug": "dai-so",
+  "difficulty": "beginner",
+  "is_published": true,
+  "is_featured": true,
+  "order_index": 10
+}

@@ -70,7 +70,7 @@
                   }
                 ]
               },
-              "prompt": "Kéo thanh trượt để khám phá vùng dương và âm dưới $\\sin(x)$ trên $[0, 2\\pi]$. Tích phân ròng $\\int_0^{2\\pi} \\sin(x)\\,dx$ bằng bao nhiêu?"
+              "prompt": "Kéo đường chia qua lại. Quan sát A₁ và A₂ — tổng của chúng có gì bất ngờ?"
             }
           }
         }
