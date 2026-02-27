@@ -27,6 +27,7 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Progress } from '../components/ui/progress'
 import { Separator } from '../components/ui/separator'
+import LearningStreakCard from '../components/LearningStreakCard'
 
 export default function Home() {
   const { user, isAuthenticated, fetchUser } = useAuthStore()
@@ -47,7 +48,19 @@ export default function Home() {
   const loadDashboard = async () => {
     try {
       const data = await api.get('/progress/dashboard')
+      // Set dashboard data first
       setDashboardData(data)
+
+      // Then fetch current user's rank and merge it into dashboardData
+      try {
+        const rankRes = await api.get('/progress/leaderboard?around=true&limit=1')
+        if (rankRes && typeof rankRes.current_user_rank !== 'undefined') {
+          setDashboardData(prev => ({ ...(prev || {}), rank: rankRes.current_user_rank }))
+        }
+      } catch (e) {
+        // silent - dashboard still useful without rank
+        console.debug('Failed to fetch current rank', e)
+      }
     } catch (e) {
       console.error(e)
     } finally {
@@ -118,20 +131,21 @@ export default function Home() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 lg:gap-8">
         {/* Left Sidebar - Colorful & Minimal */}
         <aside className="order-2 lg:order-1 space-y-6">
+          {/* Learning Streak Card (interactive) */}
+          <LearningStreakCard />
+          
           {/* User Stats Overview - Colorful Card */}
           <Card className="border-2 border-fuchsia-400/40 bg-gradient-to-br from-fuchsia-100 via-pink-100 to-yellow-100 shadow-xl animate-pulse-slow">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 text-fuchsia-700">
-                <TrendingUp className="w-5 h-5 text-fuchsia-500 animate-bounce" />
-                Tiến trình của bạn
+                <TrendingUp className="w-5 h-5 text-fuchsia-500" />
+                Your Progress
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <StatItem icon={Flame} label="Chuỗi ngày" value={`${user?.current_streak || 0}d`} color="text-orange-600" bgColor="bg-orange-100/80" />
                 <StatItem icon={Zap} label="XP" value={user?.xp || 0} color="text-yellow-600" bgColor="bg-yellow-100/80" />
-                <StatItem icon={Trophy} label="Hạng" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100/80" />
-                <StatItem icon={BookOpen} label="Bài học" value={dashboardData?.lessons_completed || 0} color="text-blue-600" bgColor="bg-blue-100/80" />
+                <StatItem icon={Trophy} label="Ranking" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100/80" />
               </div>
             </CardContent>
           </Card>
@@ -342,19 +356,39 @@ export default function Home() {
 
     // Leaderboard Modal (mobile-first, modern minimal gamified look)
     function LeaderboardModal({ onClose, user }) {
-      const [items, setItems] = useState(null)
+      const [items, setItems] = useState([])
       const [loading, setLoading] = useState(true)
       const [error, setError] = useState(null)
+      const [currentRank, setCurrentRank] = useState(null)
+      const [totalCount, setTotalCount] = useState(null)
 
       useEffect(() => {
         let mounted = true
         const fetchLeaderboard = async () => {
           setLoading(true)
           try {
-            // Request ranks 26-45 (start=26, limit=20)
-            const res = await api.get('/progress/leaderboard?start=26&limit=20')
+            // Fetch top 50
+            const topRes = await api.get('/progress/leaderboard?start=1&limit=50')
             if (!mounted) return
-            setItems(res?.entries || [])
+            const topEntries = topRes?.entries || []
+            setItems(topEntries)
+            setTotalCount(topRes?.total_count || null)
+
+            // If current user not in top 50, fetch their personal rank and append below
+            const isInTop = topEntries.some(e => e.id === user?.id)
+            if (!isInTop) {
+              const meRes = await api.get('/progress/leaderboard?around=true&limit=1')
+              if (!mounted) return
+              const meEntry = (meRes?.entries && meRes.entries.length > 0) ? meRes.entries[0] : null
+              if (meEntry) {
+                setItems(prev => [...prev, { ...meEntry, is_current_user: true }])
+                setCurrentRank(meRes?.current_user_rank || null)
+              }
+            } else {
+              // if in top, set current rank from top entries
+              const me = topEntries.find(e => e.id === user?.id)
+              if (me) setCurrentRank(me.rank)
+            }
           } catch (e) {
             console.error('Error loading leaderboard', e)
             if (mounted) setError('Failed to load leaderboard')
@@ -383,8 +417,8 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-semibold tracking-widest">HYDROGEN LEAGUE</div>
-                    <div className="text-sm font-bold">Top 15 advance · <span className="text-gray-400 font-medium">3 days left</span></div>
+                    <div className="text-xs text-gray-500 uppercase font-semibold tracking-widest">RANKING TOP 50</div>
+                    <div className="text-sm font-bold">Top 50 · <span className="text-gray-400 font-medium">Updated live</span></div>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
@@ -395,7 +429,11 @@ export default function Home() {
 
             {/* List */}
             <div className="p-4">
-              <div className="text-xs text-gray-400 mb-3">Rankings (showing 26–45)</div>
+              <div className="text-xs text-gray-400 mb-3">
+                {items && items.length > 0 ? (
+                  `Top ${items.length >= 50 ? '1–50' : `${items[0].rank}–${items[items.length-1].rank}`}${totalCount ? ` · ${totalCount} users` : ''}`
+                ) : 'Leaderboard'}
+              </div>
               <div className="max-h-72 overflow-y-auto rounded-lg border border-gray-100 shadow-sm">
                 {loading ? (
                   <div className="p-6 flex items-center justify-center text-sm text-gray-500">Loading…</div>
@@ -404,7 +442,7 @@ export default function Home() {
                 ) : (
                   <ul className="divide-y divide-gray-100">
                     {items.map((it, idx) => {
-                      const isCurrent = it.id === user?.id
+                      const isCurrent = it.id === user?.id || it.is_current_user
                       return (
                         <li key={it.id} className={"flex items-center justify-between px-4 py-3 gap-3 " + (isCurrent ? 'bg-gray-100 rounded-lg mx-2 my-2' : '')}>
                           <div className="flex items-center gap-3 min-w-0">
@@ -427,7 +465,7 @@ export default function Home() {
 
             {/* Footer */}
             <div className="px-4 py-3 border-t flex items-center justify-between">
-              <div className="text-sm text-gray-500">Showing ranks 26–45 · Top 15 advances soon</div>
+              <div className="text-sm text-gray-500">{currentRank ? `Your rank: #${currentRank}` : 'Leaderboard' }</div>
               <div>
                 <button onClick={onClose} className="px-3 py-2 bg-emerald-500 text-white rounded-lg shadow-sm font-semibold">Close</button>
               </div>
@@ -558,7 +596,7 @@ function CourseCard({ story }) {
                   '--progress-color': themeColor 
                 }}
               />
-              <style jsx>{`
+              <style>{`
                 :global(.bg-gray-100 > div) {
                   background-color: var(--progress-color) !important;
                 }

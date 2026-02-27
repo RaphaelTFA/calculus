@@ -10,6 +10,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [remember, setRemember] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,7 +22,7 @@ export default function Login() {
     }
     
     try {
-      await login(email, password)
+      await login(email, password, remember)
       showToast('Đăng nhập thành công!', 'success')
       navigate('/')
     } catch (err) {
@@ -97,6 +98,12 @@ export default function Login() {
               'Đăng nhập'
             )}
           </button>
+          <div className="flex items-center justify-between mt-4">
+            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="rounded" />
+              Ghi nhớ đăng nhập
+            </label>
+          </div>
         </form>
 
         <p className="text-center mt-6 text-slate-500">

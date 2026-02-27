@@ -19,11 +19,16 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    // include user's timezone offset in minutes (minutes to add to UTC to get local time)
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
 
-    const res = await fetch(`${API_BASE}${endpoint}`, { headers })
+    const res = await fetch(`${API_BASE}${endpoint}`, { headers, credentials: 'include' })
     
     if (res.status === 401) {
       // Token expired or invalid, clear auth
@@ -48,6 +53,10 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -55,7 +64,8 @@ const api = {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     })
 
     if (res.status === 401 && !endpoint.includes('/auth/')) {
@@ -77,6 +87,10 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -84,7 +98,8 @@ const api = {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: 'PUT',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     })
 
     if (!res.ok) {
@@ -100,13 +115,18 @@ const api = {
     const headers = {
       'Content-Type': 'application/json',
     }
+    try {
+      const tzOffset = -new Date().getTimezoneOffset()
+      headers['x-user-tz-offset'] = String(tzOffset)
+    } catch (e) {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
 
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: 'DELETE',
-      headers
+      headers,
+      credentials: 'include'
     })
 
     if (!res.ok) {

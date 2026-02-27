@@ -43,17 +43,14 @@ export default function Layout() {
     <div className="min-h-screen bg-background">
       {/* Header - Minimal, clean */}
       <header className="bg-card border-b sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-xl text-primary-foreground font-bold">∫</span>
-            </div>
-            <span className="font-bold text-xl text-foreground hidden sm:block">Calculus</span>
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+          {/* Title only - text (no logo) */}
+          <Link to="/" className="group">
+            <span className="font-bebas text-3xl sm:text-3xl text-foreground inline-block mt-4">Calculus</span>
           </Link>
 
           {/* Desktop Navigation - 2 items only (Hick's Law) */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-3">
             {navItems.map(({ path, label }) => {
               const isActive = location.pathname === path
               return (
@@ -61,7 +58,7 @@ export default function Layout() {
                   key={path}
                   variant={isActive ? 'secondary' : 'ghost'}
                   asChild
-                  className="font-semibold"
+                  className="font-semibold text-lg px-3 py-2"
                 >
                   <Link to={path}>{label}</Link>
                 </Button>
@@ -168,7 +165,7 @@ export default function Layout() {
                 }`}
               >
                 <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5]' : ''}`} />
-                <span className="text-xs font-semibold">{label}</span>
+                <span className="text-base font-semibold">{label}</span>
               </Link>
             )
           })}
@@ -182,7 +179,7 @@ export default function Layout() {
             }`}
           >
             <User className={`w-6 h-6 ${location.pathname === '/profile' ? 'stroke-[2.5]' : ''}`} />
-            <span className="text-xs font-semibold">Profile</span>
+            <span className="text-lg font-semibold">Profile</span>
           </Link>
         </div>
       </nav>

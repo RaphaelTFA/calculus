@@ -25,6 +25,20 @@ class User(Base):
     achievements = relationship("UserAchievement", back_populates="user")
 
 
+class StreakWeek(Base):
+    __tablename__ = "streak_weeks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    week_start = Column(String(10), nullable=False, index=True)  # YYYY-MM-DD (Monday)
+    days = Column(JSON, default=list)  # list of booleans for Mon..Sun
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    # lightweight relationship
+    user = relationship("User")
+
+
 class Category(Base):
     __tablename__ = "categories"
     
