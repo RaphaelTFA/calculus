@@ -36,6 +36,14 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const friendlyMessages = [
+    'Great to see you again!',
+    'Hope your day is going well.',
+    'Small steps, big wins.',
+    'Ready for another streak?',
+    'You got this—keep going.'
+  ]
+  const [friendlyLine] = useState(() => friendlyMessages[Math.floor(Math.random() * friendlyMessages.length)])
 
   useEffect(() => {
     // Fetch fresh user data to ensure XP/streak is synced
@@ -134,21 +142,41 @@ export default function Home() {
           {/* Learning Streak Card (interactive) */}
           <LearningStreakCard />
           
-          {/* User Stats Overview - Colorful Card */}
-          <Card className="border-2 border-fuchsia-400/40 bg-gradient-to-br from-fuchsia-100 via-pink-100 to-yellow-100 shadow-xl animate-pulse-slow">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2 text-fuchsia-700">
-                <TrendingUp className="w-5 h-5 text-fuchsia-500" />
-                Your Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <StatItem icon={Zap} label="XP" value={user?.xp || 0} color="text-yellow-600" bgColor="bg-yellow-100/80" />
-                <StatItem icon={Trophy} label="Ranking" value={dashboardData?.rank ? `#${dashboardData.rank}` : '-'} color="text-purple-600" bgColor="bg-purple-100/80" />
-              </div>
-            </CardContent>
-          </Card>
+          {/* User Stats Overview - clean, balanced */}
+          {(() => {
+            const xpValue = user?.xp || 0
+            const level = Math.floor(xpValue / 100) + 1
+            const nextProgress = xpValue % 100
+            const nextNeed = 100 - nextProgress
+            return (
+              <Card className="border border-slate-100 bg-gradient-to-br from-emerald-50 via-white to-indigo-50 shadow-md">
+                <CardHeader className="pb-1">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center gap-2 text-slate-800">
+                      <TrendingUp className="w-5 h-5 text-emerald-500" />
+                      Your Progress
+                    </CardTitle>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 font-semibold">On LIVE</span>
+                  </div>
+                  <p className="text-xs text-slate-500">A quick snapshot of where you are.</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <StatItem icon={Zap} label="Total XP" value={xpValue} color="text-amber-600" bgColor="bg-amber-50" />
+                    <StatItem icon={Award} label="Level" value={level} color="text-emerald-600" bgColor="bg-emerald-50" />
+                    <StatItem icon={Trophy} label="Rank" value={dashboardData?.rank ? `#${dashboardData.rank}` : '—'} color="text-indigo-600" bgColor="bg-indigo-50" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+                      <span>Next level</span>
+                      <span>{nextNeed} XP left</span>
+                    </div>
+                    <Progress value={nextProgress} className="h-2 bg-slate-100" />
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })()}
 
           {/* Daily Goal - More Colorful */}
           {dashboardData?.daily_goal && (
@@ -220,9 +248,9 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <span className="text-2xl">👋</span>
               <div>
-                <p className="text-muted-foreground font-medium">Nice work today</p>
+                <p className="text-muted-foreground font-medium">{friendlyLine}</p>
                 <h1 className="text-xl font-bold text-foreground">
-                  Welcome back, {user?.display_name || user?.username}
+                  Welcome, {user?.display_name || user?.username}
                 </h1>
               </div>
             </div>
@@ -400,61 +428,85 @@ export default function Home() {
         return () => { mounted = false }
       }, [])
 
-      const colors = ['bg-amber-300','bg-emerald-300','bg-sky-300','bg-pink-300','bg-violet-300']
+      const medalBg = ['bg-amber-400','bg-gray-200','bg-orange-300']
+      const avatarBg = ['bg-amber-200','bg-emerald-200','bg-sky-200','bg-pink-200','bg-violet-200']
+      const levelOf = (xpVal) => Math.floor((xpVal || 0) / 100) + 1
 
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-slate-900/55 to-slate-900/60 backdrop-blur" onClick={onClose} />
 
-          <div className="relative z-10 w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="relative z-10 w-full max-w-lg mx-4 bg-white/95 rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
             {/* Header */}
-            <div className="px-6 pt-6 pb-4 border-b">
-              <div className="flex items-start justify-between">
+            <div className="px-6 pt-6 pb-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50 via-white to-emerald-50">
+              <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#ffba5a,#ff7a18)' }}>
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2l3 4h4v6c0 5-3 9-7 10-4-1-7-5-7-10V6h4l3-4z" fill="#fff" opacity="0.95" />
-                    </svg>
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg,#8b5cf6,#22c55e)' }}>
+                    <Trophy className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-semibold tracking-widest">RANKING TOP 50</div>
-                    <div className="text-sm font-bold">Top 50 · <span className="text-gray-400 font-medium">Updated live</span></div>
+                    <div className="text-[11px] text-slate-500 uppercase font-bold tracking-[0.2em]">Leaderboard</div>
+                    <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      Top 50
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-900 text-white font-semibold">Live</span>
+                    </div>
+                    <div className="mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-900 text-white text-xs font-semibold shadow-sm">
+                      <span className="bg-white/20 px-2 py-0.5 rounded-full">{currentRank ? `#${currentRank}` : '--'}</span>
+                      <span>Your position</span>
+                    </div>
                   </div>
                 </div>
-                <button onClick={onClose} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <button onClick={onClose} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition">
                   <XIcon className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
             {/* List */}
-            <div className="p-4">
-              <div className="text-xs text-gray-400 mb-3">
-                {items && items.length > 0 ? (
+            <div className="p-5">
+              <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
+                <span>{items && items.length > 0 ? (
                   `Top ${items.length >= 50 ? '1–50' : `${items[0].rank}–${items[items.length-1].rank}`}${totalCount ? ` · ${totalCount} users` : ''}`
-                ) : 'Leaderboard'}
+                ) : 'Loading leaderboard'}</span>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 font-semibold">XP Race</span>
               </div>
-              <div className="max-h-72 overflow-y-auto rounded-lg border border-gray-100 shadow-sm">
+
+              <div className="max-h-80 overflow-y-auto rounded-2xl border border-slate-100 shadow-inner bg-slate-50/40">
                 {loading ? (
-                  <div className="p-6 flex items-center justify-center text-sm text-gray-500">Loading…</div>
+                  <div className="p-6 flex items-center justify-center text-sm text-slate-500">Loading…</div>
                 ) : error ? (
                   <div className="p-6 text-sm text-red-500">{error}</div>
                 ) : (
-                  <ul className="divide-y divide-gray-100">
+                  <ul className="divide-y divide-slate-100">
                     {items.map((it, idx) => {
                       const isCurrent = it.id === user?.id || it.is_current_user
+                      const isTop = it.rank <= 3
                       return (
-                        <li key={it.id} className={"flex items-center justify-between px-4 py-3 gap-3 " + (isCurrent ? 'bg-gray-100 rounded-lg mx-2 my-2' : '')}>
+                        <li
+                          key={it.id}
+                          className={
+                            "flex items-center justify-between px-4 py-3 gap-3 transition " +
+                            (isCurrent ? 'bg-white/95 shadow-sm ring-1 ring-emerald-200/70' : 'hover:bg-white')
+                          }
+                        >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="text-sm text-gray-400 w-6 text-right">{it.rank}</div>
-                            <div className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-bold ${colors[idx % colors.length]}`}>
+                            <div className={"w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-extrabold " + (isTop ? medalBg[it.rank-1] + ' text-slate-900' : 'bg-slate-200 text-slate-700')}>
+                              {isTop ? ['1st','2nd','3rd'][it.rank-1] : `#${it.rank}`}
+                            </div>
+                            <div className={`w-11 h-11 flex items-center justify-center rounded-2xl text-slate-900 font-bold ${avatarBg[idx % avatarBg.length]}`}>
                               {String(it.username || 'U').charAt(0).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm font-medium truncate">{it.username}</div>
+                              <div className="text-sm font-semibold text-slate-900 truncate flex items-center gap-2">
+                                {it.username}
+                                {isCurrent && <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">You</span>}
+                              </div>
+                              <div className="text-xs text-slate-500"> Level {levelOf(it.xp)}</div>
                             </div>
                           </div>
-                          <div className="text-sm text-gray-500 font-medium">{it.xp} XP</div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-slate-600 px-2.5 py-1 rounded-full bg-slate-100">{it.xp} XP</span>
+                          </div>
                         </li>
                       )
                     })}
@@ -464,10 +516,10 @@ export default function Home() {
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-3 border-t flex items-center justify-between">
-              <div className="text-sm text-gray-500">{currentRank ? `Your rank: #${currentRank}` : 'Leaderboard' }</div>
-              <div>
-                <button onClick={onClose} className="px-3 py-2 bg-emerald-500 text-white rounded-lg shadow-sm font-semibold">Close</button>
+            <div className="px-5 pb-5 pt-3 border-t border-slate-100 bg-white/90 flex items-center justify-between">
+              <div className="text-sm text-slate-500"> Keep climbing! You're doing great!</div>
+              <div className="flex items-center gap-2">
+                <button onClick={onClose} className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100">Close</button>
               </div>
             </div>
           </div>
@@ -633,12 +685,12 @@ function CourseCard({ story }) {
  */
 function StatItem({ icon: Icon, label, value, color, bgColor }) {
   return (
-    <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-background/50">
-      <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center mb-2`}>
+    <div className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 bg-white/70">
+      <div className={`w-9 h-9 rounded-lg ${bgColor} flex items-center justify-center mb-2 shadow-inner`}> 
         <Icon className={`w-5 h-5 ${color}`} />
       </div>
-      <p className="text-lg font-bold text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground font-medium">{label}</p>
+      <p className="text-lg font-bold text-slate-900 leading-tight">{value}</p>
+      <p className="text-[11px] text-slate-500 font-medium tracking-wide">{label}</p>
     </div>
   )
 }

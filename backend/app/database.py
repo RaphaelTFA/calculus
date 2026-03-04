@@ -11,7 +11,10 @@ engine_kwargs = {
 
 
 if database_url.startswith("postgresql+asyncpg://"):
-    engine_kwargs["connect_args"] = {"ssl": "require"}
+    engine_kwargs["connect_args"] = {
+        "ssl": "require",
+        "statement_cache_size": 0,
+    }
 
 engine = create_async_engine(database_url, **engine_kwargs)
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

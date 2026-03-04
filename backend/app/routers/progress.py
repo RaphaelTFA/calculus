@@ -361,9 +361,27 @@ async def get_streak_week(
                 current_streak += 1
                 j -= 1
 
-    # If persisted/activity days don't indicate a streak but user's scalar counters do, prefer the user's counter
-    if (current_user.current_streak or 0) > current_streak:
-        current_streak = current_user.current_streak or 0
+    # Determine last activity in user-local date to avoid dropping the streak before the day ends
+    last_activity_local = None
+    if current_user.last_activity_date:
+        try:
+            lad = current_user.last_activity_date
+            last_activity_local = (lad + timedelta(minutes=tz_offset_minutes)).date() if tz_offset_minutes is not None else lad.date()
+        except Exception:
+            last_activity_local = current_user.last_activity_date.date()
+
+    if last_activity_local:
+        gap_days = (today_local - last_activity_local).days
+        # If today or yesterday has activity, keep the stored streak counter even if today is not yet completed
+        if gap_days <= 1 and (current_user.current_streak or 0) > current_streak:
+            current_streak = current_user.current_streak or 0
+        # If the user has been inactive for more than one full day, streak dies
+        if gap_days > 1:
+            current_streak = 0
+    else:
+        # If persisted/activity days don't indicate a streak but user's scalar counters do, prefer the user's counter
+        if (current_user.current_streak or 0) > current_streak:
+            current_streak = current_user.current_streak or 0
 
     longest = current_user.longest_streak or 0
 
