@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models import Step, Slide, StepProgress, Chapter, Story, User, Enrollment, SlideProgress, StreakWeek
 from app.schemas import StepDetailResponse, SlideResponse, StepCompleteRequest, SlideCompleteRequest
 from app.auth import get_current_user
+from app.routers.quests import tick_quest_progress
 
 router = APIRouter(prefix="/steps", tags=["steps"])
 
@@ -138,6 +139,7 @@ async def complete_step(
     progress = progress_result.scalar_one_or_none()
     
     xp_earned = 0
+    coins_earned = 0
     
     if not progress:
         progress = StepProgress(
@@ -150,14 +152,18 @@ async def complete_step(
         )
         db.add(progress)
         xp_earned = step.xp_reward
+        coins_earned = step.coin_reward
         current_user.xp += xp_earned
+        current_user.coins = (current_user.coins or 0) + coins_earned
     elif not progress.is_completed:
         progress.is_completed = True
         progress.score = data.score
         progress.time_spent_seconds = data.time_spent_seconds
         progress.completed_at = datetime.utcnow()
         xp_earned = step.xp_reward
+        coins_earned = step.coin_reward
         current_user.xp += xp_earned
+        current_user.coins = (current_user.coins or 0) + coins_earned
     # Update streak (in-memory fields)
     # read tz offset header if present (minutes offset from UTC)
     tz_offset = None
@@ -169,6 +175,14 @@ async def complete_step(
         tz_offset = None
 
     streak_info = update_streak(current_user, tz_offset)
+
+    # Streak milestone bonus: every 7-day streak = +20 coins
+    streak_bonus = 0
+    cur_streak = current_user.current_streak or 0
+    if coins_earned > 0 and cur_streak > 0 and cur_streak % 7 == 0:
+        streak_bonus = 20
+        current_user.coins = (current_user.coins or 0) + streak_bonus
+        coins_earned += streak_bonus
 
     # Persist today's completion into StreakWeek for the current week using user-local date
     try:
@@ -199,12 +213,33 @@ async def complete_step(
         # don't break step completion on streak persistence errors
         pass
 
+    # Tick quest progress for lesson completion
+    if xp_earned > 0:
+        try:
+            await tick_quest_progress(current_user.id, "lessons", 1, db)
+            if data.time_spent_seconds > 0:
+                await tick_quest_progress(current_user.id, "study_time", data.time_spent_seconds, db)
+            # Check streak-based quests
+            await tick_quest_progress(current_user.id, "streak", current_user.current_streak or 0, db)
+        except Exception:
+            pass
+
+    # Auto-check achievements after each step (awards XP + coins for milestones)
+    try:
+        from app.routers.progress import check_and_award_achievements as _check_ach
+        from fastapi import Request as _Req
+        await _check_ach(db=db, current_user=current_user)
+    except Exception:
+        pass
+
     await db.commit()
     
     return {
         "success": True,
         "xp_earned": xp_earned,
+        "coins_earned": coins_earned,
         "total_xp": current_user.xp,
+        "total_coins": current_user.coins or 0,
         "streak": streak_info
     }
 
@@ -297,6 +332,13 @@ async def complete_slide(
                 db.add(sw_entry)
         except Exception:
             pass
+
+        # Tick quest progress for slide completion
+        try:
+            await tick_quest_progress(current_user.id, "slides", 1, db)
+        except Exception:
+            pass
+
         await db.commit()
     else:
         # already completed — idempotent

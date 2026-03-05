@@ -1,6 +1,7 @@
+import { useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Compass, User, Flame, Zap, Settings, LogOut, HelpCircle, Bell } from 'lucide-react'
-import { useAuthStore, useUIStore } from '../lib/store'
+import { Home, Compass, User, Flame, Zap, Coins, Settings, LogOut, HelpCircle, Bell, ShoppingBag, ScrollText } from 'lucide-react'
+import { useAuthStore, useUIStore, useQuestStore } from '../lib/store'
 import Toast from './Toast'
 import AnimatedOutlet from './AnimatedOutlet'
 
@@ -22,11 +23,18 @@ export default function Layout() {
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
   const { toast } = useUIStore()
+  const { quests, fetchQuests } = useQuestStore()
+  const claimableCount = quests.filter(q => q.is_complete && !q.coins_claimed).length
 
-  // Hick's Law: Max 2 top-level nav items
+  // Fetch quests on mount so badge count is accurate
+  useEffect(() => {
+    if (user) fetchQuests()
+  }, [user])
+
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/explore', icon: Compass, label: 'Explore' },
+    { path: '/quests', icon: ScrollText, label: 'Quests' },
   ]
 
   const handleLogout = () => {
@@ -58,9 +66,16 @@ export default function Layout() {
                   key={path}
                   variant={isActive ? 'secondary' : 'ghost'}
                   asChild
-                  className="font-semibold text-lg px-3 py-2"
+                  className="font-semibold text-lg px-3 py-2 relative"
                 >
-                  <Link to={path}>{label}</Link>
+                  <Link to={path}>
+                    {label}
+                    {path === '/quests' && claimableCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">
+                        {claimableCount}
+                      </span>
+                    )}
+                  </Link>
                 </Button>
               )
             })}
@@ -81,6 +96,14 @@ export default function Layout() {
                   <Zap className="w-4 h-4" />
                   <span>{user.xp || 0}</span>
                 </Badge>
+
+                {/* Coins badge - clickable to shop */}
+                <Link to="/shop">
+                  <Badge variant="outline" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100 transition-colors cursor-pointer">
+                    <Coins className="w-4 h-4" />
+                    <span>{user.coins || 0}</span>
+                  </Badge>
+                </Link>
 
                 {/* User Dropdown - Secondary actions hidden here (Hick's Law) */}
                 <DropdownMenu>
@@ -158,25 +181,28 @@ export default function Layout() {
               <Link
                 key={path}
                 to={path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${
-                  isActive 
-                    ? 'text-primary' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${isActive
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5]' : ''}`} />
                 <span className="text-base font-semibold">{label}</span>
+                {path === '/quests' && claimableCount > 0 && (
+                  <span className="absolute top-1 right-2 w-4 h-4 bg-green-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">
+                    {claimableCount}
+                  </span>
+                )}
               </Link>
             )
           })}
           {/* Profile as third item on mobile */}
           <Link
             to="/profile"
-            className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${
-              location.pathname === '/profile'
-                ? 'text-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${location.pathname === '/profile'
+              ? 'text-primary'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             <User className={`w-6 h-6 ${location.pathname === '/profile' ? 'stroke-[2.5]' : ''}`} />
             <span className="text-lg font-semibold">Profile</span>

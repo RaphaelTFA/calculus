@@ -12,7 +12,11 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     display_name = Column(String(100))
     avatar_url = Column(String(255))
+    gender = Column(String(10), default="male")
+    skin_color = Column(String(7), default="#F3C9A0")
+    equipped_items = Column(JSON, default=dict)
     xp = Column(Integer, default=0)
+    coins = Column(Integer, default=0)
     current_streak = Column(Integer, default=0)
     longest_streak = Column(Integer, default=0)
     last_activity_date = Column(DateTime)
@@ -94,6 +98,7 @@ class Step(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text)
     xp_reward = Column(Integer, default=10)
+    coin_reward = Column(Integer, default=5)
     order_index = Column(Integer, default=0)
     
     chapter = relationship("Chapter", back_populates="steps")
@@ -161,6 +166,7 @@ class Achievement(Base):
     category = Column(String(50))
     rarity = Column(String(20), default="common")
     xp_reward = Column(Integer, default=0)
+    coin_reward = Column(Integer, default=0)
     requirement_type = Column(String(50))  # 'xp', 'steps', 'streak', 'stories'
     requirement_value = Column(Integer, default=0)
     
@@ -177,3 +183,66 @@ class UserAchievement(Base):
     
     user = relationship("User", back_populates="achievements")
     achievement = relationship("Achievement", back_populates="user_achievements")
+
+
+class ShopItem(Base):
+    __tablename__ = "shop_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    description = Column(Text)
+    icon = Column(String(10))
+    price = Column(Integer, nullable=False)
+    item_type = Column(String(50), nullable=False)  # streak_freeze, xp_boost, hint_token, avatar_frame, course_unlock
+    effect_value = Column(Integer, default=1)
+    is_active = Column(Boolean, default=True)
+    order_index = Column(Integer, default=0)
+
+    inventory = relationship("UserInventory", back_populates="item")
+
+
+class UserInventory(Base):
+    __tablename__ = "user_inventory"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    item_id = Column(Integer, ForeignKey("shop_items.id"), nullable=False)
+    quantity = Column(Integer, default=1)
+    acquired_at = Column(DateTime, server_default=func.now())
+    expires_at = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True)
+
+    user = relationship("User")
+    item = relationship("ShopItem", back_populates="inventory")
+
+
+class Quest(Base):
+    __tablename__ = "quests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    description = Column(Text)
+    quest_type = Column(String(20), nullable=False)  # "daily" | "weekly" | "milestone"
+    requirement_type = Column(String(50), nullable=False)  # "lessons", "quizzes", "streak", "slides", "study_time", "shop_buy", "chapter", "course"
+    requirement_value = Column(Integer, default=1)
+    coin_reward = Column(Integer, default=20)
+    icon = Column(String(10), default="📋")
+    is_active = Column(Boolean, default=True)
+
+    user_quests = relationship("UserQuest", back_populates="quest")
+
+
+class UserQuest(Base):
+    __tablename__ = "user_quests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    quest_id = Column(Integer, ForeignKey("quests.id"), nullable=False)
+    progress = Column(Integer, default=0)
+    is_complete = Column(Boolean, default=False)
+    assigned_at = Column(DateTime, server_default=func.now())
+    completed_at = Column(DateTime, nullable=True)
+    coins_claimed = Column(Boolean, default=False)
+
+    user = relationship("User")
+    quest = relationship("Quest", back_populates="user_quests")

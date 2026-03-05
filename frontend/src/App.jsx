@@ -7,6 +7,8 @@ import Step from './pages/Step'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import Shop from './pages/Shop'
+import Quests from './pages/Quests'
 import NotFound from './pages/NotFound'
 
 // Admin
@@ -27,11 +29,13 @@ export default function App() {
         <Route path="explore" element={<Explore />} />
         <Route path="course/:slug" element={<Story />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="shop" element={<Shop />} />
+        <Route path="quests" element={<Quests />} />
       </Route>
       <Route path="/course/:slug/step/:encodedId" element={<Step />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
+
       {/* Admin Panel - Hidden from main UI, only accessible via /admin */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
@@ -41,7 +45,7 @@ export default function App() {
         <Route path="server" element={<AdminServerStatus />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
-      
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

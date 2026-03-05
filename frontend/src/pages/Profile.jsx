@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { User, Settings, LogOut, Trophy, Flame, Star, X, ChevronRight, Bell, Lock, Sparkles, KeyRound } from 'lucide-react'
-import { useAuthStore } from '../lib/store'
+import { useAuthStore, useShopStore } from '../lib/store'
 import { useState, useEffect } from 'react'
-import api from '../lib/api' // Đảm bảo bạn đã import api
+import api from '../lib/api'
 
 export default function Profile() {
   const navigate = useNavigate()
@@ -11,7 +11,7 @@ export default function Profile() {
   const [showEditProfile, setShowEditProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
-  
+
   const [displayName, setDisplayName] = useState(user?.display_name || '')
   const [notifications, setNotifications] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -25,9 +25,12 @@ export default function Profile() {
   const [passwordError, setPasswordError] = useState('')
 
   // Fetch fresh user data when profile page loads
+  const { items, fetchItems } = useShopStore()
+
   useEffect(() => {
     if (isAuthenticated()) {
       fetchUser()
+      if (items.length === 0) fetchItems()
     }
   }, [])
 
@@ -35,6 +38,10 @@ export default function Profile() {
     navigate('/login')
     return null
   }
+
+  const equippedFrameId = user?.equipped_items?.avatar_frame
+  const equippedFrame = items.find(i => i.id === equippedFrameId)
+
 
   const handleLogout = () => {
     logout()
@@ -56,7 +63,7 @@ export default function Profile() {
 
   const handleChangePassword = async () => {
     setPasswordError('')
-    
+
     if (!passwordData.old_password || !passwordData.new_password) {
       setPasswordError('Vui lòng nhập đầy đủ thông tin')
       return
@@ -71,7 +78,7 @@ export default function Profile() {
     try {
       // SỬA TẠI ĐÂY: Dùng hàm của Store giống như file cũ của bạn
       await changePassword(passwordData.old_password, passwordData.new_password)
-      
+
       alert("Đổi mật khẩu thành công!")
       setShowChangePassword(false)
       setPasswordData({ old_password: '', new_password: '', confirm_password: '' })
@@ -95,15 +102,26 @@ export default function Profile() {
         <div className="relative bg-white rounded-[22px] p-6 text-center">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-yellow-200/40 to-transparent rounded-full blur-2xl" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/40 to-transparent rounded-full blur-xl" />
-          
+
           <div className="relative inline-block mb-4">
-            <div className="w-28 h-28 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full p-1 shadow-xl shadow-purple-500/25">
-              <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                <span className="text-4xl font-bold bg-gradient-to-br from-blue-500 to-purple-600 bg-clip-text text-transparent">
-                  {user?.display_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
-                </span>
-              </div>
-            </div>
+            {(() => {
+              let borderStyle = "bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 shadow-purple-500/25"
+              if (equippedFrame) {
+                const name = equippedFrame.name.toLowerCase()
+                if (name.includes("gold")) borderStyle = "bg-[#FFC800] ring-4 ring-[#FFC800]/30 shadow-[#FFC800]/40"
+                else if (name.includes("diamond")) borderStyle = "bg-[#1CB0F6] ring-4 ring-[#1CB0F6]/30 shadow-[#1CB0F6]/40"
+                else borderStyle = "bg-[#CE82FF] ring-4 ring-[#CE82FF]/30 shadow-[#CE82FF]/40"
+              }
+              return (
+                <div className={`w-28 h-28 rounded-full p-1 shadow-xl ${borderStyle}`}>
+                  <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                    <span className="text-4xl font-bold bg-gradient-to-br from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                      {user?.display_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                </div>
+              )
+            })()}
             <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
               Lv.{level}
@@ -121,7 +139,7 @@ export default function Profile() {
               <span>{xpProgress}/100 XP</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500"
                 style={{ width: `${xpProgress}%` }}
               />
@@ -217,9 +235,9 @@ export default function Profile() {
             <SettingRow icon={<Bell className="w-5 h-5 text-orange-500" />} label="Thông báo" desc="Nhắc nhở học tập">
               <Toggle checked={notifications} onChange={() => setNotifications(!notifications)} />
             </SettingRow>
-            
+
             <div className="pt-3">
-              <button 
+              <button
                 onClick={() => { setShowSettings(false); setShowChangePassword(true); }}
                 className="w-full py-3 px-4 rounded-xl border-2 border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
               >
@@ -247,37 +265,37 @@ export default function Profile() {
               </div>
             )}
 
-            <InputField 
-              label="Mật khẩu hiện tại" 
+            <InputField
+              label="Mật khẩu hiện tại"
               type="password"
               value={passwordData.old_password}
-              onChange={e => setPasswordData({...passwordData, old_password: e.target.value})}
+              onChange={e => setPasswordData({ ...passwordData, old_password: e.target.value })}
               placeholder="••••••••"
             />
-            <InputField 
-              label="Mật khẩu mới" 
+            <InputField
+              label="Mật khẩu mới"
               type="password"
               value={passwordData.new_password}
-              onChange={e => setPasswordData({...passwordData, new_password: e.target.value})}
+              onChange={e => setPasswordData({ ...passwordData, new_password: e.target.value })}
               placeholder="Tối thiểu 6 ký tự"
             />
-            <InputField 
-              label="Xác nhận mật khẩu mới" 
+            <InputField
+              label="Xác nhận mật khẩu mới"
               type="password"
               value={passwordData.confirm_password}
-              onChange={e => setPasswordData({...passwordData, confirm_password: e.target.value})}
+              onChange={e => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
               placeholder="Nhập lại mật khẩu mới"
             />
 
             <div className="flex gap-3 pt-4">
-              <button 
-                onClick={() => setShowChangePassword(false)} 
+              <button
+                onClick={() => setShowChangePassword(false)}
                 className="flex-1 py-3 px-4 rounded-xl border-2 border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
               >
                 Hủy
               </button>
-              <button 
-                onClick={handleChangePassword} 
+              <button
+                onClick={handleChangePassword}
                 disabled={saving || !passwordData.old_password || !passwordData.new_password}
                 className="flex-1 py-3 px-4 rounded-xl bg-slate-800 text-white font-semibold shadow-lg hover:bg-slate-900 transition-all disabled:opacity-50"
               >
@@ -300,7 +318,7 @@ function StatCard({ icon, value, label, color }) {
     yellow: 'bg-yellow-50 text-yellow-500',
     purple: 'bg-purple-50 text-purple-500',
   }
-  
+
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group text-center">
       <div className={`w-12 h-12 mx-auto ${colors[color]} rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>

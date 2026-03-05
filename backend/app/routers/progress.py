@@ -90,6 +90,7 @@ async def get_dashboard(
             current_story=None,
             in_progress_stories=[],
             total_xp=current_user.xp,
+            coins=current_user.coins or 0,
             level=level,
             next_level_xp=next_level_xp
         )
@@ -207,6 +208,7 @@ async def get_dashboard(
         current_story=current_story,
         in_progress_stories=in_progress_stories,
         total_xp=current_user.xp,
+        coins=current_user.coins or 0,
         level=level,
         next_level_xp=next_level_xp
     )
@@ -545,6 +547,7 @@ async def get_user_progress(
             category=ach.category,
             rarity=ach.rarity,
             xp_reward=ach.xp_reward,
+            coin_reward=getattr(ach, 'coin_reward', 0) or 0,
             is_earned=ach.id in earned_achievements,
             earned_at=earned_achievements.get(ach.id)
         ))
@@ -578,6 +581,7 @@ async def get_user_progress(
     
     stats = UserStatsResponse(
         total_xp=current_user.xp,
+        coins=current_user.coins or 0,
         level=level,
         xp_to_next_level=xp_to_next,
         current_streak=current_user.current_streak,
@@ -652,11 +656,15 @@ async def check_and_award_achievements(
             )
             db.add(user_ach)
             current_user.xp += ach.xp_reward
+            coins_awarded = getattr(ach, 'coin_reward', 0) or 0
+            current_user.coins = (current_user.coins or 0) + coins_awarded
             newly_earned.append({
                 "id": ach.id,
                 "title": ach.title,
                 "icon": ach.icon,
-                "xp_reward": ach.xp_reward
+                "rarity": ach.rarity,
+                "xp_reward": ach.xp_reward,
+                "coin_reward": coins_awarded,
             })
     
     if newly_earned:
@@ -664,5 +672,6 @@ async def check_and_award_achievements(
     
     return {
         "newly_earned": newly_earned,
-        "total_xp": current_user.xp
+        "total_xp": current_user.xp,
+        "total_coins": current_user.coins or 0,
     }

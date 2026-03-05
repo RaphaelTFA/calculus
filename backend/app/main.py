@@ -7,7 +7,7 @@ import runpy
 import asyncio
 from app.config import settings
 from app.database import init_db
-from app.routers import auth_router, stories_router, steps_router, progress_router, categories_router, auth
+from app.routers import auth_router, stories_router, steps_router, progress_router, categories_router, shop_router, quests_router, auth
 
 # Reduce noisy Uvicorn logs and show only SQL logs
 import logging
@@ -30,6 +30,8 @@ async def lifespan(app: FastAPI):
     await ensure_course_jsons()
     await seed_from_json()
     await seed_achievements()
+    await seed_shop_items()
+    await seed_quests()
     yield
     # Shutdown
 
@@ -53,6 +55,8 @@ app.include_router(stories_router, prefix="/api/v1")
 app.include_router(steps_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
+app.include_router(shop_router, prefix="/api/v1")
+app.include_router(quests_router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 
 @app.get("/")
@@ -310,30 +314,30 @@ async def seed_achievements():
             return
         
         achievements_data = [
-            # XP milestones
-            {"title": "Người mới bắt đầu", "description": "Đạt 100 XP đầu tiên", "icon": "🌱", "category": "xp", "rarity": "common", "xp_reward": 10, "requirement_type": "xp", "requirement_value": 100},
-            {"title": "Sinh viên chăm chỉ", "description": "Đạt 500 XP", "icon": "📚", "category": "xp", "rarity": "common", "xp_reward": 25, "requirement_type": "xp", "requirement_value": 500},
-            {"title": "Nhà toán học trẻ", "description": "Đạt 1000 XP", "icon": "🎓", "category": "xp", "rarity": "uncommon", "xp_reward": 50, "requirement_type": "xp", "requirement_value": 1000},
-            {"title": "Bậc thầy giải tích", "description": "Đạt 5000 XP", "icon": "🏆", "category": "xp", "rarity": "rare", "xp_reward": 100, "requirement_type": "xp", "requirement_value": 5000},
-            {"title": "Huyền thoại toán học", "description": "Đạt 10000 XP", "icon": "👑", "category": "xp", "rarity": "legendary", "xp_reward": 200, "requirement_type": "xp", "requirement_value": 10000},
+            # XP milestones — coin_reward scales with rarity
+            {"title": "Người mới bắt đầu", "description": "Đạt 100 XP đầu tiên", "icon": "🌱", "category": "xp", "rarity": "common", "xp_reward": 10, "coin_reward": 20, "requirement_type": "xp", "requirement_value": 100},
+            {"title": "Sinh viên chăm chỉ", "description": "Đạt 500 XP", "icon": "📚", "category": "xp", "rarity": "common", "xp_reward": 25, "coin_reward": 20, "requirement_type": "xp", "requirement_value": 500},
+            {"title": "Nhà toán học trẻ", "description": "Đạt 1000 XP", "icon": "🎓", "category": "xp", "rarity": "uncommon", "xp_reward": 50, "coin_reward": 50, "requirement_type": "xp", "requirement_value": 1000},
+            {"title": "Bậc thầy giải tích", "description": "Đạt 5000 XP", "icon": "🏆", "category": "xp", "rarity": "rare", "xp_reward": 100, "coin_reward": 100, "requirement_type": "xp", "requirement_value": 5000},
+            {"title": "Huyền thoại toán học", "description": "Đạt 10000 XP", "icon": "👑", "category": "xp", "rarity": "legendary", "xp_reward": 200, "coin_reward": 500, "requirement_type": "xp", "requirement_value": 10000},
             
             # Steps milestones
-            {"title": "Bước đầu tiên", "description": "Hoàn thành bài học đầu tiên", "icon": "👣", "category": "progress", "rarity": "common", "xp_reward": 15, "requirement_type": "steps", "requirement_value": 1},
-            {"title": "Đang tiến bộ", "description": "Hoàn thành 5 bài học", "icon": "🚶", "category": "progress", "rarity": "common", "xp_reward": 30, "requirement_type": "steps", "requirement_value": 5},
-            {"title": "Học tập đều đặn", "description": "Hoàn thành 10 bài học", "icon": "🏃", "category": "progress", "rarity": "uncommon", "xp_reward": 50, "requirement_type": "steps", "requirement_value": 10},
-            {"title": "Không gì ngăn cản", "description": "Hoàn thành 25 bài học", "icon": "🚀", "category": "progress", "rarity": "rare", "xp_reward": 75, "requirement_type": "steps", "requirement_value": 25},
-            {"title": "Bền bỉ", "description": "Hoàn thành 50 bài học", "icon": "💪", "category": "progress", "rarity": "epic", "xp_reward": 100, "requirement_type": "steps", "requirement_value": 50},
+            {"title": "Bước đầu tiên", "description": "Hoàn thành bài học đầu tiên", "icon": "👣", "category": "progress", "rarity": "common", "xp_reward": 15, "coin_reward": 20, "requirement_type": "steps", "requirement_value": 1},
+            {"title": "Đang tiến bộ", "description": "Hoàn thành 5 bài học", "icon": "🚶", "category": "progress", "rarity": "common", "xp_reward": 30, "coin_reward": 20, "requirement_type": "steps", "requirement_value": 5},
+            {"title": "Học tập đều đặn", "description": "Hoàn thành 10 bài học", "icon": "🏃", "category": "progress", "rarity": "uncommon", "xp_reward": 50, "coin_reward": 50, "requirement_type": "steps", "requirement_value": 10},
+            {"title": "Không gì ngăn cản", "description": "Hoàn thành 25 bài học", "icon": "🚀", "category": "progress", "rarity": "rare", "xp_reward": 75, "coin_reward": 100, "requirement_type": "steps", "requirement_value": 25},
+            {"title": "Bền bỉ", "description": "Hoàn thành 50 bài học", "icon": "💪", "category": "progress", "rarity": "epic", "xp_reward": 100, "coin_reward": 200, "requirement_type": "steps", "requirement_value": 50},
             
             # Streak milestones
-            {"title": "Khởi động", "description": "Streak 3 ngày liên tiếp", "icon": "🔥", "category": "streak", "rarity": "common", "xp_reward": 20, "requirement_type": "streak", "requirement_value": 3},
-            {"title": "Tuần hoàn hảo", "description": "Streak 7 ngày liên tiếp", "icon": "⚡", "category": "streak", "rarity": "uncommon", "xp_reward": 50, "requirement_type": "streak", "requirement_value": 7},
-            {"title": "Tháng kiên trì", "description": "Streak 30 ngày liên tiếp", "icon": "🌟", "category": "streak", "rarity": "rare", "xp_reward": 150, "requirement_type": "streak", "requirement_value": 30},
-            {"title": "Kỷ luật thép", "description": "Streak 100 ngày liên tiếp", "icon": "💎", "category": "streak", "rarity": "legendary", "xp_reward": 500, "requirement_type": "streak", "requirement_value": 100},
+            {"title": "Khởi động", "description": "Streak 3 ngày liên tiếp", "icon": "🔥", "category": "streak", "rarity": "common", "xp_reward": 20, "coin_reward": 20, "requirement_type": "streak", "requirement_value": 3},
+            {"title": "Tuần hoàn hảo", "description": "Streak 7 ngày liên tiếp", "icon": "⚡", "category": "streak", "rarity": "uncommon", "xp_reward": 50, "coin_reward": 50, "requirement_type": "streak", "requirement_value": 7},
+            {"title": "Tháng kiên trì", "description": "Streak 30 ngày liên tiếp", "icon": "🌟", "category": "streak", "rarity": "rare", "xp_reward": 150, "coin_reward": 100, "requirement_type": "streak", "requirement_value": 30},
+            {"title": "Kỷ luật thép", "description": "Streak 100 ngày liên tiếp", "icon": "💎", "category": "streak", "rarity": "legendary", "xp_reward": 500, "coin_reward": 500, "requirement_type": "streak", "requirement_value": 100},
             
             # Stories milestones
-            {"title": "Hoàn thành khóa học", "description": "Hoàn thành 1 khóa học", "icon": "✅", "category": "stories", "rarity": "uncommon", "xp_reward": 100, "requirement_type": "stories", "requirement_value": 1},
-            {"title": "Nhà sưu tập", "description": "Hoàn thành 3 khóa học", "icon": "🎯", "category": "stories", "rarity": "rare", "xp_reward": 200, "requirement_type": "stories", "requirement_value": 3},
-            {"title": "Đa năng", "description": "Hoàn thành 5 khóa học", "icon": "🌈", "category": "stories", "rarity": "epic", "xp_reward": 300, "requirement_type": "stories", "requirement_value": 5},
+            {"title": "Hoàn thành khóa học", "description": "Hoàn thành 1 khóa học", "icon": "✅", "category": "stories", "rarity": "uncommon", "xp_reward": 100, "coin_reward": 50, "requirement_type": "stories", "requirement_value": 1},
+            {"title": "Nhà sưu tập", "description": "Hoàn thành 3 khóa học", "icon": "🎯", "category": "stories", "rarity": "rare", "xp_reward": 200, "coin_reward": 100, "requirement_type": "stories", "requirement_value": 3},
+            {"title": "Đa năng", "description": "Hoàn thành 5 khóa học", "icon": "🌈", "category": "stories", "rarity": "epic", "xp_reward": 300, "coin_reward": 200, "requirement_type": "stories", "requirement_value": 5},
         ]
         
         for ach_data in achievements_data:
@@ -342,3 +346,116 @@ async def seed_achievements():
         
         await db.commit()
         logger.debug("✅ Achievements seeded!")
+
+
+async def seed_shop_items():
+    """Seed default shop items"""
+    from app.database import async_session
+    from app.models import ShopItem
+    from sqlalchemy import select
+
+    async with async_session() as db:
+        result = await db.execute(select(ShopItem).limit(1))
+        if result.scalar_one_or_none():
+            return
+
+        items = [
+            {
+                "name": "Streak Freeze",
+                "description": "Skip 1 day without losing your streak",
+                "icon": "🧊",
+                "price": 50,
+                "item_type": "streak_freeze",
+                "effect_value": 1,
+                "order_index": 1,
+            },
+            {
+                "name": "XP Boost",
+                "description": "2x XP for the next lesson",
+                "icon": "⚡",
+                "price": 80,
+                "item_type": "xp_boost",
+                "effect_value": 1,
+                "order_index": 2,
+            },
+            {
+                "name": "Hint Token",
+                "description": "Reveal a hint on a hard question",
+                "icon": "💡",
+                "price": 30,
+                "item_type": "hint_token",
+                "effect_value": 1,
+                "order_index": 3,
+            },
+            {
+                "name": "Gold Frame",
+                "description": "A shiny gold frame for your avatar",
+                "icon": "🖼️",
+                "price": 200,
+                "item_type": "avatar_frame",
+                "effect_value": 1,
+                "order_index": 4,
+            },
+            {
+                "name": "Diamond Frame",
+                "description": "A prestigious diamond avatar frame",
+                "icon": "💎",
+                "price": 500,
+                "item_type": "avatar_frame",
+                "effect_value": 2,
+                "order_index": 5,
+            },
+            {
+                "name": "Chapter Unlock",
+                "description": "Unlock a locked chapter early",
+                "icon": "🔓",
+                "price": 150,
+                "item_type": "course_unlock",
+                "effect_value": 1,
+                "order_index": 6,
+            },
+        ]
+
+        for item_data in items:
+            db.add(ShopItem(**item_data))
+
+        await db.commit()
+        logger.debug("✅ Shop items seeded!")
+
+
+async def seed_quests():
+    """Seed quest definitions from data/quests.json"""
+    from app.database import async_session
+    from app.models import Quest
+    from sqlalchemy import select
+
+    async with async_session() as db:
+        result = await db.execute(select(Quest).limit(1))
+        if result.scalar_one_or_none():
+            return
+
+        quests_file = DATA_DIR / "quests.json"
+        if not quests_file.exists():
+            logger.debug("⚠️ data/quests.json not found, skipping quest seed")
+            return
+
+        with open(quests_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        quests_data = data.get("quests", data) if isinstance(data, dict) else data
+
+        for q in quests_data:
+            quest = Quest(
+                title=q["title"],
+                description=q.get("description", ""),
+                quest_type=q["quest_type"],
+                requirement_type=q["requirement_type"],
+                requirement_value=q.get("requirement_value", 1),
+                coin_reward=q.get("coin_reward", 20),
+                icon=q.get("icon", "📋"),
+                is_active=True,
+            )
+            db.add(quest)
+
+        await db.commit()
+        logger.debug("✅ Quests seeded!")

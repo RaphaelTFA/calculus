@@ -17,7 +17,15 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:4173", "https://calculus-mu.vercel.app"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:3003",
+        "http://localhost:3004",
+        "http://localhost:4173",
+        "https://calculus-mu.vercel.app",
+    ]
 
     class Config:
         env_file = ".env"

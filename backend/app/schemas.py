@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -18,9 +18,13 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str
-    display_name: Optional[str]
-    avatar_url: Optional[str]
+    display_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    gender: str = "male"
+    skin_color: str = "#F3C9A0"
+    equipped_items: dict = Field(default_factory=dict)
     xp: int
+    coins: int = 0
     current_streak: int
     longest_streak: int
     
@@ -99,6 +103,7 @@ class DashboardResponse(BaseModel):
     current_story: Optional[StoryDetailResponse]
     in_progress_stories: list[StoryDetailResponse] = []
     total_xp: int
+    coins: int = 0
     level: int
     next_level_xp: int
 
@@ -120,6 +125,7 @@ class AchievementResponse(BaseModel):
     category: Optional[str]
     rarity: str
     xp_reward: int
+    coin_reward: int = 0
     is_earned: bool = False
     earned_at: Optional[datetime] = None
     
@@ -129,6 +135,7 @@ class AchievementResponse(BaseModel):
 # User Stats
 class UserStatsResponse(BaseModel):
     total_xp: int
+    coins: int = 0
     level: int
     xp_to_next_level: int
     current_streak: int
@@ -191,3 +198,74 @@ class UpdateProfile(BaseModel):
 class ChangePassword(BaseModel):
     old_password: str
     new_password: str
+
+
+# Shop
+class ShopItemResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    icon: Optional[str]
+    price: int
+    item_type: str
+    effect_value: int
+    is_active: bool
+    order_index: int
+
+    class Config:
+        from_attributes = True
+
+
+class BuyItemResponse(BaseModel):
+    success: bool
+    item: ShopItemResponse
+    coins_spent: int
+    remaining_coins: int
+    message: Optional[str] = None
+
+
+class InventoryItemResponse(BaseModel):
+    id: int
+    item: ShopItemResponse
+    quantity: int
+    acquired_at: datetime
+    expires_at: Optional[datetime] = None
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+# Quests
+class QuestResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str]
+    quest_type: str
+    requirement_type: str
+    requirement_value: int
+    coin_reward: int
+    icon: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class UserQuestResponse(BaseModel):
+    id: int
+    quest: QuestResponse
+    progress: int
+    is_complete: bool
+    assigned_at: datetime
+    completed_at: Optional[datetime] = None
+    coins_claimed: bool
+
+    class Config:
+        from_attributes = True
+
+
+class ClaimQuestResponse(BaseModel):
+    success: bool
+    coins_awarded: int
+    total_coins: int
+    message: Optional[str] = None
