@@ -427,8 +427,62 @@ async def complete_slide(
         xp_earned = 0
         streak_info = {"current_streak": current_user.current_streak, "longest_streak": current_user.longest_streak}
 
+    # ── Auto-check and award achievements ─────────────────────────────────
+    newly_earned = []
+    try:
+        from sqlalchemy import func
+        from app.models import Achievement, UserAchievement, StepProgress, Enrollment
+        subq = select(UserAchievement.achievement_id).where(UserAchievement.user_id == current_user.id)
+        unearned_res = await db.execute(select(Achievement).where(Achievement.id.notin_(subq)))
+        unearned = unearned_res.scalars().all()
+
+        if unearned:
+            steps_res = await db.execute(
+                select(func.count(StepProgress.id)).where(
+                    StepProgress.user_id == current_user.id,
+                    StepProgress.is_completed == True
+                )
+            )
+            completed_steps = steps_res.scalar() or 0
+
+            completed_stories = 0
+            enroll_res2 = await db.execute(select(Enrollment).where(Enrollment.user_id == current_user.id))
+            from app.routers.stories import calculate_story_progress
+            for enr in enroll_res2.scalars().all():
+                prog = await calculate_story_progress(db, current_user.id, enr.story_id)
+                if prog >= 100:
+                    completed_stories += 1
+
+            for ach in unearned:
+                earned = False
+                if ach.requirement_type == "xp" and current_user.xp >= ach.requirement_value:
+                    earned = True
+                elif ach.requirement_type == "steps" and completed_steps >= ach.requirement_value:
+                    earned = True
+                elif ach.requirement_type == "streak" and current_user.current_streak >= ach.requirement_value:
+                    earned = True
+                elif ach.requirement_type == "stories" and completed_stories >= ach.requirement_value:
+                    earned = True
+
+                if earned:
+                    db.add(UserAchievement(user_id=current_user.id, achievement_id=ach.id))
+                    current_user.xp += ach.xp_reward
+                    newly_earned.append({
+                        "id": ach.id,
+                        "title": ach.title,
+                        "icon": ach.icon,
+                        "xp_reward": ach.xp_reward
+                    })
+
+            if newly_earned:
+                await db.commit()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("Achievement check failed on slide complete: %s", e)
+
     return {
         "success": True,
         "xp_earned": xp_earned,
-        "total_xp": current_user.xp
+        "total_xp": current_user.xp,
+        "newly_earned_achievements": newly_earned
     }

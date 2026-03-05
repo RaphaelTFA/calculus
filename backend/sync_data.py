@@ -5,6 +5,7 @@ This script reads from /data/ folder and syncs to database
 
 import json
 import asyncio
+import runpy
 from pathlib import Path
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -23,6 +24,65 @@ logger = logging.getLogger(__name__)
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
+async def ensure_course_jsons():
+    """Run builder on any source folder not yet indexed.
+
+    Courses are considered present if their slug appears as a value in
+    `data/courses/_index.json`. Sources are looked for under `data/raw_courses/`.
+    """
+    data_dir = DATA_DIR
+    raw_courses_dir = data_dir / 'raw_courses'
+    courses_dir = data_dir / 'courses'
+    index_path = courses_dir / '_index.json'
+    existing_slugs = set()
+    if index_path.exists():
+        try:
+            existing_slugs = set(json.loads(index_path.read_text(encoding='utf-8')).values())
+        except Exception:
+            existing_slugs = set()
+
+    sources = []
+    # check top-level data folders
+    for entry in sorted(data_dir.iterdir()):
+        if entry.is_dir() and (entry / 'course.json').is_file():
+            sources.append(entry)
+    # also look in data/courses subfolders
+    if courses_dir.exists():
+        for entry in sorted(courses_dir.iterdir()):
+            if entry.is_dir() and (entry / 'course.json').is_file():
+                sources.append(entry)
+    # additionally consider raw_courses directory
+    if raw_courses_dir.exists():
+        for entry in sorted(raw_courses_dir.iterdir()):
+            if entry.is_dir() and (entry / 'course.json').is_file():
+                sources.append(entry)
+
+    if not sources:
+        logger.debug("No course source folders found to build")
+        return
+
+    def run_build():
+        globs = runpy.run_path(str(Path(__file__).parent.parent / 'tools' / 'build_course_from_chapters.py'))
+        build_fn = globs.get('build_course_from_folder')
+        if not build_fn:
+            logger.debug("build_course_from_folder not available")
+            return
+        for src in sources:
+            try:
+                with open(src / 'course.json', 'r', encoding='utf-8') as f:
+                    meta = json.load(f)
+                slug = meta.get('slug') or meta.get('title')
+            except Exception:
+                slug = None
+            if slug and slug in existing_slugs:
+                logger.debug(f"Skipping {src}, already indexed")
+                continue
+            out, salt = build_fn(str(src), str(courses_dir), encrypt=True)
+            logger.info(f"Built course file: {out}")
+
+    await asyncio.to_thread(run_build)
+
+
 async def sync_data():
     """Sync all JSON data to database"""
     engine = create_async_engine(settings.database_url, echo=True)
@@ -30,7 +90,9 @@ async def sync_data():
     
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
+    await ensure_course_jsons()
+
     async with async_session() as session:
         # 0. Clean all existing course data so deleted folders are removed from DB
         from sqlalchemy import text

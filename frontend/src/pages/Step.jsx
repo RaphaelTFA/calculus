@@ -4,7 +4,8 @@ import {
   X as XIcon, Check, Sparkles, RotateCcw, HelpCircle,
   Eye,
   Lightbulb, AlertTriangle, Info, GraduationCap,
-  Copy, CheckCheck, Play, GripVertical
+  Copy, CheckCheck, Play, GripVertical,
+  Trophy
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import api from '../lib/api'
@@ -41,7 +42,9 @@ export default function Step() {
   const [totalXpEarned, setTotalXpEarned] = useState(0)
 
   const [showCompleteScreen, setShowCompleteScreen] = useState(false)
+  const [showAchievementsScreen, setShowAchievementsScreen] = useState(false)
   const [newAchievements, setNewAchievements] = useState([])
+  const [slideAchievements, setSlideAchievements] = useState([])
 
   useEffect(() => { loadData() }, [id, slug])
 
@@ -106,6 +109,9 @@ export default function Step() {
         setTotalXpEarned(prev => prev + (res.xp_earned || 0))
         // Patch local store – no second fetchUser round-trip needed
         updateUserStats(res)
+        // Show achievement popup if any were newly unlocked
+        const unlocked = res.newly_earned_achievements || []
+        if (unlocked.length > 0) setSlideAchievements(unlocked)
       }
     } catch (e) {
       console.error('Error awarding slide xp', e)
@@ -180,28 +186,21 @@ export default function Step() {
       // Patch store immediately
       if (result) updateUserStats(result)
 
-      // If new achievements were unlocked, stay on complete screen to show them
+      // If new achievements were unlocked, show the dedicated achievements screen
       const unlocked = result?.newly_earned_achievements || []
       if (unlocked.length > 0) {
         setNewAchievements(unlocked)
-        return   // user taps Continue again to actually navigate
+        setShowAchievementsScreen(true)
+        return
       }
 
-      const currentIdx = allSteps.findIndex(s => s.id === parseInt(id))
-      if (currentIdx < allSteps.length - 1) {
-        const next = allSteps[currentIdx + 1]
-        navigate(`/course/${slug}/step/${encodeStepId(next.id)}`)
-      } else {
-        navigate(`/course/${slug}`)
-      }
-      fetchUser().catch(() => {})
+      doNavigateNext()
     } catch {
       navigate(`/course/${slug}`)
     }
   }
 
-  const handleNavigateAfterAchievements = () => {
-    setNewAchievements([])
+  const doNavigateNext = () => {
     const currentIdx = allSteps.findIndex(s => s.id === parseInt(id))
     if (currentIdx < allSteps.length - 1) {
       const next = allSteps[currentIdx + 1]
@@ -210,6 +209,12 @@ export default function Step() {
       navigate(`/course/${slug}`)
     }
     fetchUser().catch(() => {})
+  }
+
+  const handleNavigateAfterAchievements = () => {
+    setNewAchievements([])
+    setShowAchievementsScreen(false)
+    doNavigateNext()
   }
 
   // ── LOADING ──
@@ -238,14 +243,32 @@ export default function Step() {
     )
   }
 
+  // ── SLIDE ACHIEVEMENT POPUP ──
+  // Rendered as an overlay so it doesn't interrupt navigation
+  const achievementPopup = slideAchievements.length > 0 ? (
+    <AchievementUnlockedPopup
+      achievements={slideAchievements}
+      onClose={() => setSlideAchievements([])}
+    />
+  ) : null
+
+  // ── ACHIEVEMENTS SCREEN ──
+  if (showAchievementsScreen) {
+    return (
+      <AchievementsScreen
+        achievements={newAchievements}
+        onContinue={handleNavigateAfterAchievements}
+      />
+    )
+  }
+
   // ── COMPLETION SCREEN ──
   if (showCompleteScreen) {
     return (
       <CompleteScreen
         xpEarned={totalXpEarned || (step?.xp_reward || 10)}
         stepTitle={step?.title}
-        newAchievements={newAchievements}
-        onContinue={newAchievements.length > 0 ? handleNavigateAfterAchievements : handleCompleteAndNavigate}
+        onContinue={handleCompleteAndNavigate}
       />
     )
   }
@@ -304,6 +327,7 @@ export default function Step() {
     <div className={cn(
       'h-[100dvh] flex flex-col overflow-hidden', 'bg-white'
     )}>
+      {achievementPopup}
       {/* ── Header ── 1/10 of screen */}
       <header className="h-[10vh] shrink-0 flex items-center justify-center relative bg-white">
         {/* Exit button — top left */}
@@ -1183,9 +1207,83 @@ function InteractiveGraphBlock({ block }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPLETION SCREEN
 // ═══════════════════════════════════════════════════════════════════════════════
+// ACHIEVEMENT UNLOCKED POPUP — shown as overlay after a slide awards XP
+// ═══════════════════════════════════════════════════════════════════════════════
 
-function CompleteScreen({ xpEarned, stepTitle, newAchievements = [], onContinue }) {
-  const hasAchievements = newAchievements.length > 0
+function AchievementUnlockedPopup({ achievements = [], onClose }) {
+  // Auto-dismiss after 5 s
+  useEffect(() => {
+    const t = setTimeout(onClose, 5000)
+    return () => clearTimeout(t)
+  }, [onClose])
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4 pointer-events-none"
+      >
+        <motion.div
+          initial={{ y: 80, opacity: 0, scale: 0.95 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 60, opacity: 0, scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+          className="w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-amber-100 overflow-hidden pointer-events-auto"
+        >
+          {/* amber top bar */}
+          <div className="h-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500" />
+
+          <div className="px-5 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🏆</span>
+                <p className="text-sm font-bold tracking-widest text-amber-600 uppercase">
+                  New achievement unlocked!
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="text-stone-400 hover:text-stone-600 transition-colors"
+              >
+                <XIcon className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {achievements.map((ach, i) => (
+                <motion.div
+                  key={ach.id}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.12 }}
+                  className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl px-4 py-3"
+                >
+                  <span className="text-2xl">{ach.icon || '🏅'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-800 text-sm leading-tight truncate">{ach.title}</p>
+                    <p className="text-xs text-amber-600 font-semibold mt-0.5">+{ach.xp_reward} XP</p>
+                  </div>
+                  <motion.span
+                    animate={{ rotate: [0, 15, -15, 0] }}
+                    transition={{ delay: 0.3 + i * 0.12, duration: 0.5 }}
+                    className="text-lg"
+                  >✨</motion.span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function CompleteScreen({ xpEarned, stepTitle, onContinue }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -1245,38 +1343,202 @@ function CompleteScreen({ xpEarned, stepTitle, newAchievements = [], onContinue 
           </motion.div>
         </motion.div>
 
-        {/* Newly unlocked achievements */}
-        {hasAchievements && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="space-y-2 text-left"
-          >
-            <p className="text-center text-xs font-bold tracking-widest text-amber-500 uppercase mb-3">🏆 Thành tích mới mở khoá!</p>
-            {newAchievements.map((ach, i) => (
-              <motion.div
-                key={ach.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.0 + i * 0.15 }}
-                className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl px-4 py-3"
-              >
-                <span className="text-2xl">{ach.icon || '🏅'}</span>
-                <div className="flex-1">
-                  <p className="font-bold text-slate-800 text-sm">{ach.title}</p>
-                  <p className="text-xs text-amber-600 font-semibold">+{ach.xp_reward} XP thưởng</p>
-                </div>
-                <span className="text-lg">✨</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: hasAchievements ? 1.3 : 0.6 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
           <Button
             onClick={onContinue}
             className="h-14 px-12 text-lg font-bold bg-stone-900 hover:bg-stone-800 text-white rounded-2xl shadow-sm"
+          >
+            Continue
+          </Button>
+        </motion.div>
+      </div>
+    </motion.div>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ACHIEVEMENTS SCREEN — full-screen shown after CompleteScreen when achievements unlock
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const RARITY = {
+  common:    { label: 'Common',    border: 'border-l-slate-300',  badge: 'bg-slate-100 text-slate-500',    glow: '' },
+  uncommon:  { label: 'Uncommon',  border: 'border-l-emerald-400',badge: 'bg-emerald-50 text-emerald-600', glow: 'shadow-emerald-100' },
+  rare:      { label: 'Rare',      border: 'border-l-blue-400',   badge: 'bg-blue-50 text-blue-600',       glow: 'shadow-blue-100' },
+  epic:      { label: 'Epic',      border: 'border-l-violet-500', badge: 'bg-violet-50 text-violet-600',   glow: 'shadow-violet-100' },
+  legendary: { label: 'Legendary', border: 'border-l-amber-400',  badge: 'bg-amber-50 text-amber-600',    glow: 'shadow-amber-200' },
+}
+
+function AchievementsScreen({ achievements = [], onContinue }) {
+  const totalBonusXp = achievements.reduce((sum, a) => sum + (a.xp_reward || 0), 0)
+
+  // 28 randomly scattered dots — positions seeded so they don't shift on re-render
+  const particles = [
+    { top:  '4%', left:  '7%',  size: 22, dur: 3.8, delay: 0.0 },
+    { top:  '3%', left: '38%',  size: 14, dur: 4.5, delay: 0.5 },
+    { top:  '6%', left: '63%',  size: 18, dur: 3.4, delay: 0.2 },
+    { top:  '5%', left: '88%',  size: 12, dur: 5.1, delay: 0.9 },
+    { top: '17%', left:  '2%',  size: 16, dur: 4.2, delay: 0.4 },
+    { top: '14%', left: '24%',  size: 24, dur: 3.7, delay: 0.7 },
+    { top: '20%', left: '52%',  size: 10, dur: 4.9, delay: 0.1 },
+    { top: '15%', left: '78%',  size: 20, dur: 3.5, delay: 0.6 },
+    { top: '22%', left: '94%',  size: 14, dur: 4.3, delay: 0.3 },
+    { top: '33%', left: '11%',  size: 18, dur: 5.0, delay: 0.8 },
+    { top: '36%', left: '42%',  size: 26, dur: 3.6, delay: 0.2 },
+    { top: '30%', left: '70%',  size: 12, dur: 4.7, delay: 0.5 },
+    { top: '38%', left: '90%',  size: 16, dur: 3.9, delay: 0.0 },
+    { top: '48%', left:  '5%',  size: 20, dur: 4.4, delay: 0.7 },
+    { top: '46%', left: '30%',  size: 14, dur: 3.3, delay: 0.3 },
+    { top: '52%', left: '58%',  size: 22, dur: 5.2, delay: 0.9 },
+    { top: '50%', left: '83%',  size: 10, dur: 4.0, delay: 0.1 },
+    { top: '62%', left: '16%',  size: 18, dur: 3.7, delay: 0.6 },
+    { top: '65%', left: '44%',  size: 24, dur: 4.6, delay: 0.4 },
+    { top: '60%', left: '72%',  size: 12, dur: 3.8, delay: 0.2 },
+    { top: '68%', left: '95%',  size: 16, dur: 5.0, delay: 0.8 },
+    { top: '76%', left:  '8%',  size: 20, dur: 4.1, delay: 0.5 },
+    { top: '74%', left: '35%',  size: 14, dur: 3.5, delay: 0.0 },
+    { top: '80%', left: '60%',  size: 26, dur: 4.8, delay: 0.7 },
+    { top: '78%', left: '86%',  size: 10, dur: 3.6, delay: 0.3 },
+    { top: '88%', left: '20%',  size: 18, dur: 5.1, delay: 0.6 },
+    { top: '92%', left: '50%',  size: 22, dur: 4.3, delay: 0.1 },
+    { top: '90%', left: '78%',  size: 14, dur: 3.9, delay: 0.4 },
+  ].map((p, i) => ({
+    ...p,
+    color: ['bg-amber-400','bg-yellow-300','bg-orange-300','bg-amber-300'][i % 4],
+    shape: i % 2 === 0 ? 'rounded-full' : 'rounded-md',
+  }))
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="min-h-screen bg-[radial-gradient(ellipse_at_top,_#fffbeb_0%,_#fef3c7_40%,_#fde68a_100%)] flex flex-col items-center justify-center px-6 py-10 relative overflow-hidden"
+    >
+      {/* Confetti particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {particles.map((p, i) => (
+          <motion.div
+            key={i}
+            className={`absolute ${p.color} ${p.shape}`}
+            style={{ top: p.top, left: p.left, width: p.size, height: p.size }}
+            animate={{ y: [0, -12, 0], scale: [1, 1.25, 1], opacity: [0.6, 0.9, 0.5] }}
+            transition={{ duration: p.dur, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm flex flex-col items-center gap-7">
+
+        {/* Trophy with pulsing glow */}
+        <div className="relative flex items-center justify-center">
+          <motion.div
+            animate={{ scale: [1, 1.18, 1], opacity: [0.35, 0.6, 0.35] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute w-28 h-28 rounded-full bg-amber-300/60 blur-xl"
+          />
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 16, delay: 0.1 }}
+            className="relative w-24 h-24 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-3xl flex items-center justify-center shadow-xl shadow-amber-300/60"
+          >
+            <Trophy className="w-12 h-12 text-white drop-shadow" strokeWidth={2.5} />
+          </motion.div>
+        </div>
+
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-center"
+        >
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight">
+            {achievements.length === 1 ? 'Achievement\nunlocked!' : 'Achievements\nunlocked!'}
+          </h1>
+          <p className="text-stone-500 mt-2">
+            {achievements.length === 1
+              ? 'You earned a brand new badge 🏅'
+              : `You earned ${achievements.length} new badges 🏅`}
+          </p>
+        </motion.div>
+
+        {/* Achievement cards */}
+        <div className="w-full space-y-3">
+          {achievements.map((ach, i) => {
+            const r = RARITY[ach.rarity] || RARITY.common
+            return (
+              <motion.div
+                key={ach.id}
+                initial={{ opacity: 0, y: 28, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.42 + i * 0.13, type: 'spring', stiffness: 280, damping: 22 }}
+                className={cn(
+                  'flex items-center gap-4 bg-white rounded-2xl border border-stone-100 border-l-4 px-4 py-4 shadow-md',
+                  r.border, r.glow
+                )}
+              >
+                {/* Icon bubble */}
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-yellow-50 flex items-center justify-center shrink-0 text-2xl shadow-inner">
+                  {ach.icon || '🏅'}
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-bold text-stone-900 text-sm leading-tight">{ach.title}</p>
+                    {ach.rarity && ach.rarity !== 'common' && (
+                      <span className={cn('text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide', r.badge)}>
+                        {r.label}
+                      </span>
+                    )}
+                  </div>
+                  {ach.description && (
+                    <p className="text-xs text-stone-400 mt-0.5 leading-snug">{ach.description}</p>
+                  )}
+                </div>
+
+                {/* XP */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.55 + i * 0.13, type: 'spring', stiffness: 400 }}
+                  className="shrink-0 bg-amber-50 border border-amber-200 rounded-xl px-2.5 py-1.5 text-center"
+                >
+                  <p className="text-xs font-black text-amber-600 leading-none">+{ach.xp_reward}</p>
+                  <p className="text-[9px] font-semibold text-amber-400 tracking-widest uppercase leading-none mt-0.5">XP</p>
+                </motion.div>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {/* Total bonus XP */}
+        {totalBonusXp > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.45 + achievements.length * 0.13, type: 'spring' }}
+            className="bg-white/80 border border-amber-200 rounded-2xl px-6 py-3 flex items-center gap-3 shadow-sm"
+          >
+            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+            <p className="text-sm text-stone-600">
+              Bonus XP awarded: <span className="font-extrabold text-amber-600">+{totalBonusXp} XP</span>
+            </p>
+          </motion.div>
+        )}
+
+        {/* Continue button */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 + achievements.length * 0.13 }}
+          className="w-full"
+        >
+          <Button
+            onClick={onContinue}
+            className="w-full h-14 text-lg font-bold bg-stone-900 hover:bg-stone-800 text-white rounded-2xl shadow-sm"
           >
             Continue
           </Button>
