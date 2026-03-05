@@ -304,7 +304,9 @@ async def complete_step(
         "coins_earned": coins_earned,
         "total_xp": current_user.xp,
         "total_coins": current_user.coins or 0,
-        "streak": streak_info
+        "streak": streak_info,
+        "newly_earned_achievements": newly_earned
+
     }
 
 
