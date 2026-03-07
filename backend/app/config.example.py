@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     email_verification_token_expire_minutes: int = 60 * 24  # 24 hours
 
     # URLs used in emails
-    backend_base_url: str = "http://localhost:8000/api/v1"
+    backend_base_url: str = "http://localhost:8000"
 
     # CORS
     cors_origins: list[str] = [

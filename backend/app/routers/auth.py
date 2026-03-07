@@ -6,12 +6,12 @@ from sqlalchemy import select
 from app.database import get_db
 from app.models import User
 from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse, UpdateProfile, ChangePassword
-from app.schemas import VerificationEmailRequest
 from app.auth import (
     hash_password,
     verify_password,
     create_access_token,
     get_current_user,
+    get_current_user_unverified,
     create_email_verification_token,
     decode_email_verification_token,
 )
@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def _build_verify_url(token: str) -> str:
-    if settings.frontend_base_url:
-        return f"{settings.frontend_base_url.rstrip('/')}/verify-email?token={token}"
-    return f"{settings.backend_base_url.rstrip('/')}/auth/verify-email?token={token}"
+    return f"{settings.backend_base_url.rstrip('/')}/api/v1/auth/verify-email?token={token}"
 
 
 async def _send_verification_email(user: User):
@@ -88,12 +86,13 @@ async def login(data: UserLogin, response: Response, db: AsyncSession = Depends(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
-
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email not verified. Please check your inbox."
-        )
+    
+    # Allow login even if email not verified - frontend will show verification UI
+    # if not user.is_active:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Email not verified. Please check your inbox."
+    #     )
     
     # Determine token expiry based on "remember me"
     if getattr(data, 'remember', False):
@@ -118,7 +117,8 @@ async def login(data: UserLogin, response: Response, db: AsyncSession = Depends(
     return TokenResponse(token=token, user=UserResponse.model_validate(user))
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(get_current_user_unverified)):
+    """Get current user info - allows unverified users to check their status"""
     return UserResponse.model_validate(current_user)
 
 @router.post("/logout")
@@ -153,20 +153,18 @@ async def verify_email(token: str = Query(...), db: AsyncSession = Depends(get_d
 
 
 @router.post("/resend-verification")
-async def resend_verification(data: VerificationEmailRequest, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == data.email))
-    user = result.scalar_one_or_none()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    if user.is_active:
+async def resend_verification(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_unverified)
+):
+    """Resend verification email - allows unverified users"""
+    if current_user.is_active:
         return {"success": True, "message": "Email already verified"}
 
     try:
-        await _send_verification_email(user)
+        await _send_verification_email(current_user)
     except Exception as exc:
-        logger.exception("Failed to resend verification email for user_id=%s", user.id)
+        logger.exception("Failed to resend verification email for user_id=%s", current_user.id)
         raise HTTPException(status_code=500, detail="Failed to send verification email") from exc
 
     return {"success": True, "message": "Verification email sent"}

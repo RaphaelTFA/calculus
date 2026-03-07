@@ -27,6 +27,7 @@ class UserResponse(BaseModel):
     coins: int = 0
     current_streak: int
     longest_streak: int
+    is_active: bool = True  # Email verification status
     
     class Config:
         from_attributes = True

@@ -7,9 +7,11 @@ import Step from './pages/Step'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import VerifyEmail from './pages/VerifyEmail'
 import Shop from './pages/Shop'
 import Quests from './pages/Quests'
 import NotFound from './pages/NotFound'
+import VerificationBlocker from './components/VerificationBlocker'
 
 // Admin
 import AdminLayout from './admin/AdminLayout'
@@ -22,7 +24,9 @@ import AdminSettings from './admin/Settings'
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <VerificationBlocker />
+      <Routes>
       {/* Main App */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
@@ -35,6 +39,7 @@ export default function App() {
       <Route path="/course/:slug/step/:encodedId" element={<Step />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+  <Route path="/verify-email" element={<VerifyEmail />} />
 
       {/* Admin Panel - Hidden from main UI, only accessible via /admin */}
       <Route path="/admin" element={<AdminLayout />}>
@@ -48,5 +53,6 @@ export default function App() {
 
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </>
   )
 }
