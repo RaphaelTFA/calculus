@@ -34,7 +34,7 @@ async def _send_verification_email(user: User):
     await asyncio.to_thread(
         send_html_email,
         user.email,
-        "Xac minh tai khoan Calculus",
+        "Verify Calculus Account",
         html,
     )
 
@@ -194,10 +194,10 @@ async def update_profile(
 @router.put("/change-password")
 async def change_password(
     data: ChangePassword,
-    db: AsyncSession = Depends(get_db), # Sửa Session -> AsyncSession
+    db: AsyncSession = Depends(get_db),  # Using AsyncSession for async operations
     current_user: User = Depends(get_current_user),
 ):
-    # Sử dụng await và select thay vì db.query
+    # Use await and select instead of db.query
     result = await db.execute(select(User).where(User.id == current_user.id))
     user = result.scalar_one_or_none()
 
@@ -205,9 +205,9 @@ async def change_password(
         raise HTTPException(status_code=404, detail="User not found")
 
     if not verify_password(data.old_password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Mật khẩu cũ không đúng")
+        raise HTTPException(status_code=400, detail="Old password is incorrect")
 
     user.hashed_password = hash_password(data.new_password)
     
-    await db.commit() # Thêm await
-    return {"success": True, "message": "Đổi mật khẩu thành công"}
+    await db.commit()  # Wait for commit to finish
+    return {"success": True, "message": "Password changed successfully"}

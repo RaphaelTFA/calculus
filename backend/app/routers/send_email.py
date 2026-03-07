@@ -9,19 +9,49 @@ password = settings.email_password
 
 def build_verification_email_html(display_name: str, verify_url: str) -> str:
     return f"""
-        <div style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;\">
-            <h2 style=\"margin-bottom: 8px;\">Xac minh tai khoan Calculus</h2>
-            <p>Xin chao <strong>{display_name}</strong>,</p>
-            <p>Cam on ban da dang ky. Vui long bam nut ben duoi de xac minh email:</p>
-            <p style=\"margin: 24px 0;\">
-                <a href=\"{verify_url}\"
-                     style=\"background:#2563eb;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;\">
-                    Xac minh email
-                </a>
+    <div style="font-family: Arial, Helvetica, sans-serif; background:#f3f4f6; padding:40px 0;">
+        <div style="max-width:520px; margin:auto; background:white; border-radius:12px; padding:32px; box-shadow:0 4px 16px rgba(0,0,0,0.05);">
+
+            <h2 style="margin-top:0; color:#111827;">
+            Verify Calculus Account
+            </h2>
+
+            <p style="color:#374151;">
+            Hello <strong>{display_name}</strong>,
             </p>
-            <p>Neu ban khong tao tai khoan nay, ban co the bo qua email.</p>
+
+            <p style="color:#374151;">
+            Thank you for signing up for <strong>Calculus</strong>.  
+            Please click the button below to verify your email address.
+            </p>
+
+            <div style="text-align:center; margin:32px 0;">
+            <a href="{verify_url}"
+                style="background:#2563eb;
+                    color:white;
+                    padding:12px 22px;
+                    font-size:15px;
+                    border-radius:8px;
+                    text-decoration:none;
+                    display:inline-block;
+                    font-weight:600;">
+                Verify Email
+            </a>
+            </div>
+
+            <p style="color:#6b7280; font-size:14px;">
+            If you didn't create this account, you can ignore this email.
+            </p>
+
+            <hr style="border:none; border-top:1px solid #e5e7eb; margin:24px 0;">
+
+            <p style="font-size:13px; color:#9ca3af; margin:0;">
+            This email was automatically sent from the Calculus system.
+            </p>
+
         </div>
-        """
+    </div>
+"""
 
 
 def send_html_email(receiver: str, subject: str, html: str):
