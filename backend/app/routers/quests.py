@@ -97,38 +97,6 @@ async def refresh_weekly_quests(user_id: int, db: AsyncSession):
         db.add(uq)
 
 
-async def ensure_milestone_quests(user_id: int, db: AsyncSession):
-    """Assign all milestone quests that the user doesn't have yet."""
-    # Get all milestone quest IDs
-    all_milestones = await db.execute(
-        select(Quest.id).where(Quest.quest_type == "milestone", Quest.is_active == True)
-    )
-    all_ids = set(all_milestones.scalars().all())
-
-    # Get IDs the user already has
-    user_milestones = await db.execute(
-        select(UserQuest.quest_id)
-        .join(Quest)
-        .where(
-            UserQuest.user_id == user_id,
-            Quest.quest_type == "milestone",
-        )
-    )
-    existing_ids = set(user_milestones.scalars().all())
-
-    missing = all_ids - existing_ids
-    for quest_id in missing:
-        uq = UserQuest(
-            user_id=user_id,
-            quest_id=quest_id,
-            progress=0,
-            is_complete=False,
-            assigned_at=datetime.utcnow(),
-            coins_claimed=False,
-        )
-        db.add(uq)
-
-
 async def tick_quest_progress(user_id: int, event_type: str, amount: int, db: AsyncSession):
     """Increment progress on matching quests for the user.
     
@@ -183,7 +151,6 @@ async def get_quests(
     # Ensure quests are assigned
     await refresh_daily_quests(current_user.id, db)
     await refresh_weekly_quests(current_user.id, db)
-    await ensure_milestone_quests(current_user.id, db)
     await db.commit()
 
     # Fetch current period quests
@@ -210,9 +177,6 @@ async def get_quests(
         elif qt == "weekly":
             if uq.assigned_at >= week_start:
                 active.append(uq)
-        elif qt == "milestone":
-            active.append(uq)
-
     return active
 
 

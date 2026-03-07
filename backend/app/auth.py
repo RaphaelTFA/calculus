@@ -29,6 +29,30 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
+
+def create_email_verification_token(
+    user_id: int,
+    email: str,
+    expires_delta: Optional[timedelta] = None,
+) -> str:
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=settings.email_verification_token_expire_minutes))
+    payload = {
+        "sub": str(user_id),
+        "email": email,
+        "scope": "email_verification",
+        "exp": expire,
+    }
+    return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
+
+
+def decode_email_verification_token(token: str) -> Optional[dict]:
+    payload = decode_token(token)
+    if not payload:
+        return None
+    if payload.get("scope") != "email_verification":
+        return None
+    return payload
+
 def decode_token(token: str) -> Optional[dict]:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
@@ -77,6 +101,12 @@ async def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found"
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email not verified. Please verify your email before continuing."
         )
 
     return user

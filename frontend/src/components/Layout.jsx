@@ -181,18 +181,20 @@ export default function Layout() {
               <Link
                 key={path}
                 to={path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${isActive
+                className={`relative flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${isActive
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
-                <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5]' : ''}`} />
+                <span className="relative inline-flex">
+                  <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5]' : ''}`} />
+                  {path === '/quests' && claimableCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">
+                      {claimableCount}
+                    </span>
+                  )}
+                </span>
                 <span className="text-base font-semibold">{label}</span>
-                {path === '/quests' && claimableCount > 0 && (
-                  <span className="absolute top-1 right-2 w-4 h-4 bg-green-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">
-                    {claimableCount}
-                  </span>
-                )}
               </Link>
             )
           })}

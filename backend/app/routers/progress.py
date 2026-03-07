@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/progress", tags=["progress"])
 
-
 @router.get("/leaderboard", response_model=LeaderboardResponse)
 async def get_leaderboard(
     start: int = 1,

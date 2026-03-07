@@ -3,13 +3,14 @@ from functools import lru_cache
 from pydantic import field_validator
 import os
 
+
 class Settings(BaseSettings):
     app_name: str = "Calculus API"
     debug: bool = True
 
     # Email settings
-    email_sender: str = "calculus.dtthhsgs@gmail.com"
-    email_password: str = "yiae pfyq rniz exvt"  
+    email_sender: str = ""
+    email_password: str = ""
 
     # Database (default to local sqlite file)
     database_url: str = "sqlite+aiosqlite:///./calculus.db"
@@ -21,8 +22,7 @@ class Settings(BaseSettings):
     email_verification_token_expire_minutes: int = 60 * 24  # 24 hours
 
     # URLs used in emails
-    backend_base_url: str = os.getenv("VITE_API_URL") or "http://localhost:8000/api/v1"
-    frontend_base_url: str = ""
+    backend_base_url: str = "http://localhost:8000/api/v1"
 
     # CORS
     cors_origins: list[str] = [

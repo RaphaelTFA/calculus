@@ -202,6 +202,10 @@ class ChangePassword(BaseModel):
     new_password: str
 
 
+class VerificationEmailRequest(BaseModel):
+    email: EmailStr
+
+
 # Shop
 class ShopItemResponse(BaseModel):
     id: int
