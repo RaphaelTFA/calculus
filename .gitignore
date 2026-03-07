@@ -6,4 +6,4 @@ dist
 *.db
 *.log
 *.pyc
-config.py
+.env

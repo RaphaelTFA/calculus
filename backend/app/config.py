@@ -8,14 +8,14 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # Email settings
-    email_sender: str = "calculus.dtthhsgs@gmail.com"
-    email_password: str = "yiae pfyq rniz exvt"  
+    email_sender: str = os.getenv("SENDER_EMAIL")
+    email_password: str = os.getenv("SENDER_PASSWORD") 
 
     # Database (default to local sqlite file)
     database_url: str = "sqlite+aiosqlite:///./calculus.db"
 
     # JWT
-    secret_key: str = "your-secret-key-change-in-production"
+    secret_key: str = os.getenv("JWT_SECRET_KEY")
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
     email_verification_token_expire_minutes: int = 60 * 24  # 24 hours
