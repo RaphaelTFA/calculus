@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
-from pydantic import field_validator
+from pydantic import Field, field_validator
 import os
 
 class Settings(BaseSettings):
@@ -8,17 +8,20 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # Email settings
-    email_sender: str = os.getenv("SENDER_EMAIL")
-    email_password: str = os.getenv("SENDER_PASSWORD") 
+    email_sender: str = Field(alias="SENDER_EMAIL")
+    email_password: str = Field(alias="SENDER_PASSWORD")
 
     # Database (default to local sqlite file)
     database_url: str = "sqlite+aiosqlite:///./calculus.db"
 
     # JWT
-    secret_key: str = os.getenv("JWT_SECRET_KEY")
+    secret_key: str = Field(alias="JWT_SECRET_KEY")
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
     email_verification_token_expire_minutes: int = 60 * 24  # 24 hours
+
+    # Email verification
+    require_email_verification: bool = False
 
     # URLs used in emails
     backend_base_url: str = "http://localhost:8000"

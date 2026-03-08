@@ -64,10 +64,7 @@ def send_html_email(receiver: str, subject: str, html: str):
     msg["Subject"] = subject
     msg.attach(MIMEText(html, "html"))
 
-    with smtplib.SMTP("smtp.gmail.com", 2525) as server:
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
         server.login(sender, password)
         server.send_message(msg)
-
-if __name__ == "__main__":
-    send_html_email("hungna200111@gmail.com", "Test Email", "<h1>Hello from Calculus API!</h1><p>This is a test email.</p>")

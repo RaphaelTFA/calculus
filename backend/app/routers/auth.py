@@ -56,20 +56,21 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
         email=data.email,
         hashed_password=hash_password(data.password),
         display_name=data.display_name or data.username,
-        is_active=False,
+        is_active=not settings.require_email_verification,
     )
     db.add(user)
     await db.commit()
     await db.refresh(user)
 
-    try:
-        await _send_verification_email(user)
-    except Exception as exc:
-        logger.exception("Failed to send verification email for user_id=%s", user.id)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Account created but failed to send verification email. Please try resend verification.",
-        ) from exc
+    if settings.require_email_verification:
+        try:
+            await _send_verification_email(user)
+        except Exception as exc:
+            logger.exception("Failed to send verification email for user_id=%s", user.id)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Account created but failed to send verification email. Please try resend verification.",
+            ) from exc
     
     # Generate token
     token = create_access_token({"sub": str(user.id)})
