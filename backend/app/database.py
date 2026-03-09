@@ -35,14 +35,16 @@ async def init_db():
     from sqlalchemy import text
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        # Add new columns to existing tables (idempotent)
-        _migrations = [
-            "ALTER TABLE users ADD COLUMN hearts INTEGER DEFAULT 5",
-            "ALTER TABLE users ADD COLUMN last_heart_restore_at DATETIME",
-            "ALTER TABLE streak_weeks ADD COLUMN frozen_days JSON",
-        ]
-        for sql in _migrations:
-            try:
+    # Run each migration in its own transaction so a failure (e.g. column already
+    # exists) cannot roll back the create_all above.
+    _migrations = [
+        "ALTER TABLE users ADD COLUMN hearts INTEGER DEFAULT 5",
+        "ALTER TABLE users ADD COLUMN last_heart_restore_at TIMESTAMP",
+        "ALTER TABLE streak_weeks ADD COLUMN frozen_days JSON",
+    ]
+    for sql in _migrations:
+        try:
+            async with engine.begin() as conn:
                 await conn.execute(text(sql))
-            except Exception:
-                pass  # column already exists
+        except Exception:
+            pass  # column already exists
