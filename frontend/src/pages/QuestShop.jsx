@@ -274,7 +274,10 @@ function QuestsPanel() {
   const resetTimer = (type) => {
     if (type === 'daily') {
       const tom = new Date(now); tom.setDate(tom.getDate() + 1); tom.setHours(0,0,0,0)
-      return `${Math.floor((tom - now) / 3600000)}h`
+      const diff = tom - now
+      const h = Math.floor(diff / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      return `${h}h ${m}m`
     }
     if (type === 'weekly') {
       const dow = now.getDay()
@@ -308,7 +311,15 @@ function QuestsPanel() {
             <div key={section.key} className="rounded-2xl border border-border bg-card overflow-hidden">
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4">
-                <h2 className="font-bold text-lg text-foreground">{section.title}</h2>
+                <div>
+                  <h2 className="font-bold text-lg text-foreground">{section.title}</h2>
+                  {resetTimer(section.key) && (
+                    <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                      <span className="inline-block w-3.5 h-3.5 flex-shrink-0"><IcoTimer /></span>
+                      <span>Time remaining: {resetTimer(section.key)}</span>
+                    </p>
+                  )}
+                </div>
                 <button
                   disabled={claimableInSection.length === 0 || claimingAll}
                   onClick={handleClaimAll}
@@ -362,9 +373,6 @@ function ShopItemCard({ item, owned, canAfford, buying, onBuy, isLast }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="font-bold text-lg text-foreground leading-tight">{item.name}</p>
-          {owned > 0 && (
-            <span className="text-sm font-extrabold text-[#58CC02]">×{owned}</span>
-          )}
         </div>
         {item.description && (
           <p className="text-base text-muted-foreground leading-snug mt-1 line-clamp-2">{item.description}</p>
