@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { MathText } from './MathText'
+import { buildSamplePoints, createExpressionFn, evaluateExpression } from './interactionMath'
+import { setupCanvas } from './interactionCommon'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -36,20 +38,16 @@ function recompute(interaction, state) {
   const { function: fnExpr, derivative: dfExpr, domain, anchor } = interaction.systemSpec
   const resolution = state.resolution
 
-  const mathHelpers = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
-  const f = interaction.systemSpec._f || new Function("x", `${mathHelpers} return ${fnExpr}`)
-  const df = interaction.systemSpec._df || new Function("x", `${mathHelpers} return ${dfExpr}`)
-
-  const graph = []
-  const dxGraph = (domain[1] - domain[0]) / 300
-  for (let x = domain[0]; x <= domain[1]; x += dxGraph) {
-    graph.push({ x, y: f(x) })
-  }
+  const f = interaction.systemSpec._f || createExpressionFn(fnExpr, ['x'])
+  const df = interaction.systemSpec._df || createExpressionFn(dfExpr, ['x'])
 
   const h = 1 / resolution
+  const graph = buildSamplePoints(f, domain, 300, [anchor, anchor + h])
   const y0 = f(anchor)
   // Forward difference — converges as h→0
-  const approxSlope = (f(anchor + h) - y0) / h
+    const MIN_H = 1e-9
+    const hh = Math.max(MIN_H, h)
+    const approxSlope = (f(anchor + hh) - y0) / hh
   const trueSlope = df(anchor)
   const error = Math.abs(approxSlope - trueSlope)
 
@@ -59,7 +57,7 @@ function recompute(interaction, state) {
       graph, anchor, y0, h, approxSlope, trueSlope, error,
       secant: {
         p1: { x: anchor, y: y0 },
-        p2: { x: anchor + h, y: f(anchor + h) }
+          p2: { x: anchor + hh, y: f(anchor + hh) }
       }
     }
   }
@@ -71,14 +69,9 @@ function recomputeRiemann(interaction, state) {
   const { function: fnExpr, integral, sumType, domain } = interaction.systemSpec
   const n = state.resolution
 
-  const mathHelpers = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
-  const f = interaction.systemSpec._f || new Function("x", `${mathHelpers} return ${fnExpr}`)
+  const f = interaction.systemSpec._f || createExpressionFn(fnExpr, ['x'])
 
-  const graph = []
-  const dxGraph = (domain[1] - domain[0]) / 300
-  for (let x = domain[0]; x <= domain[1]; x += dxGraph) {
-    graph.push({ x, y: f(x) })
-  }
+  const graph = buildSamplePoints(f, domain, 300)
 
   const dx = (domain[1] - domain[0]) / n
   let sum = 0
@@ -157,12 +150,14 @@ function renderCanvasRiemann(systemState, interaction, ctx, canvas) {
   // Function curve on top
   ctx.strokeStyle = '#374151'
   ctx.lineWidth = 2.5
-  ctx.beginPath()
-  systemState.graph.forEach((pt, i) => {
-    const px = mapX(pt.x); const py = mapY(pt.y)
-    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
-  })
-  ctx.stroke()
+    ctx.beginPath()
+    let started2 = false
+    for (const pt of systemState.graph) {
+      if (!Number.isFinite(pt.y)) continue
+      const px = mapX(pt.x); const py = mapY(pt.y)
+      if (!started2) { ctx.moveTo(px, py); started2 = true } else ctx.lineTo(px, py)
+    }
+    ctx.stroke()
 
   // Sample points on rectangles
   if (rectangles.length <= 64) {
@@ -181,9 +176,9 @@ function renderCanvas(systemState, interaction, ctx, canvas) {
   const w = canvas.clientWidth
   const h = canvas.clientHeight
 
-  // ── Dynamic camera padding ──────────────────────────────────────────
-  const padX = (rawDomain[1] - rawDomain[0]) * 0.15
-  const padY = (rawRange[1] - rawRange[0]) * 0.20
+  // ── Dynamic camera padding (reduced to keep origin placement stable)
+  const padX = (rawDomain[1] - rawDomain[0]) * 0.08
+  const padY = (rawRange[1] - rawRange[0]) * 0.12
   const domain = [rawDomain[0] - padX, rawDomain[1] + padX]
   const range = [rawRange[0] - padY, rawRange[1] + padY]
 
@@ -192,9 +187,10 @@ function renderCanvas(systemState, interaction, ctx, canvas) {
   const anchorY = systemState.y0
   const domainMid = (domain[0] + domain[1]) / 2
   const rangeMid = (range[0] + range[1]) / 2
-  // Bias 40% toward anchor (subtle, avoids jarring jump)
-  const biasX = (anchorX - domainMid) * 0.4
-  const biasY = (anchorY - rangeMid) * 0.4
+  // Bias toward anchor (kept small to avoid large shifts)
+  const biasFactor = 0
+  const biasX = (anchorX - domainMid) * biasFactor
+  const biasY = (anchorY - rangeMid) * biasFactor
   domain[0] += biasX; domain[1] += biasX
   range[0] += biasY; range[1] += biasY
 
@@ -225,10 +221,13 @@ function renderCanvas(systemState, interaction, ctx, canvas) {
   ctx.strokeStyle = '#374151'
   ctx.lineWidth = 2.5
   ctx.beginPath()
-  systemState.graph.forEach((pt, i) => {
+  // draw only finite points; find first valid point to moveTo
+  let started = false
+  for (const pt of systemState.graph) {
+    if (!Number.isFinite(pt.y)) continue
     const px = mapX(pt.x); const py = mapY(pt.y)
-    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
-  })
+    if (!started) { ctx.moveTo(px, py); started = true } else ctx.lineTo(px, py)
+  }
   ctx.stroke()
 
   // Tangent line — red, extended across full canvas
@@ -277,7 +276,7 @@ function evalCondition(trigger, state) {
   if (typeof trigger.condition === 'function') return trigger.condition(state)
   if (typeof trigger.condition === 'string') {
     try {
-      return new Function('state', `"use strict"; return (${trigger.condition});`)(state)
+      return evaluateExpression(trigger.condition, { state })
     } catch { return false }
   }
   if (trigger.conditionSpec) {
@@ -310,11 +309,10 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
   const canvasRef = useRef(null)
 
   const { f, df } = useMemo(() => {
-    const mh = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
     return {
-      f: new Function("x", `${mh} return ${LESSON.systemSpec.function}`),
+      f: createExpressionFn(LESSON.systemSpec.function, ['x']),
       df: !isRiemann && LESSON.systemSpec.derivative
-        ? new Function("x", `${mh} return ${LESSON.systemSpec.derivative}`)
+        ? createExpressionFn(LESSON.systemSpec.derivative, ['x'])
         : () => 0
     }
   }, [LESSON, isRiemann])
@@ -341,12 +339,8 @@ export default function InteractionTypeA({ lesson: lessonProp }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    const dpr = window.devicePixelRatio || 1
-    const rect = canvas.getBoundingClientRect()
-    if (!rect.width || !rect.height) return
-    canvas.width = rect.width * dpr
-    canvas.height = rect.height * dpr
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    const { cssW, cssH } = setupCanvas(canvas)
+    if (!cssW || !cssH) return
     const sys = (result || computationResult).systemState
     const inter2 = inter || interaction
     if (isRiemann) renderCanvasRiemann(sys, inter2, ctx, canvas)

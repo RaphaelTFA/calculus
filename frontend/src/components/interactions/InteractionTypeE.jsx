@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { MathText } from './MathText'
+import { buildSamplePoints, createExpressionFn, evaluateExpression } from './interactionMath'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -25,18 +26,6 @@ const DEFAULT_LESSON = {
     "splitSpec": { "type": "domainSplit" },
     "viewBox": { "xMin": 0, "xMax": 4.5, "yMin": 0, "yMax": 18 }
   }
-}
-
-// ─── MATH UTILITIES ──────────────────────────────────────────────────────────
-
-function evalExpr(expr, scope) {
-  const fn = new Function(...Object.keys(scope), `"use strict"; return (${expr});`)
-  return fn(...Object.values(scope))
-}
-
-const MATH_HELPERS = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
-function makeFn(expr) {
-  return new Function("x", `${MATH_HELPERS} return ${expr}`)
 }
 
 function integrate(f, a, b, n = 300) {
@@ -75,7 +64,7 @@ function buildBaseGeometry(spec, scope) {
   switch (spec.type) {
     case "rectangle": {
       const origin = spec.origin || [0, 0]
-      return { type: "rectangle", x: origin[0], y: origin[1], width: evalExpr(String(spec.width), scope), height: evalExpr(String(spec.height), scope) }
+      return { type: "rectangle", x: origin[0], y: origin[1], width: evaluateExpression(String(spec.width), scope), height: evaluateExpression(String(spec.height), scope) }
     }
     case "areaUnderCurve":
       return { type: "areaUnderCurve", functionSpec: spec.function, domain: spec.domain }
@@ -108,8 +97,8 @@ function applySplit(splitSpec, base, structure, scope) {
       ]
     }
     case "signPartition": {
-      const f = makeFn(base.f)
-      const g = makeFn(base.g)
+      const f = createExpressionFn(base.f, ['x'])
+      const g = createExpressionFn(base.g, ['x'])
       const h = x => f(x) - g(x)
       const [a, b] = base.domain
       const roots = detectRoots(h, a, b)
@@ -132,12 +121,12 @@ function measure(geom) {
   switch (geom.type) {
     case "rectangle": return geom.width * geom.height
     case "areaUnderCurve": {
-      const f = makeFn(geom.functionSpec)
+      const f = createExpressionFn(geom.functionSpec, ['x'])
       return integrate(f, geom.domain[0], geom.domain[1])
     }
     case "regionBetweenCurves": {
-      const f = makeFn(geom.f)
-      const g = makeFn(geom.g)
+      const f = createExpressionFn(geom.f, ['x'])
+      const g = createExpressionFn(geom.g, ['x'])
       return Math.abs(integrate(x => f(x) - g(x), geom.domain[0], geom.domain[1]))
     }
     default: return 0
@@ -146,7 +135,7 @@ function measure(geom) {
 
 function recompute(lesson, state) {
   const scope = lesson.systemSpec.baseValues || {}
-  const TOTAL = evalExpr(lesson.systemSpec.conservedObject.expression, scope)
+  const TOTAL = evaluateExpression(lesson.systemSpec.conservedObject.expression, scope)
   const base = buildBaseGeometry(lesson.representationSpec.geometryBase, scope)
   const parts = applySplit(lesson.representationSpec.splitSpec, base, state.structure, scope)
 
@@ -182,43 +171,31 @@ const COLORS = {
 }
 
 function buildCurvePath(fnSpec, domain, mapX, mapY, steps = 300) {
-  const f = makeFn(fnSpec)
-  const [a, b] = domain
-  const dx = (b - a) / steps
+  const f = createExpressionFn(fnSpec, ['x'])
   let d = ""
-  for (let i = 0; i <= steps; i++) {
-    const x = a + i * dx
-    const y = f(x)
+    const points = buildSamplePoints(f, domain, steps, [domain[0], domain[1]])
+  points.forEach((pt, i) => {
+    const { x, y } = pt
     d += i === 0 ? `M ${mapX(x)} ${mapY(y)}` : ` L ${mapX(x)} ${mapY(y)}`
-  }
+  })
   return d
 }
 
 function buildAreaPath(geom, mapX, mapY, steps = 300) {
   if (geom.type === "areaUnderCurve") {
-    const f = makeFn(geom.functionSpec)
+    const f = createExpressionFn(geom.functionSpec, ['x'])
     const [a, b] = geom.domain
     if (a >= b) return ""
-    const dx = (b - a) / steps
-    let pts = []
-    for (let i = 0; i <= steps; i++) {
-      const x = a + i * dx
-      pts.push(`${mapX(x)},${mapY(f(x))}`)
-    }
+    const pts = buildSamplePoints(f, geom.domain, steps, [a, b]).map(pt => `${mapX(pt.x)},${mapY(pt.y)}`)
     return `M ${mapX(a)},${mapY(0)} L ${pts.join(" L ")} L ${mapX(b)},${mapY(0)} Z`
   }
   if (geom.type === "regionBetweenCurves") {
-    const f = makeFn(geom.f)
-    const g = makeFn(geom.g)
+    const f = createExpressionFn(geom.f, ['x'])
+    const g = createExpressionFn(geom.g, ['x'])
     const [a, b] = geom.domain
-    const dx = (b - a) / steps
-    const top = [], bot = []
-    for (let i = 0; i <= steps; i++) {
-      const x = a + i * dx
-      top.push(`${mapX(x)},${mapY(f(x))}`)
-      bot.push(`${mapX(x)},${mapY(g(x))}`)
-    }
-    return `M ${top[0]} L ${top.join(" L ")} L ${bot[steps]} L ${bot.slice().reverse().join(" L ")} Z`
+    const top = buildSamplePoints(f, geom.domain, steps, [a, b]).map(pt => `${mapX(pt.x)},${mapY(pt.y)}`)
+    const bot = buildSamplePoints(g, geom.domain, steps, [a, b]).map(pt => `${mapX(pt.x)},${mapY(pt.y)}`)
+    return `M ${top[0]} L ${top.join(" L ")} L ${bot[bot.length - 1]} L ${bot.slice().reverse().join(" L ")} Z`
   }
   if (geom.type === "rectangle") {
     const { x, y, width, height } = geom
@@ -562,10 +539,12 @@ function GraphView({ lesson, structure, system, onStructureChange }) {
 function MetricCard({ label, value, color, textColor, isTotal }) {
   return (
     <div style={{
-      background: '#f8f9fa',
-      borderRadius: 6,
-      padding: '8px 10px',
-      borderLeft: `3px solid ${isTotal ? '#475569' : textColor}`,
+      background: 'rgba(255,255,255,0.96)',
+      borderRadius: 12,
+      padding: '10px 12px',
+      border: '1px solid #e2e8f0',
+      borderLeft: `4px solid ${isTotal ? '#475569' : textColor}`,
+      boxShadow: '0 2px 10px rgba(15, 23, 42, 0.05)',
     }}>
       <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>
         {label}
@@ -630,6 +609,9 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
       overflow: 'hidden',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       userSelect: 'none',
+      background: 'linear-gradient(180deg, #f8fbff 0%, #ffffff 100%)',
+      padding: '10px',
+      boxSizing: 'border-box',
     }}>
 
       {/* Main content: graph (left) + info panel (right) */}
@@ -657,11 +639,11 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
           <div style={{
             flex: 1,
             minHeight: 0,
-            background: '#fff',
-            border: '1.5px solid #e2e8f0',
-            borderRadius: 16,
-            padding: '8px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            background: 'rgba(255,255,255,0.96)',
+            border: '1px solid #dbe4f0',
+            borderRadius: 20,
+            padding: '10px',
+            boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)',
             overflow: 'hidden',
           }}>
             <GraphView lesson={lesson} structure={structure} system={system} onStructureChange={setStructure} />
@@ -739,10 +721,11 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
           {/* Current value readout */}
           {splitType === "domainSplit" && (
             <div style={{
-              background: '#f8f9fa',
-              borderRadius: 6,
-              padding: '8px 10px',
-              borderLeft: `3px solid ${COLORS.splitLine}`,
+              background: 'rgba(248, 250, 252, 0.96)',
+              borderRadius: 12,
+              padding: '10px 12px',
+              border: '1px solid #e2e8f0',
+              borderLeft: `4px solid ${COLORS.splitLine}`,
             }}>
               <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>
                 {paramSpec.label || "Điểm chia"}
@@ -758,10 +741,10 @@ export default function InteractionTypeE({ lesson: lessonProp }) {
 
           {/* Reflection card */}
           <div style={{
-            padding: '8px 10px',
-            borderRadius: 6,
-            background: message ? '#fffbeb' : '#f8f9fa',
-            border: '1px solid ' + (message ? '#fde68a' : '#e5e7eb'),
+            padding: '10px 12px',
+            borderRadius: 12,
+            background: message ? '#fff7ed' : 'rgba(248, 250, 252, 0.96)',
+            border: '1px solid ' + (message ? '#fcd34d' : '#e5e7eb'),
             fontSize: 13,
             lineHeight: 1.5,
             color: message ? '#78350f' : '#9ca3af',

@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { MathText } from './MathText'
+import { createExpressionFn } from './interactionMath'
+import { COLORS, createMapFns, fmtNum, niceStep, setupCanvas } from './interactionCommon'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -9,7 +11,7 @@ const DEFAULT_LESSON = {
     time: { start: 0, end: 2 * Math.PI, step: 0.02 }
   },
   systemSpec: {
-    initialState: { x: 0, y: -1 },
+    initialState: { x: 0, y: 0 },
     evolutionRule: {
       type: "expression",
       expression: "[cos(t), sin(t)]",
@@ -27,24 +29,10 @@ const DEFAULT_LESSON = {
   }
 }
 
-// ─── DSL EVALUATOR ───────────────────────────────────────────────────────────
-
-const ALLOWED_FNS = {
-  sin: Math.sin, cos: Math.cos, abs: Math.abs,
-  sqrt: Math.sqrt, log: Math.log, exp: Math.exp,
-  pow: Math.pow, sign: Math.sign
-}
-
 function createEvaluator(model) {
   const expr = model.expression.replace(/\^/g, "**")
-  return function (scope) {
-    const fn = new Function(
-      ...Object.keys(ALLOWED_FNS),
-      ...Object.keys(scope),
-      `"use strict"; return (${expr});`
-    )
-    return fn(...Object.values(ALLOWED_FNS), ...Object.values(scope))
-  }
+  const fn = createExpressionFn(expr, ['t', 'x', 'y'])
+  return scope => fn(scope.t, scope.x, scope.y)
 }
 
 // ─── PURE LOGIC ──────────────────────────────────────────────────────────────
@@ -54,10 +42,24 @@ function computeFullTrace(interaction) {
   const { start, end, step } = interaction.parameterSpec.time
   let position = { ...interaction.systemSpec.initialState }
   const trace = []
+  // include the initial state as the first sample so the trace starts exactly at initialState
+  try {
+    const initVy = evaluator({ t: start, x: position.x, y: position.y })[1]
+    trace.push({ x: position.x, y: position.y, vy: initVy })
+  } catch (e) {
+    trace.push({ x: position.x, y: position.y, vy: 0 })
+  }
   for (let tau = start; tau <= end; tau += step) {
+    const dt = Math.min(step, end - tau)
+    if (dt <= 0) break
     const [vx, vy] = evaluator({ t: tau, x: position.x, y: position.y })
-    position = { x: position.x + vx * step, y: position.y + vy * step }
-    trace.push({ x: position.x, y: position.y, vy })
+    const midPosition = {
+      x: position.x + vx * dt / 2,
+      y: position.y + vy * dt / 2
+    }
+    const [midVx, midVy] = evaluator({ t: tau + dt / 2, x: midPosition.x, y: midPosition.y })
+    position = { x: position.x + midVx * dt, y: position.y + midVy * dt }
+    trace.push({ x: position.x, y: position.y, vy: midVy })
   }
   return trace
 }
@@ -70,11 +72,27 @@ function recompute(interaction, state) {
   const trace = []
   let lastVy = 0
 
+  // include initial state so the recomputed trace begins at the true initial point
+  try {
+    const initVy = evaluator({ t: start, x: position.x, y: position.y })[1]
+    trace.push({ x: position.x, y: position.y, vy: initVy })
+    lastVy = initVy
+  } catch (e) {
+    trace.push({ x: position.x, y: position.y, vy: 0 })
+  }
+
   for (let tau = start; tau <= state.t; tau += step) {
+    const dt = Math.min(step, state.t - tau)
+    if (dt <= 0) break
     const [vx, vy] = evaluator({ t: tau, x: position.x, y: position.y })
-    position = { x: position.x + vx * step, y: position.y + vy * step }
-    lastVy = vy
-    trace.push({ x: position.x, y: position.y, vy })
+    const midPosition = {
+      x: position.x + vx * dt / 2,
+      y: position.y + vy * dt / 2
+    }
+    const [midVx, midVy] = evaluator({ t: tau + dt / 2, x: midPosition.x, y: midPosition.y })
+    position = { x: position.x + midVx * dt, y: position.y + midVy * dt }
+    lastVy = midVy
+    trace.push({ x: position.x, y: position.y, vy: midVy })
   }
 
   return { position, trace, velocity: lastVy }
@@ -91,42 +109,13 @@ function evaluateReflections(interaction, state) {
 
 // ─── CANVAS RENDERER ─────────────────────────────────────────────────────────
 
-const COLORS = {
-  rising: '#059669',
-  falling: '#dc2626',
-  neutral: '#6366f1',
-  preview: '#d1d5db',
-  tangent: '#f59e0b',
-  grid: '#f1f5f9',
-  axis: '#64748b',
-  bg: '#ffffff',
-  point: '#1e40af',
-  areaPos: 'rgba(5, 150, 105, 0.12)',
-  areaNeg: 'rgba(220, 38, 38, 0.12)',
-}
-
 function renderCanvas(ctx, canvas, vb, fullTrace, currentTrace, position, velocity, repSpec) {
-  const rect = canvas.getBoundingClientRect()
-  const dpr = window.devicePixelRatio || 1
-  const cssW = Math.max(1, rect.width)
-  const cssH = Math.max(1, rect.height)
-  const pxW = Math.round(cssW * dpr)
-  const pxH = Math.round(cssH * dpr)
-  if (canvas.width !== pxW || canvas.height !== pxH) {
-    canvas.width = pxW
-    canvas.height = pxH
-  }
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  const { cssW, cssH } = setupCanvas(canvas)
   ctx.clearRect(0, 0, cssW, cssH)
   ctx.fillStyle = COLORS.bg
   ctx.fillRect(0, 0, cssW, cssH)
 
-  const pad = { top: 16, right: 16, bottom: 32, left: 40 }
-  const w = cssW - pad.left - pad.right
-  const h = cssH - pad.top - pad.bottom
-
-  const mapX = x => pad.left + (x - vb.xMin) / (vb.xMax - vb.xMin) * w
-  const mapY = y => pad.top + h - (y - vb.yMin) / (vb.yMax - vb.yMin) * h
+  const { pad, w, h, mapX, mapY } = createMapFns(vb, cssW, cssH)
 
   // ── Grid ──
   ctx.save()
@@ -210,7 +199,7 @@ function renderCanvas(ctx, canvas, vb, fullTrace, currentTrace, position, veloci
   }
 
   // ── Area fill under current trace (optional) ──
-  if (repSpec.showArea && currentTrace.length > 1) {
+if (repSpec.showArea && currentTrace.length > 1) {
     let i = 0
     while (i < currentTrace.length - 1) {
       const isPos = currentTrace[i].y >= 0
@@ -305,21 +294,6 @@ function renderCanvas(ctx, canvas, vb, fullTrace, currentTrace, position, veloci
     ctx.stroke()
     ctx.restore()
   }
-}
-
-function niceStep(range) {
-  const rough = range / 5
-  const mag = Math.pow(10, Math.floor(Math.log10(rough)))
-  const norm = rough / mag
-  if (norm < 1.5) return mag
-  if (norm < 3.5) return 2 * mag
-  if (norm < 7.5) return 5 * mag
-  return 10 * mag
-}
-
-function fmtNum(n) {
-  if (Number.isInteger(n)) return String(n)
-  return n.toFixed(1)
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────

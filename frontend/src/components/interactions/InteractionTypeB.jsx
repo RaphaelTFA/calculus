@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { MathText } from './MathText'
+import { buildSamplePoints, createExpressionFn, evaluateExpression } from './interactionMath'
+import { setupCanvas } from './interactionCommon'
 
 // ─── DEFAULT LESSON CONFIG ───────────────────────────────────────────────────
 
@@ -9,7 +11,7 @@ const DEFAULT_LESSON = {
   system: {
     resolution: 200,
     view: { xMin: -4, xMax: 4, yMin: -10, yMax: 10 },
-    model: "Math.pow(x, 4) - (p * Math.pow(x, 2))"
+    model: "pow(x, 4) - (p * pow(x, 2))"
   },
   reflections: [
     {
@@ -32,16 +34,6 @@ const DEFAULT_LESSON = {
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
-const MATH_HELPERS_STR = 'const {abs,pow,sin,cos,tan,sqrt,log,exp,floor,ceil,round,PI,E,min,max,sign} = Math;'
-
-function makeEval(expr) {
-  return new Function('x', 'p', `${MATH_HELPERS_STR} return ${expr}`)
-}
-
-function makeEvalP(expr) {
-  return new Function('p', `${MATH_HELPERS_STR} return ${expr}`)
-}
-
 /**
  * Interpolate dynamic values in reflection text.
  * {p}           → current parameter value (2 decimals)
@@ -53,7 +45,7 @@ function interpolateText(text, p) {
     .replace(/\{p\}/g, Number.isFinite(p) ? p.toFixed(2) : String(p))
     .replace(/\{eval:([^}]+)\}/g, (_, expr) => {
       try {
-        const val = makeEvalP(expr)(p)
+        const val = createExpressionFn(expr, ['p'])(p)
         return Number.isFinite(val) ? val.toFixed(2) : '\u2204'
       } catch { return '?' }
     })
@@ -63,7 +55,20 @@ function interpolateText(text, p) {
 
 function recomputeSystem(config, p) {
   const { resolution, view } = config.system
-  const dx = (view.xMax - view.xMin) / (resolution - 1)
+  const focusXs = []
+
+  if (config.system.approachPoint) focusXs.push(Number(config.system.approachPoint.x))
+  if (config.system.trackerDot) focusXs.push(p)
+  if (config.system.shading) {
+    const sh = config.system.shading
+    focusXs.push(sh.from === 'p' ? p : Number(sh.from))
+    focusXs.push(sh.to === 'p' ? p : Number(sh.to))
+  }
+  if (config.system.annotations) {
+    config.system.annotations.forEach(ann => {
+      if (ann.type === 'limitValue') focusXs.push(Number(ann.at))
+    })
+  }
 
   /* ── Build curves ──────────────────────────────────────────────────────── */
   let curvesData = []
@@ -71,14 +76,8 @@ function recomputeSystem(config, p) {
   if (config.system.curves && config.system.curves.length > 0) {
     // ── Extended multi-curve mode ──────────────────────────────────────────
     curvesData = config.system.curves.map(curve => {
-      const fn = makeEval(curve.expr)
-      const pts = []
-      for (let i = 0; i < resolution; i++) {
-        const x = view.xMin + i * dx
-        let y = 0
-        try { y = fn(x, p) } catch { y = 0 }
-        pts.push({ x, y })
-      }
+      const fn = createExpressionFn(curve.expr, ['x', 'p'])
+      const pts = buildSamplePoints(x => fn(x, p), [view.xMin, view.xMax], resolution, focusXs)
       return {
         points: pts,
         color: curve.color || '#3498db',
@@ -90,26 +89,14 @@ function recomputeSystem(config, p) {
     })
   } else {
     // ── Legacy single-model mode ───────────────────────────────────────────
-    const formula = makeEval(config.system.model)
-    const mainPts = []
-    for (let i = 0; i < resolution; i++) {
-      const x = view.xMin + i * dx
-      let y = 0
-      try { y = formula(x, p) } catch { y = 0 }
-      mainPts.push({ x, y })
-    }
+    const formula = createExpressionFn(config.system.model, ['x', 'p'])
+    const mainPts = buildSamplePoints(x => formula(x, p), [view.xMin, view.xMax], resolution, focusXs)
 
     // Legacy refCurves (behind main)
     if (config.system.refCurves && config.system.refCurves.length > 0) {
       config.system.refCurves.forEach(rc => {
-        const fn = makeEval(rc.expr)
-        const pts = []
-        for (let i = 0; i < resolution; i++) {
-          const x = view.xMin + i * dx
-          let y = 0
-          try { y = fn(x, p) } catch { y = 0 }
-          pts.push({ x, y })
-        }
+        const fn = createExpressionFn(rc.expr, ['x', 'p'])
+        const pts = buildSamplePoints(x => fn(x, p), [view.xMin, view.xMax], resolution, focusXs)
         curvesData.push({
           points: pts,
           color: rc.color || '#999',
@@ -152,7 +139,7 @@ function recomputeSystem(config, p) {
   if (config.system.annotations) {
     annotationsData = config.system.annotations.map(ann => {
       if (ann.type === 'limitValue') {
-        const fn = makeEval(ann.expr)
+        const fn = createExpressionFn(ann.expr, ['x', 'p'])
         let value = 0
         try { value = fn(ann.at, p) } catch { value = NaN }
         const display = Number.isFinite(value) ? value.toFixed(2) : '\u2204'
@@ -163,7 +150,7 @@ function recomputeSystem(config, p) {
         }
       }
       if (ann.type === 'horizontalLine') {
-        const fn = makeEvalP(ann.expr)
+        const fn = createExpressionFn(ann.expr, ['p'])
         let value = 0
         try { value = fn(p) } catch { value = 0 }
         return { ...ann, computedValue: value }
@@ -240,7 +227,7 @@ function recomputeSystem(config, p) {
     const hx = config.system.hole.x
     const fn = curvesData.length > 0
       ? curvesData[curvesData.length - 1]._fn
-      : makeEval(config.system.model)
+      : createExpressionFn(config.system.model, ['x', 'p'])
     let hy = 0
     try { hy = fn(hx, p) } catch { hy = 0 }
     markers.hole = { x: hx, y: hy }
@@ -545,9 +532,8 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
     const handleResize = () => {
       const canvas = canvasRef.current
       if (!canvas) return
-      const parent = canvas.parentElement
-      canvas.width = parent.clientWidth * window.devicePixelRatio
-      canvas.height = parent.clientHeight * window.devicePixelRatio
+      const { cssW, cssH } = setupCanvas(canvas)
+      if (!cssW || !cssH) return
       renderCanvas(canvas, recomputeSystem(config, valueRef.current))
     }
 
@@ -577,7 +563,7 @@ export default function InteractionTypeB({ lesson: lessonProp }) {
         triggered = ref.trigger(state)
       } else if (typeof ref.trigger === 'string') {
         try {
-          triggered = new Function('state', `"use strict"; return (${ref.trigger});`)(state)
+          triggered = evaluateExpression(ref.trigger, { state })
         } catch { triggered = false }
       } else if (ref.triggerSpec) {
         const { field, op, value } = ref.triggerSpec

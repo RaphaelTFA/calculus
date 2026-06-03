@@ -33,14 +33,14 @@
                                 },
                                 "curves": [
                                     {
-                                        "expr": "4*Math.sqrt(x)",
+                                        "expr": "4*sqrt(x)",
                                         "label": "Quãng đường thực tế",
                                         "color": "#3b82f6",
                                         "style": "solid",
                                         "width": 2
                                     },
                                     {
-                                        "expr": "4/Math.sqrt(p)*x",
+                                        "expr": "4/sqrt(p)*x",
                                         "label": "Nếu đi đều (tốc độ trung bình)",
                                         "color": "#ef4444",
                                         "style": "dashed",
@@ -54,7 +54,7 @@
                                 "annotations": [
                                     {
                                         "type": "limitValue",
-                                        "expr": "4/Math.sqrt(p)",
+                                        "expr": "4/sqrt(p)",
                                         "at": "p",
                                         "label": "Tốc độ trung bình = {value} m/s",
                                         "color": "#ef4444"
