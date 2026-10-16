@@ -1,12 +1,7 @@
 # 📐 Calculus - Interactive Math Learning Platform
 
 <p align="center">
-  <strong>Learn Math like playing a game! 🎮📚</strong>
-</p>
-
-<p align="center">
-  An interactive EdTech platform inspired by Brilliant.org & Duolingo<br>
-  designed specifically for Calculus learners.
+  <strong>Learn Math like playing a game!</strong>
 </p>
 
 ---
